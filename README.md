@@ -17,18 +17,13 @@ main, develop, feat 브랜치로 나누어 개발
 
 `develop 브랜치`는 개발 단계에서 git-flow의 master 역할을 하는 브랜치
 
-`feature 브랜치`는 기능 단위로 독립적인 개발 환경을 위하여 사용하고 merge 후 각 브랜치 삭제
+`feature 브랜치`는 기능 단위로 독립적인 개발 환경을 위하여 사용
 <br>
 <br>
 
-## Feature branch
-브랜치명은 아래의 형식으로 작성 (feature/이름-기능제목#이슈번호)
 
-팀원 sheepyis의 브랜치명: feature/sheepyis-login#1
-
-Feature branch -> develop branch로 merge하기 전 PR에서 reviewers 설정하여 팀원 2명 이상에게 approve 받기
-
-PR 후 팀원들에게 공지하기
+## PR 후 팀원들에게 공지하기!
+issue template, PR template에 맞게 작성하기
 <br>
 <br>
 
