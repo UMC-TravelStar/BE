@@ -1,6 +1,7 @@
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
-
+require("dotenv").config();
+const sever_ip = process.env.IP;
 const options = {
   swaggerDefinition: {
     openapi: "3.0.0",
@@ -11,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:4000", // 요청 URL
+        url: `${sever_ip}`, // 요청 URL
       },
     ],
   },
@@ -21,4 +22,3 @@ const options = {
 const specs = swaggerJsDoc(options);
 
 module.exports = { swaggerUi, specs };
-  
