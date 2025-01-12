@@ -1,13 +1,16 @@
 const express = require("express");
-const { PrismaClient } = require("@prisma/client");
 const app = express();
 const port = 4000;
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const prisma = new PrismaClient();
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
+const {
+  handleUserSignUp,
+  handleUserLogin,
+  handleUserLogout,
+} = require("./controllers/user.controller.js");
+const sever_ip = process.env.IP;
 
 const options = {
   swaggerDefinition: {
@@ -19,11 +22,11 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:4000", // 요청 URL
+        url: `${sever_ip}`, // 요청 URL
       },
     ],
   },
-  apis: ["./index.js"], // Swagger 파일 경로
+  apis: ["./src/index.js", "./src/controllers/*.js"], // Swagger 파일 경로
 };
 
 const specs = swaggerJsDoc(options);
@@ -34,7 +37,7 @@ app.listen(port, () => {
 
 app.use(
   cors({
-    origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
+    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
     credentials: true, // 쿠키를 포함한 요청 허용
   })
 );
@@ -43,80 +46,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-// 회원가입
-app.post("/register", async (req, res) => {
-  const { user_id, nickname, password, name, birth, phonenum, email } = req.body;
+//유저관리
+app.post("/register", handleUserSignUp);
 
-  try {
-    const newUser = await prisma.user.create({
-      data: {
-        user_id, // Primary Key
-        nickname: nickname || null,
-        password, // 암호화 없이 저장
-        name: name || null,
-        birth: birth ? new Date(birth) : null, // Date로 변환
-        phonenum: phonenum || null,
-        email: email || null,
-      },
-    });
+app.post("/login", handleUserLogin);
 
-    res.status(201).json({
-      message: "회원가입 성공",
-      user: {
-        user_id: newUser.user_id,
-        nickname: newUser.nickname,
-        email: newUser.email,
-      },
-    });
-  } catch (error) {
-    console.error("회원가입 에러:", error);
-    res.status(400).json({
-      message: "회원가입 실패",
-      error: error.message,
-    });
-  }
-});
-
-// 로그인
-app.post("/login", (req, res) => {
-  const { id, pw } = req.body;
-  const secretKey = process.env.JWT_SECRET;
-
-  const token = jwt.sign({ id, pw }, secretKey, {
-    expiresIn: "10h",
-  });
-
-  res.cookie("authToken", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "Lax",
-    maxAge: 1000 * 60 * 60 * 10,
-  });
-
-  res.status(200).json({
-    message: "로그인 성공!",
-    token,
-  });
-});
-
-// 로그아웃
-app.get("/logout", (req, res) => {
-  res.clearCookie("authToken", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "Lax",
-    path: "/",
-  });
-
-  res.status(200).json({
-    message: "로그아웃 성공! 쿠키가 삭제되었습니다.",
-  });
-});
+app.get("/logout", handleUserLogout);
 
 // 로그인 API
 /**
  * @swagger
- * /login:
+ * prod/login:
  *   post:
  *     summary: 로그인
  *     description: 사용자가 로그인합니다.
@@ -152,7 +92,7 @@ app.get("/logout", (req, res) => {
 // 회원가입 API
 /**
  * @swagger
- * /register:
+ * prod/register:
  *   post:
  *     summary: 회원가입
  *     description: 사용자를 등록합니다.
@@ -358,7 +298,6 @@ app.get("/logout", (req, res) => {
  *       404:
  *         description: 게시글이 없어요. 작성해주세요!
  */
-
 
 // 게시글 작성 API
 /**
