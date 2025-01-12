@@ -56,7 +56,7 @@ app.get("/logout", handleUserLogout);
 // 로그인 API
 /**
  * @swagger
- * /login:
+ * prod/login:
  *   post:
  *     summary: 로그인
  *     description: 사용자가 로그인합니다.
@@ -92,7 +92,7 @@ app.get("/logout", handleUserLogout);
 // 회원가입 API
 /**
  * @swagger
- * /register:
+ * prod/register:
  *   post:
  *     summary: 회원가입
  *     description: 사용자를 등록합니다.
