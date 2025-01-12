@@ -1,3 +1,5 @@
+import { handleAddPost } from "./controllers/post.controller.js";
+
 const express = require("express");
 const app = express();
 const port = 4000;
@@ -299,6 +301,11 @@ app.get("/logout", handleUserLogout);
  *         description: 게시글이 없어요. 작성해주세요!
  */
 
+<<<<<<< Updated upstream
+=======
+app.post("/api/v1/users/{user_id}/posts", handleAddPost);
+
+>>>>>>> Stashed changes
 // 게시글 작성 API
 /**
  * @swagger
