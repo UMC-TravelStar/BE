@@ -23,4 +23,23 @@ model user {
   email      String?  // Nullable, VARCHAR(255)
   created_at DateTime @default(now()) // Default CURRENT_TIMESTAMP
   updated_at DateTime @updatedAt      // Automatically updated on change
+
+  //관계 정의
+  sentFriendRequests   Friend[] @relation("FromUser")
+  receivedFriendRequests Friend[] @relation("ToUser")
+}
+
+model Friend {
+  id  Int @id @default(autoincrement()) //Primary Key
+  from_user_id  String //친구 요청을 보낸 사용자의 id
+  to_user_id  String //친구 요청을 받은 사용자의 id
+  are_we_friend Boolean @default(false) //친구 상태 여부
+  created_date  DateTime @default(now())  
+  last_modified_date  DateTime @updatedAt
+
+  from_user user @relation("FromUser", fields: [from_user_id], references: [user_id])
+  to_user user @relation("ToUser", fields:[to_user_id], references:[user_id])
+
+  //중복 요청 방지
+  @@unique([from_user_id, to_user_id])
 }
