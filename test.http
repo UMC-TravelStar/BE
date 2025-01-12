@@ -3,7 +3,7 @@ POST http://localhost:4000/register
 Content-Type: application/json; charset=UTF-8
 
 {
-  "user_id": "test3",
+  "user_id": "test4",
   "nickname": "qqqq",
   "password": "qqqq",
   "name": "qqqq",

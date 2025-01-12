@@ -26,7 +26,7 @@ const options = {
       },
     ],
   },
-  apis: ["./index.js"], // Swagger 파일 경로
+  apis: ["./src/index.js", "./src/controllers/*.js"], // Swagger 파일 경로
 };
 
 const specs = swaggerJsDoc(options);
@@ -37,7 +37,7 @@ app.listen(port, () => {
 
 app.use(
   cors({
-    origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
+    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
     credentials: true, // 쿠키를 포함한 요청 허용
   })
 );
@@ -48,7 +48,9 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 //유저관리
 app.post("/register", handleUserSignUp);
+
 app.post("/login", handleUserLogin);
+
 app.get("/logout", handleUserLogout);
 
 // 로그인 API
