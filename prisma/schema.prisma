@@ -24,3 +24,20 @@ model user {
   created_at DateTime @default(now()) // Default CURRENT_TIMESTAMP
   updated_at DateTime @updatedAt      // Automatically updated on change
 }
+
+model post {
+  post_id     String    @id @default(autoincrement()) // PK
+  title       String    // 일지 제목
+  content     String    // 일지 내용
+  music       String?   // 일지 음악 
+  region      String    // 행성 내 지역
+  detail_reg  String    // 일지 지역
+  feeling     String    // 일지 감정
+  feel_cor    String    // 감정 색깔
+  views       Int       // 조회수
+  created_at  DateTime  @default(now())
+  updated_at  DateTime
+
+  author      user      @relation(fields: [author_id], references: [user_id])
+  author_id   Int       // 작성자 id (FK)
+}
