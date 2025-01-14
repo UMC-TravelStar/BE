@@ -1,13 +1,20 @@
 export const addPost = async (data) => {
-    const existingPost = await prismapost.findFirst({ where: { title: data.title } });
+    const existingPost = await prismapost.findFirst({ 
+        where: { 
+            title: data.title, 
+            author_id: data.author_id 
+        } 
+    });
+
     if (existingPost) {
-        return null;
+        throw new Error("Duplicate post title for this author.");
     }
 
     const createdPost = await prisma.post.create({
         data: {
             title: data.title,       
-            location: data.location,
+            region: data.region,
+            detail_reg: data.detail_reg,
             music: data.music || "", 
             content: data.content,   
             photos: data.photos,    
@@ -15,5 +22,5 @@ export const addPost = async (data) => {
         },
     });
 
-    return createdPost.id;
+    return createdPost.post_id;
 };

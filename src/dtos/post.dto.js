@@ -18,6 +18,6 @@ export const responseFromPost = (post) => {
         content: post.content,
         photos: post.photos,
         feeling: post.feeling,
-        createdAt: post.createdAt
+        createdAt: post.createdAt,
     };
 };
