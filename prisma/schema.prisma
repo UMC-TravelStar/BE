@@ -44,3 +44,4 @@ model post {
   author      user      @relation(fields: [author_id], references: [user_id]) 
   author_id   Int       // 작성자 id (FK)
 }
+
