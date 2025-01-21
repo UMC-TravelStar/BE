@@ -358,14 +358,14 @@ app.post('/api/v1/users/:user_id/posts', async (req, res) => {
  *         schema:
  *           type: integer
  *           example: 1
- *         description: 페이지 번호 (기본값: 1)
+ *         description: "페이지 번호 (기본값: 1)"
  *       - in: query
  *         name: limit
  *         required: false
  *         schema:
  *           type: integer
  *           example: 10
- *         description: 한 페이지에 표시할 일지 수 (기본값: 10)
+ *         description: "한 페이지에 표시할 일지 수 (기본값: 10)"
  *     responses:
  *       200:
  *         description: 일지 검색 성공
@@ -936,7 +936,7 @@ app.post('/api/v1/users/:user_id/posts', async (req, res) => {
  *                         description: 친구의 이름
  *                       profile_image:
  *                         type: string
- *                         description: 친구의 프로필 사진 (user_image 테이블의 file_name)
+ *                         description: "친구의 프로필 사진 (user_image 테이블의 file_name)"
  *       404:
- *         description: 친구가가 존재하지 않음
+ *         description: 친구가 존재하지 않음
  */
