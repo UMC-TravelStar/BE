@@ -208,33 +208,22 @@ app.get("/logout", (req, res) => {
  *         description: 회원가입 실패
  */
 
-//행성 이름 설정 API
 /**
  * @swagger
- * /users/{user_id}/planet_set:
- *   post:
- *     summary: 행성 이름 설정
- *     description: 사용자가 자신의 행성 이름을 설정합니다.
+ * /register/email-check:
+ *   get:
+ *     summary: 이메일 중복 확인
+ *     description: 사용자가 입력한 이메일이 이미 등록되어 있는지 확인합니다.
  *     parameters:
- *       - in: path
- *         name: user_id
+ *       - in: query
+ *         name: email
  *         required: true
  *         schema:
  *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: 행성 이름
+ *         description: 확인할 이메일 주소
  *     responses:
  *       200:
- *         description: 행성 이름 설정 성공
+ *         description: 이메일 중복 확인 성공
  *         content:
  *           application/json:
  *             schema:
@@ -242,26 +231,30 @@ app.get("/logout", (req, res) => {
  *               properties:
  *                 message:
  *                   type: string
- *                 planet:
- *                   type: object
- *                   properties:
- *                     planet_id:
- *                       type: integer
- *                     user_id:
- *                       type: string
- *                     name:
- *                       type: string
- *       400:
- *         description: 행성 이름 설정 실패
+ *                   example: "이메일 사용 가능"
+ *                 available:
+ *                   type: boolean
+ *                   example: true
+ *       409:
+ *         description: 이메일이 이미 등록되어 있음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "이미 사용 중인 이메일입니다."
  */
 
-// 유저의 게시글 조회 API
+
+// 유저의 일지 조회 API
 /**
  * @swagger
  * /users/{user_id}/posts:
  *   get:
- *     summary: 유저의 게시글 조회
- *     description: 로그인된 사용자의 게시글을 조회합니다. 최신순으로 10개씩 반환합니다.
+ *     summary: 유저의 일지 조회
+ *     description: 로그인된 사용자의 일지을 조회합니다. 최신순으로 10개씩 반환합니다.
  *     parameters:
  *       - in: path
  *         name: user_id
@@ -278,7 +271,7 @@ app.get("/logout", (req, res) => {
  *         description: "페이지 번호 (기본값: 1)"
  *     responses:
  *       200:
- *         description: 게시글 조회 성공
+ *         description: 일지 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -286,7 +279,7 @@ app.get("/logout", (req, res) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "게시글 조회 성공"
+ *                   example: "일지 조회 성공"
  *                 posts:
  *                   type: array
  *                   items:
@@ -302,7 +295,7 @@ app.get("/logout", (req, res) => {
  *                         type: string
  *                         format: date-time
  *       404:
- *         description: 게시글이 없어요. 작성해주세요!
+ *         description: 일지이 없어요. 작성해주세요!
  */
 
 // 메인 페이지 API
@@ -310,8 +303,8 @@ app.get("/logout", (req, res) => {
  * @swagger
  * /users/{user_id}/main:
  *   get:
- *     summary: 추천 게시글 조회
- *     description: 조회수 순으로 추천 게시글을 10개씩 반환합니다.
+ *     summary: 메인 페이지 (추천 일지 조회)
+ *     description: 조회수 순으로 추천 일지를 10개씩 반환합니다.
  *     parameters:
  *       - in: path
  *         name: user_id
@@ -328,7 +321,7 @@ app.get("/logout", (req, res) => {
  *         description: "페이지 번호 (기본값: 1)"
  *     responses:
  *       200:
- *         description: 추천 게시글 조회 성공
+ *         description: 추천 일지 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -336,7 +329,7 @@ app.get("/logout", (req, res) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "추천 게시글 조회 성공"
+ *                   example: "추천 일지 조회 성공"
  *                 posts:
  *                   type: array
  *                   items:
@@ -354,19 +347,82 @@ app.get("/logout", (req, res) => {
  *                         type: array
  *                         items:
  *                           type: string
- *                           description: 게시글에 첨부된 이미지 파일 이름 (post_image 테이블의 file_name)
+ *                           description: 일지에 첨부된 이미지 파일 이름 (post_image 테이블의 file_name)
  *       404:
- *         description: 게시글이 없어요. 작성해주세요!
+ *         description: 일지가가 없어요. 작성해주세요!
+ */
+
+//검색 API
+/**
+ * @swagger
+ * /users/{user_id}/posts/search:
+ *   get:
+ *     summary: 일지 검색
+ *     description: 키워드를 기반으로 사용자의 일지를 검색합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: query
+ *         name: keyword
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 검색할 키워드
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: 페이지 번호 (기본값: 1)
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: 한 페이지에 표시할 일지 수 (기본값: 10)
+ *     responses:
+ *       200:
+ *         description: 일지 검색 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "일지 검색 성공"
+ *                 posts:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       post_id:
+ *                         type: integer
+ *                       title:
+ *                         type: string
+ *                       content:
+ *                         type: string
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *       404:
+ *         description: 검색 결과가 없음
  */
 
 
-// 게시글 작성 API
+// 일지 작성 API
 /**
  * @swagger
  * /users/{user_id}/post:
  *   post:
- *     summary: 게시글 작성
- *     description: 로그인된 사용자가 게시글을 작성합니다.
+ *     summary: 일지 작성
+ *     description: 로그인된 사용자가 일지를를 작성합니다.
  *     parameters:
  *       - in: path
  *         name: user_id
@@ -383,7 +439,7 @@ app.get("/logout", (req, res) => {
  *             properties:
  *               title:
  *                 type: string
- *                 description: 게시글 제목
+ *                 description: 일지 제목
  *               location:
  *                 type: string
  *                 description: 위치
@@ -403,7 +459,7 @@ app.get("/logout", (req, res) => {
  *                 description: 이번 여행을 통해 느낀 감정
  *     responses:
  *       201:
- *         description: 게시글 작성 성공
+ *         description: 일지 작성 성공
  *         content:
  *           application/json:
  *             schema:
@@ -411,21 +467,21 @@ app.get("/logout", (req, res) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "게시글 작성 성공"
+ *                   example: "일지 작성 성공"
  *                 post_id:
  *                   type: integer
- *                   description: 작성된 게시글의 ID
+ *                   description: 작성된 일지의 ID
  *       400:
- *         description: 게시글 작성 실패
+ *         description: 일지 작성 실패
  */
 
-// 게시글 조회 API
+// 일지 조회 API
 /**
  * @swagger
  * /users/{user_id}/posts/{post_id}:
  *   get:
- *     summary: 게시글 조회
- *     description: 사용자가 작성한 게시글을 조회합니다.
+ *     summary: 일지 조회
+ *     description: 사용자가 작성한 일지을 조회합니다.
  *     parameters:
  *       - in: path
  *         name: user_id
@@ -438,10 +494,10 @@ app.get("/logout", (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: 게시글 ID
+ *         description: 일지 ID
  *     responses:
  *       200:
- *         description: 게시글 조회 성공
+ *         description: 일지 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -449,7 +505,7 @@ app.get("/logout", (req, res) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "게시글 조회 성공"
+ *                   example: "일지 조회 성공"
  *                 post:
  *                   type: object
  *                   properties:
@@ -471,7 +527,234 @@ app.get("/logout", (req, res) => {
  *                       type: string
  *                       format: date-time
  *       404:
- *         description: 게시글을 찾을 수 없음
+ *         description: 일지을 찾을 수 없음
+ */
+
+// 일지 수정 API
+/**
+ * @swagger
+ * /users/{user_id}/posts/{post_id}:
+ *   patch:
+ *     summary: 일지 수정
+ *     description: 사용자가 작성한 일지를 수정합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: post_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "수정할 일지의 ID"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: "새로운 일지 제목"
+ *               content:
+ *                 type: string
+ *                 description: "수정된 일지 내용"
+ *     responses:
+ *       200:
+ *         description: 일지 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "일지 수정 성공"
+ *       400:
+ *         description: 수정 실패 (잘못된 입력 등)
+ *       404:
+ *         description: 일지를 찾을 수 없음
+ */
+
+// 일지 삭제 API
+/**
+ * @swagger
+ * /users/{user_id}/posts/{post_id}:
+ *   delete:
+ *     summary: 일지 삭제
+ *     description: 사용자가 작성한 일지를 삭제합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: post_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "삭제할 일지의 ID"
+ *     responses:
+ *       200:
+ *         description: 일지 삭제 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "일지 삭제 성공"
+ *       404:
+ *         description: 일지를 찾을 수 없음
+ *       403:
+ *         description: 접근 권한 없음
+ */
+
+//행성 설정 API
+/**
+ * @swagger
+ * /users/{user_id}/planets:
+ *   post:
+ *     summary: 행성 설정
+ *     description: 사용자가 자신의 행성 설정합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "사용자 ID (로그인된 사용자)"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: 행성 이름
+ *     responses:
+ *       200:
+ *         description: 행성 설정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 planet:
+ *                   type: object
+ *                   properties:
+ *                     planet_id:
+ *                       type: integer
+ *                     user_id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *       400:
+ *         description: 행성 설정 실패
+ */
+
+// 행성 수정 API
+/**
+ * @swagger
+ * /users/{user_id}/planets:
+ *   patch:
+ *     summary: 행성 수정
+ *     description: 사용자가 자신의 행성을 수정합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "사용자 ID (로그인된 사용자)"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: "수정된 행성 이름"
+ *     responses:
+ *       200:
+ *         description: 행성 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "행성 수정 성공"
+ *                 planet:
+ *                   type: object
+ *                   properties:
+ *                     user_id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *       400:
+ *         description: 행성 수정 실패
+ *       404:
+ *         description: 행성을 찾을 수 없음
+ */
+
+
+// 다른 사용자의 행성 조회 API
+/**
+ * @swagger
+ * /users/{user_id}/planets/{target_user_id}:
+ *   get:
+ *     summary: 다른 사용자의 행성 조회
+ *     description: 특정 사용자의 행성을 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: target_user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "조회할 사용자의 ID"
+ *     responses:
+ *       200:
+ *         description: 행성 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "행성 조회 성공"
+ *                 planet:
+ *                   type: object
+ *                   properties:
+ *                     planet_id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *       404:
+ *         description: 사용자를 찾을 수 없음
+ *       403:
+ *         description: 접근 권한 없음
  */
 
 // 행성 조회 API
