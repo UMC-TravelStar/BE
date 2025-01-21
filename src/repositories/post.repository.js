@@ -1,4 +1,4 @@
-export const addPost = async (data) => {
+const addPost = async (data) => {
     const existingPost = await prismapost.findFirst({ 
         where: { 
             title: data.title, 
@@ -23,4 +23,8 @@ export const addPost = async (data) => {
     });
 
     return createdPost.post_id;
+};
+
+module.exports = {
+    addPost
 };

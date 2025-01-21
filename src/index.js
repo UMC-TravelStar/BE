@@ -1,5 +1,3 @@
-import { handleAddPost } from "./controllers/post.controller.js";
-
 const express = require("express");
 const app = express();
 const port = 4000;
@@ -13,6 +11,7 @@ const {
   handleUserLogout,
 } = require("./controllers/user.controller.js");
 const sever_ip = process.env.IP;
+const { handleAddPost } = require("./controllers/post.controller.js");
 
 const options = {
   swaggerDefinition: {
@@ -47,6 +46,10 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
+app.get('/', (req, res) => {
+  res.send('Welcome to the server!');
+});
 
 //유저관리
 app.post("/register", handleUserSignUp);
@@ -301,7 +304,40 @@ app.get("/logout", handleUserLogout);
  *         description: 게시글이 없어요. 작성해주세요!
  */
 
-app.post("/api/v1/users/{user_id}/posts", handleAddPost);
+app.post('/api/v1/users/:user_id/posts', async (req, res) => {
+  try {
+    const { title, location, music, content, photos, feeling } = req.body;
+
+    // 데이터가 모두 존재하는지 확인
+    if (!title || !location || !music || !content || !photos || !feeling) {
+      return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
+    }
+
+    // 예시로 DB에 저장하는 부분. 실제 DB 로직을 여기에 작성하세요.
+    const newPost = {
+      title,
+      location,
+      music,
+      content,
+      photos,
+      feeling,
+      author_id: req.params.user_id,
+    };
+
+    // DB에 저장 후 새로 생성된 게시글의 ID를 응답으로 반환
+    // 예시로 post_id를 "1"로 가정합니다. 실제로는 DB에서 생성된 ID를 받아옵니다.
+    const postId = 1; // 실제 DB 연동 시 반환된 post_id 사용
+
+    return res.status(201).json({
+      message: '게시글 작성 성공',
+      post_id: postId, // 실제 생성된 게시글의 ID
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: '게시글 작성 실패' });
+  }
+});
+
 // 게시글 작성 API
 /**
  * @swagger

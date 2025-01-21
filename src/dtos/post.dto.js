@@ -1,4 +1,4 @@
-export const bodyToPost = (body) => {
+const bodyToPost = (body) => {
     return {
         title: body.title,
         location: body.location,
@@ -9,7 +9,7 @@ export const bodyToPost = (body) => {
     };
 };
 
-export const responseFromPost = (post) => {
+const responseFromPost = (post) => {
     return {
         id: post.id,
         title: post.title,
@@ -20,4 +20,9 @@ export const responseFromPost = (post) => {
         feeling: post.feeling,
         createdAt: post.createdAt,
     };
+};
+
+module.exports = {
+    bodyToPost,
+    responseFromPost
 };

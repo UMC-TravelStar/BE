@@ -1,8 +1,7 @@
-import { createPost } from "../services/post.service.js";
-import { bodyToPost } from "../dtos/post.dto.js";
-import { StatusCodes } from "http-status-codes";
+const { createPost } = require("../services/post.service.js");
+const { bodyToPost } = require("../dtos/post.dto.js");
 
-export const handleAddPost = async (req, res, next) => {
+const handleAddPost = async (req, res, next) => {
     console.log("Request to add post received");
     console.log("Request body:", req.body);
 
@@ -27,4 +26,8 @@ export const handleAddPost = async (req, res, next) => {
             error: error.message,
         });
     }
+};
+
+module.exports = {
+    handleAddPost
 };

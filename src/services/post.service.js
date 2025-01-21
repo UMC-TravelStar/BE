@@ -1,7 +1,7 @@
-import { addPost } from "../repositories/post.repository.js";
-import { responseFromPost } from "../dtos/post.dto.js";
+const { addPost } = require("../repositories/post.repository.js");
+const { responseFromPost } = require("../dtos/post.dto.js");
 
-export const createPost = async (data) => {
+const createPost = async (data) => {
 
     const postId = await addPost({
         title: data.title,
@@ -18,4 +18,9 @@ export const createPost = async (data) => {
     }
     
     return responseFromPost({ id: postId, ...data }); 
+};
+
+
+module.exports = {
+    createPost
 };
