@@ -29,6 +29,16 @@ const addPost = async (data) => {
     return createdPost.post_id; // 생성된 게시글의 ID 반환
 };
 
+const getPostById = async (userId, postId) => {
+    return prisma.post.findUnique({
+        where: { 
+            id: parseInt(post_id),
+            authorId: parseInt(user_id),
+         },
+    });
+};
+
 module.exports = {
-    addPost
+    addPost,
+    getPostById
 };

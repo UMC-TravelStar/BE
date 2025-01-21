@@ -23,7 +23,21 @@ const responseFromPost = (post) => {
     };
 };
 
+class UserPostResponseDTO {
+    constructor(post) {
+      this.post_id = post.id;
+      this.title = post.title;
+      this.location = post.location;
+      this.music = post.music;
+      this.content = post.content;
+      this.photos = post.photos || [];
+      this.createdAt = post.createdAt;
+      this.updatedAt = post.updatedAt;
+    }
+}
+
 module.exports = {
     bodyToPost,
-    responseFromPost
+    responseFromPost,
+    UserPostResponseDTO
 };
