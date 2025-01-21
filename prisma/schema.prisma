@@ -14,7 +14,7 @@ datasource db {
 }
 
 model user {
-  user_id    String   @id // Primary Key
+  user_id    Int      @id // Primary Key
   nickname   String?  // Nullable, VARCHAR(255)
   password   String?  // Nullable, VARCHAR(255)
   name       String?  // Nullable, VARCHAR(255)
@@ -23,4 +23,24 @@ model user {
   email      String?  // Nullable, VARCHAR(255)
   created_at DateTime @default(now()) // Default CURRENT_TIMESTAMP
   updated_at DateTime @updatedAt      // Automatically updated on change
+
+  posts      post[]
+}
+
+model post {
+  post_id     Int       @id @default(autoincrement()) // PK
+  title       String    // 일지 제목
+  content     String    // 일지 내용
+  music       String?   // 일지 음악 (선택사항)
+  region      String    // 행성 내 지역
+  detail_reg  String    // 일지 지역
+  feeling     String    // 일지 감정
+  feel_color  String    // 감정 색깔
+  photos      String    // 사진 URLs
+  views       Int       @default(0) // 조회수
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  author      user      @relation(fields: [author_id], references: [user_id]) 
+  author_id   Int       // 작성자 id (FK)
 }

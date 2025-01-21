@@ -1,13 +1,17 @@
 const express = require("express");
-const { PrismaClient } = require("@prisma/client");
 const app = express();
 const port = 4000;
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const prisma = new PrismaClient();
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
+const {
+  handleUserSignUp,
+  handleUserLogin,
+  handleUserLogout,
+} = require("./controllers/user.controller.js");
+const sever_ip = process.env.IP;
+const { handleAddPost } = require("./controllers/post.controller.js");
 
 const options = {
   swaggerDefinition: {
@@ -19,11 +23,11 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:4000", // 요청 URL
+        url: `${sever_ip}`, // 요청 URL
       },
     ],
   },
-  apis: ["./index.js"], // Swagger 파일 경로
+  apis: ["./src/index.js", "./src/controllers/*.js"], // Swagger 파일 경로
 };
 
 const specs = swaggerJsDoc(options);
@@ -34,7 +38,7 @@ app.listen(port, () => {
 
 app.use(
   cors({
-    origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
+    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
     credentials: true, // 쿠키를 포함한 요청 허용
   })
 );
@@ -43,80 +47,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-// 회원가입
-app.post("/register", async (req, res) => {
-  const { user_id, nickname, password, name, birth, phonenum, email } = req.body;
-
-  try {
-    const newUser = await prisma.user.create({
-      data: {
-        user_id, // Primary Key
-        nickname: nickname || null,
-        password, // 암호화 없이 저장
-        name: name || null,
-        birth: birth ? new Date(birth) : null, // Date로 변환
-        phonenum: phonenum || null,
-        email: email || null,
-      },
-    });
-
-    res.status(201).json({
-      message: "회원가입 성공",
-      user: {
-        user_id: newUser.user_id,
-        nickname: newUser.nickname,
-        email: newUser.email,
-      },
-    });
-  } catch (error) {
-    console.error("회원가입 에러:", error);
-    res.status(400).json({
-      message: "회원가입 실패",
-      error: error.message,
-    });
-  }
+app.get('/', (req, res) => {
+  res.send('Welcome to the server!');
 });
 
-// 로그인
-app.post("/login", (req, res) => {
-  const { id, pw } = req.body;
-  const secretKey = process.env.JWT_SECRET;
+//유저관리
+app.post("/register", handleUserSignUp);
 
-  const token = jwt.sign({ id, pw }, secretKey, {
-    expiresIn: "10h",
-  });
+app.post("/login", handleUserLogin);
 
-  res.cookie("authToken", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "Lax",
-    maxAge: 1000 * 60 * 60 * 10,
-  });
-
-  res.status(200).json({
-    message: "로그인 성공!",
-    token,
-  });
-});
-
-// 로그아웃
-app.get("/logout", (req, res) => {
-  res.clearCookie("authToken", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "Lax",
-    path: "/",
-  });
-
-  res.status(200).json({
-    message: "로그아웃 성공! 쿠키가 삭제되었습니다.",
-  });
-});
+app.get("/logout", handleUserLogout);
 
 // 로그인 API
 /**
  * @swagger
- * /login:
+ * prod/login:
  *   post:
  *     summary: 로그인
  *     description: 사용자가 로그인합니다.
@@ -152,7 +97,7 @@ app.get("/logout", (req, res) => {
 // 회원가입 API
 /**
  * @swagger
- * /register:
+ * prod/register:
  *   post:
  *     summary: 회원가입
  *     description: 사용자를 등록합니다.
@@ -359,6 +304,39 @@ app.get("/logout", (req, res) => {
  *         description: 게시글이 없어요. 작성해주세요!
  */
 
+app.post('/api/v1/users/:user_id/posts', async (req, res) => {
+  try {
+    const { title, location, music, content, photos, feeling } = req.body;
+
+    // 데이터가 모두 존재하는지 확인
+    if (!title || !location || !music || !content || !photos || !feeling) {
+      return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
+    }
+
+    // 예시로 DB에 저장하는 부분. 실제 DB 로직을 여기에 작성하세요.
+    const newPost = {
+      title,
+      location,
+      music,
+      content,
+      photos,
+      feeling,
+      author_id: req.params.user_id,
+    };
+
+    // DB에 저장 후 새로 생성된 게시글의 ID를 응답으로 반환
+    // 예시로 post_id를 "1"로 가정합니다. 실제로는 DB에서 생성된 ID를 받아옵니다.
+    const postId = 1; // 실제 DB 연동 시 반환된 post_id 사용
+
+    return res.status(201).json({
+      message: '게시글 작성 성공',
+      post_id: postId, // 실제 생성된 게시글의 ID
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: '게시글 작성 실패' });
+  }
+});
 
 // 게시글 작성 API
 /**
