@@ -5,8 +5,7 @@ require("dotenv").config();
 const addPost = async (data) => {
     const existingPost = await prisma.post.findFirst({
         where: { 
-            title: data.title, 
-            author_id: data.author_id // 게시글 작성자 확인
+            title: data.title
         }
     });
 
@@ -17,12 +16,13 @@ const addPost = async (data) => {
     const createdPost = await prisma.post.create({
         data: {
             title: data.title,
-            location: data.location,
             music: data.music || "",
             content: data.content,
             photos: data.photos,
             feeling: data.feeling,
-            author_id: data.author_id // 작성자 ID
+            author_id: data.author_id,
+            region: data.region || "default_region", 
+            feel_color: data.feel_color
         },
     });
 
@@ -32,9 +32,9 @@ const addPost = async (data) => {
 const getPostById = async (userId, postId) => {
     return prisma.post.findUnique({
         where: { 
-            id: parseInt(post_id),
-            authorId: parseInt(user_id),
-         },
+            author_id: parseInt(userId),
+            post_id: parseInt(postId),
+        },
     });
 };
 

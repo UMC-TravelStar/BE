@@ -32,8 +32,7 @@ model post {
   title       String    // 일지 제목
   content     String    // 일지 내용
   music       String?   // 일지 음악 (선택사항)
-  region      String    // 행성 내 지역
-  detail_reg  String    // 일지 지역
+  region      String?   // 지역
   feeling     String    // 일지 감정
   feel_color  String    // 감정 색깔
   photos      String    // 사진 URLs

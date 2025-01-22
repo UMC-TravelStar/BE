@@ -1,5 +1,6 @@
 const { createPost, getUserPost } = require("../services/post.service.js");
 const { bodyToPost } = require("../dtos/post.dto.js");
+const { StatusCodes } = require("http-status-codes");
 
 const handleAddPost = async (req, res, next) => {
     console.log("Request to add post received");
@@ -10,12 +11,12 @@ const handleAddPost = async (req, res, next) => {
         const postData = bodyToPost(req.body);
 
         // 서비스 호출로 게시물 생성
-        const post = await createPost(postData);
+        const postResponse = await createPost(postData);
 
         // 성공 응답 반환
         res.status(StatusCodes.CREATED).json({
             message: "게시글 작성 성공",
-            post_id: post.id,
+            post: postResponse,
         });
     } catch (error) {
         console.error("Error while creating post:", error.message);
@@ -29,9 +30,15 @@ const handleAddPost = async (req, res, next) => {
 };
 
 const handleGetUserPost = async (req, res) => {
+    console.log("Request to get user post");
 
     try {
+        console.log(req.params);
         const { userId, postId } = req.params;
+        
+        if (!userId || !postId) {
+            throw new Error('Missing required parameters: userId or postId');
+        }
 
         // 서비스 호출
         const post = await getUserPost(userId, postId);

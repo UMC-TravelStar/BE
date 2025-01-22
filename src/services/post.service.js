@@ -4,11 +4,13 @@ const { responseFromPost, UserPostResponseDTO } = require("../dtos/post.dto.js")
 const createPost = async (data) => {
     const postId = await addPost({
         title: data.title,
-        location: data.location, // location 필드를 추가로 전달
         music: data.music || "",
         content: data.content,
         photos: data.photos,
-        feeling: data.feeling
+        feeling: data.feeling,
+        author_id: data.author_id,
+        region: data.region || "default_region",  
+        feel_color: data.feel_color
     });
     
     if (!postId) {

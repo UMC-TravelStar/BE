@@ -62,7 +62,7 @@ app.get("/logout", handleUserLogout);
 app.post('/api/v1/users/:user_id/post', handleAddPost);
 
 //일지 조회
-app.get('/api/v1/users/:user_id/posts/:posts_id', handleGetUserPost);
+app.get('/api/v1/users/:userId/posts/:postId', handleGetUserPost);
 
 // 로그인 API
 /**
