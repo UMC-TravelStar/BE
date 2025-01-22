@@ -11,7 +11,7 @@ const {
   handleUserLogout,
 } = require("./controllers/user.controller.js");
 const server_ip = process.env.IP;
-const { handleAddPost } = require("./controllers/post.controller.js");
+const { handleAddPost, handleGetUserPost } = require("./controllers/post.controller.js");
 
 const options = {
   swaggerDefinition: {
@@ -58,7 +58,11 @@ app.post("/login", handleUserLogin);
 
 app.get("/logout", handleUserLogout);
 
+//일지 작성
 app.post('/api/v1/users/:user_id/post', handleAddPost);
+
+//일지 조회
+app.get('/api/v1/users/:userId/posts/:postId', handleGetUserPost);
 
 // 로그인 API
 /**
