@@ -1,7 +1,7 @@
 // const swaggerUi = require("swagger-ui-express");
 // const swaggerJsDoc = require("swagger-jsdoc");
 // require("dotenv").config();
-// const sever_ip = process.env.IP;
+// const server_ip = process.env.IP;
 // const options = {
 //   swaggerDefinition: {
 //     openapi: "3.0.0",
@@ -12,7 +12,7 @@
 //     },
 //     servers: [
 //       {
-//         url: `${sever_ip}`, // 요청 URL
+//         url: `${server_ip}`, // 요청 URL
 //       },
 //     ],
 //   },

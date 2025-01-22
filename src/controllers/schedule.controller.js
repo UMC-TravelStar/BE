@@ -23,11 +23,23 @@ class ScheduleController {
 
 
   async getSchedules(req, res) {
-      const userId = parseInt(req.params.user_id); // user_id를 정수형으로 변환
+      const userId = parseInt(req.params.user_id);
+      const { date } = req.query; // 쿼리 파라미터에서 날짜를 받음
 
       try {
-          const schedules = await ScheduleService.getSchedules(userId);
-          res.status(200).json(schedules);
+          // 날짜가 제공된 경우
+          if (date) {
+              const startDate = new Date(date);
+              const endDate = new Date(startDate);
+              endDate.setDate(endDate.getDate() + 1); // 다음 날
+
+              const schedules = await ScheduleService.getSchedulesByDate(userId, startDate, endDate);
+              res.status(200).json(schedules);
+          } else {
+              // 날짜가 제공되지 않은 경우
+              const schedules = await ScheduleService.getSchedules(userId);
+              res.status(200).json(schedules);
+          }
       } catch (error) {
           console.error("일정 조회 실패:", error);
           res.status(500).json({ message: "일정 조회 실패", error: error.message });

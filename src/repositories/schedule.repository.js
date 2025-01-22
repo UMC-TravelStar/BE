@@ -19,6 +19,18 @@ class ScheduleRepository {
         });
     }
 
+    async getSchedulesByDate(userId, startDate, endDate) {
+      return await prisma.schedule.findMany({
+          where: {
+              user_id: userId,
+              date_time: {
+                  gte: startDate, // 시작 날짜
+                  lt: endDate, // 종료 날짜 (다음 날)
+              },
+          },
+      });
+  }
+
     async updateSchedule(scheduleId, title, dateTime) {
         return await prisma.schedule.update({
             where: { schedule_id: scheduleId },
