@@ -25,6 +25,7 @@ model user {
   updated_at DateTime @updatedAt      // Automatically updated on change
 
   posts      post[]
+  schedules  schedule[]
 }
 
 model post {
@@ -45,3 +46,11 @@ model post {
   author_id   Int       // 작성자 id (FK)
 }
 
+model schedule {
+  schedule_id Int      @id @default(autoincrement()) // Primary Key
+  user_id     Int      // Foreign Key
+  title       String?  // 일정 제목
+  date_time   DateTime // 일정 날짜 및 시간
+
+  user        user     @relation(fields: [user_id], references: [user_id]) 
+}

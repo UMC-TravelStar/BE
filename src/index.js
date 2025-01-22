@@ -10,6 +10,7 @@ const {
   handleUserLogin,
   handleUserLogout,
 } = require("./controllers/user.controller.js");
+const ScheduleController = require("./controllers/schedule.controller"); 
 const sever_ip = process.env.IP;
 const { handleAddPost } = require("./controllers/post.controller.js");
 
@@ -91,6 +92,12 @@ app.post('/api/v1/users/:user_id/posts', async (req, res) => {
     return res.status(500).json({ message: '게시글 작성 실패' });
   }
 });
+
+// 일정 관리 API
+app.post("/api/users/:user_id/schedules", ScheduleController.addSchedule); // 일정 추가
+app.get("/api/users/:user_id/schedules", ScheduleController.getSchedules); // 일정 조회
+app.put("/api/schedules", ScheduleController.updateSchedule); // 일정 수정
+app.delete("/api/schedules/:schedule_id", ScheduleController.deleteSchedule); // 일정 삭제
 
 // 로그인 API
 /**
