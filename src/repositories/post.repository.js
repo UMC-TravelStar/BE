@@ -5,8 +5,7 @@ require("dotenv").config();
 const addPost = async (data) => {
     const existingPost = await prisma.post.findFirst({
         where: { 
-            title: data.title, 
-            author_id: data.author_id // 게시글 작성자 확인
+            title: data.title
         }
     });
 
@@ -22,7 +21,10 @@ const addPost = async (data) => {
             content: data.content,
             photos: data.photos,
             feeling: data.feeling,
-            author_id: data.author_id // 작성자 ID
+            author_id: data.author_id,
+            region: data.region || "default_region", 
+            detail_reg: data.detail_reg || "default_detail_reg",
+            feel_color: data.feel_color
         },
     });
 

@@ -8,7 +8,11 @@ const createPost = async (data) => {
         music: data.music || "",
         content: data.content,
         photos: data.photos,
-        feeling: data.feeling
+        feeling: data.feeling,
+        author_id: data.author_id,
+        region: data.region || "default_region",  
+        detail_reg: data.detail_reg || "default_detail_reg",
+        feel_color: data.feel_color
     });
     
     if (!postId) {
