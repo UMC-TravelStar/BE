@@ -6,6 +6,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
 const {
+  handleEmailCertification,
   handleUserSignUp,
   handleUserLogin,
   handleUserLogout,
@@ -53,6 +54,8 @@ app.get('/', (req, res) => {
 });
 
 //유저관리
+app.post("/email", handleEmailCertification);
+
 app.post("/register", handleUserSignUp);
 
 app.post("/login", handleUserLogin);
