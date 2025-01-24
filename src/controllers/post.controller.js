@@ -1,4 +1,4 @@
-const { createPost } = require("../services/post.service.js");
+const { createPost, getUserPost } = require("../services/post.service.js");
 const { bodyToPost } = require("../dtos/post.dto.js");
 const { StatusCodes } = require("http-status-codes");
 
@@ -29,6 +29,36 @@ const handleAddPost = async (req, res, next) => {
     }
 };
 
+const handleGetUserPost = async (req, res) => {
+    console.log("Request to get user post");
+
+    try {
+        console.log(req.params);
+        const { userId, postId } = req.params;
+        
+        if (!userId || !postId) {
+            throw new Error('Missing required parameters: userId or postId');
+        }
+
+        // 서비스 호출
+        const post = await getUserPost(userId, postId);
+
+        if (!post) {
+            return res.status(404).json({ success: false, message: "게시글을 찾을 수 없음." });
+        }
+
+        res.status(200).json({
+            message: "게시글 조회 성공",
+            post,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "서버 내부 오류" });
+    }
+};
+
 module.exports = {
-    handleAddPost
+    handleAddPost,
+    handleGetUserPost
 };

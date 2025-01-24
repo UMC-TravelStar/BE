@@ -14,6 +14,10 @@ class ScheduleService {
         return await ScheduleRepository.getSchedulesByDate(userId, startDate, endDate);
     }
 
+    async getScheduleById(scheduleId) {
+        return await ScheduleRepository.getScheduleById(scheduleId);
+    }
+
     async updateSchedule(scheduleId, title, dateTime) {
         return await ScheduleRepository.updateSchedule(scheduleId, title, dateTime);
     }

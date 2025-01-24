@@ -16,14 +16,12 @@ const addPost = async (data) => {
     const createdPost = await prisma.post.create({
         data: {
             title: data.title,
-            location: data.location,
             music: data.music || "",
             content: data.content,
             photos: data.photos,
             feeling: data.feeling,
             author_id: data.author_id,
             region: data.region || "default_region", 
-            detail_reg: data.detail_reg || "default_detail_reg",
             feel_color: data.feel_color
         },
     });
@@ -31,6 +29,16 @@ const addPost = async (data) => {
     return createdPost.post_id; // 생성된 게시글의 ID 반환
 };
 
+const getPostById = async (userId, postId) => {
+    return prisma.post.findUnique({
+        where: { 
+            author_id: parseInt(userId),
+            post_id: parseInt(postId),
+        },
+    });
+};
+
 module.exports = {
-    addPost
+    addPost,
+    getPostById
 };
