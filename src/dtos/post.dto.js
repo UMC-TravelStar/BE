@@ -35,8 +35,20 @@ class UserPostResponseDTO {
     }
 }
 
+class EditPostDto {
+    constructor({ title, region, music, content, photos, feeling }) {
+        this.title = title;
+        this.region = region;
+        this.music = music || "";
+        this.content = content;
+        this.photos = Array.isArray(photos) ? photos : [];
+        this.feeling = feeling;
+    }
+}
+
 module.exports = {
     bodyToPost,
     responseFromPost,
-    UserPostResponseDTO
+    UserPostResponseDTO,
+    EditPostDto
 };
