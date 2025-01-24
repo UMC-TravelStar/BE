@@ -30,8 +30,8 @@ const handleEmailCertification = async (req, res) => {
     await transporter.sendMail({
       from: `"여행별" <${process.env.NODEMAILER_USER}>`,
       to: email,
-      subject: "여행별에 오신 것을 환영합니다!",
-      html: `<p>아래 인증번호를 입력하여 회원가입을 완료해주세요:</p>
+      subject: "여행별 입니다!",
+      html: `<p>아래 인증번호를 입력 해주세요:</p>
              <h3>${authCode}</h3>`,
     });
 
