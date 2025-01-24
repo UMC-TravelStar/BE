@@ -6,6 +6,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
 const {
+  handleEmailCertification,
   handleUserSignUp,
   handleUserLogin,
   handleUserLogout,
@@ -47,6 +48,8 @@ app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하�
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 //유저관리
+app.post("/email", handleEmailCertification);
+
 app.post("/register", handleUserSignUp);
 
 app.post("/login", handleUserLogin);

@@ -2,9 +2,51 @@
 const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-// 회원가입 처리
+// 1. 이메일 인증
+const handleEmailCertification = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "이메일 주소를 입력해주세요." });
+  }
+
+  try {
+    // 인증 코드 생성 (6자리 숫자)
+    const authCode = Math.random().toString().substr(2, 6);
+
+    // 이메일 발송 설정
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "ri711628@gmail.com",
+        pass: "awvlmtlnjnvbkubs",
+      },
+    });
+
+    //인증 이메일 전송
+    await transporter.sendMail({
+      from: `"여행별" <${process.env.NODEMAILER_USER}>`,
+      to: email,
+      subject: "여행별에 오신 것을 환영합니다!",
+      html: `<p>아래 인증번호를 입력하여 회원가입을 완료해주세요:</p>
+             <h3>${authCode}</h3>`,
+    });
+
+    // 프론트엔드에 인증 코드 전달
+    res.status(200).json({
+      message: "인증 이메일이 발송되었습니다.",
+      authCode, // 프론트에서 사용할 인증 코드
+    });
+  } catch (error) {
+    console.error("이메일 발송 오류:", error);
+    res.status(500).json({ message: "이메일 발송 실패", error: error.message });
+  }
+};
+
+// 2. 회원가입 처리
 const handleUserSignUp = async (req, res) => {
   const { user_id, nickname, password, name, birth, phonenum, email } =
     req.body;
@@ -40,7 +82,10 @@ const handleUserSignUp = async (req, res) => {
 };
 
 // 로그인 처리
-const handleUserLogin = (req, res) => {
+const handleUserLogin = async (req, res) => {
+  await send(); //!!
+  console.log("이메일 전송"); //!!
+
   const { id, pw } = req.body;
   const secretKey = process.env.JWT_SECRET;
 
@@ -83,6 +128,7 @@ const handleUserLogout = (req, res) => {
 };
 
 module.exports = {
+  handleEmailCertification,
   handleUserSignUp,
   handleUserLogin,
   handleUserLogout,
