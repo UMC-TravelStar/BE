@@ -1,5 +1,5 @@
-const { createPost, getUserPost } = require("../services/post.service.js");
-const { bodyToPost } = require("../dtos/post.dto.js");
+const { createPost, getUserPost, editPost } = require("../services/post.service.js");
+const { bodyToPost, EditPostDto } = require("../dtos/post.dto.js");
 const { StatusCodes } = require("http-status-codes");
 
 const handleAddPost = async (req, res, next) => {
@@ -34,14 +34,14 @@ const handleGetUserPost = async (req, res) => {
 
     try {
         console.log(req.params);
-        const { userId, postId } = req.params;
+        const { userId, postsId } = req.params;
         
-        if (!userId || !postId) {
+        if (!userId || !postsId) {
             throw new Error('Missing required parameters: userId or postId');
         }
 
         // 서비스 호출
-        const post = await getUserPost(userId, postId);
+        const post = await getUserPost(userId, postsId);
 
         if (!post) {
             return res.status(404).json({ success: false, message: "게시글을 찾을 수 없음." });
@@ -58,7 +58,43 @@ const handleGetUserPost = async (req, res) => {
     }
 };
 
+const handleEditPost = async (req, res) => {
+    console.log("Request to edit user post");
+    console.log("Request body:", req.body);
+
+    try {
+        const { userId, postsId } = req.params;
+        const editData = new EditPostDto(req.body);
+
+        if (!userId || !postsId) {
+            return res.status(400).json({ success: false, message: "Missing required parameters: userId or postsId" });
+        }
+
+        const post = await getUserPost(userId, postsId);
+
+        if (!post) {
+            return res.status(404).json({ success: false, message: "일지를 찾을 수 없음." });
+        }
+
+        const updatedPostId = await editPost(userId, postsId, editData);
+        if (!updatedPostId) {
+            return res.status(400).json({ success: false, message: "일지 수정 실패" });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "일지 수정 성공",
+            postId: updatedPostId
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "서버 내부 오류" });
+    }
+};
+
 module.exports = {
     handleAddPost,
-    handleGetUserPost
+    handleGetUserPost,
+    handleEditPost
 };
