@@ -10,13 +10,23 @@ const {
   handleUserLogin,
   handleUserLogout,
 } = require("./controllers/user.controller.js");
-const ScheduleController = require("./controllers/schedule.controller"); 
+const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
 const { handleAddPost, 
         handleGetUserPost,
         handleEditPost, 
         handleDeletePost,
 } = require("./controllers/post.controller.js");
+const {
+  handleAddDaySchedule,
+  handleGetDaySchedules,
+  handleUpdateDaySchedule,
+  handleDeleteDaySchedule,
+  handleAddSchedule,
+  handleGetSchedules,
+  handleUpdateSchedule,
+  handleDeleteSchedule,
+} = require("./controllers/schedule.controller.js");
 
 const options = {
   swaggerDefinition: {
@@ -37,9 +47,7 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 
-app.listen(port, () => {
-  console.log(`포트가 4000인 서버 실행`);
-});
+
 
 app.use(
   cors({
@@ -75,18 +83,21 @@ app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost);
 //일지 삭제
 app.delete('api/v1/users/:userId/posts/:postsId', handleDeletePost);
 
-// 하루 일정 API
-app.post("/api/users/:user_id/day-schedules", ScheduleController.addDaySchedule); // 일정 추가
-app.get("/api/users/:user_id/day-schedules", ScheduleController.getDaySchedules); // 일정 조회
-app.patch("/api/users/:user_id/day-schedules/:day_id", ScheduleController.updateDaySchedule); // 일정 수정
-app.delete("/api/users/:user_id/day-schedules/:day_id", ScheduleController.deleteDaySchedule); // 일정 삭제
+// 일지 작성
+app.post('/api/v1/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
+app.get('/api/v1/users/:user_id/day-schedules', handleGetDaySchedules); // Day Schedule 조회
+app.patch('/api/v1/users/:user_id/day-schedules/:day_id', handleUpdateDaySchedule); // Day Schedule 수정
+app.delete('/api/v1/users/:user_id/day-schedules/:day_id', handleDeleteDaySchedule); // Day Schedule 삭제
 
-// 일정 API
-app.post("/api/users/:user_id/day-schedules/:day_id/schedules", ScheduleController.addSchedule); // 일정 추가
-app.get("/api/users/:user_id/day-schedules/:day_id/schedules", ScheduleController.getSchedulesByDate); // 일정 조회
-app.patch("/api/users/:user_id/day-schedules/:day_id/schedules/:schedule_id", ScheduleController.updateSchedule); // 일정 수정
-app.delete("/api/users/:user_id/day-schedules/:day_id/schedules/:schedule_id", ScheduleController.deleteSchedule); // 일정 삭제
+// 일정 작성
+app.post('/api/v1/users/:user_id/day-schedules/:day_id/schedules', handleAddSchedule); // Schedule 추가
+app.get('/api/v1/users/:user_id/day-schedules/:day_id/schedules', handleGetSchedules); // Schedule 조회
+app.patch('/api/v1/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleUpdateSchedule); // Schedule 수정
+app.delete('/api/v1/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleDeleteSchedule); // Schedule 삭제
 
+app.listen(port, () => {
+  console.log(`포트가 4000인 서버 실행`);
+});
 
 // 로그인 API
 /**

@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 class ScheduleRepository {
-    // Day_schedule 관련 메서드
+    // Day_schedule 생성
     async createDaySchedule(userId, date, title, content) {
         return await prisma.day_schedule.create({
             data: {
@@ -14,18 +14,14 @@ class ScheduleRepository {
         });
     }
 
+    // Day_schedule 조회
     async getDaySchedules(userId) {
         return await prisma.day_schedule.findMany({
             where: { user_id: userId },
         });
     }
 
-    async getDayScheduleById(dayId) {
-        return await prisma.day_schedule.findUnique({
-            where: { day_id: dayId },
-        });
-    }
-
+    // Day_schedule 수정
     async updateDaySchedule(dayId, title, content) {
         return await prisma.day_schedule.update({
             where: { day_id: dayId },
@@ -33,56 +29,40 @@ class ScheduleRepository {
         });
     }
 
+    // Day_schedule 삭제
     async deleteDaySchedule(dayId) {
         return await prisma.day_schedule.delete({
             where: { day_id: dayId },
         });
     }
 
-    // Schedule 관련 메서드
-    async createSchedule(dayId, userId, title, dateTime) {
+    // Schedule 생성
+    async createSchedule(dayId, userId, location, dateTime) {
         return await prisma.schedule.create({
             data: {
                 day_id: dayId,
-                user_id: userId,
-                title,
+                location: location,
                 date_time: dateTime,
             },
         });
     }
 
-    async getSchedules(dayId, userId) {
+    // Schedule 조회
+    async getSchedules(dayId) {
         return await prisma.schedule.findMany({
-            where: { day_id: dayId, user_id: userId },
+            where: { day_id: dayId },
         });
     }
 
-    async getSchedulesByDate(dayId, userId, startDate, endDate) {
-        return await prisma.schedule.findMany({
-            where: {
-                day_id: dayId,
-                user_id: userId,
-                date_time: {
-                    gte: startDate,
-                    lt: endDate,
-                },
-            },
-        });
-    }
-
-    async getScheduleById(scheduleId) {
-        return await prisma.schedule.findUnique({
-            where: { schedule_id: scheduleId },
-        });
-    }
-
-    async updateSchedule(scheduleId, title, dateTime) {
+    // Schedule 수정
+    async updateSchedule(scheduleId, location, dateTime) {
         return await prisma.schedule.update({
             where: { schedule_id: scheduleId },
-            data: { title, date_time: dateTime },
+            data: { location, date_time: dateTime },
         });
     }
 
+    // Schedule 삭제
     async deleteSchedule(scheduleId) {
         return await prisma.schedule.delete({
             where: { schedule_id: scheduleId },
