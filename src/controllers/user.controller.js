@@ -83,9 +83,6 @@ const handleUserSignUp = async (req, res) => {
 
 // 로그인 처리
 const handleUserLogin = async (req, res) => {
-  await send(); //!!
-  console.log("이메일 전송"); //!!
-
   const { id, pw } = req.body;
   const secretKey = process.env.JWT_SECRET;
 
@@ -127,9 +124,92 @@ const handleUserLogout = (req, res) => {
   });
 };
 
+//아이디 찾기
+const handleFindUserIdByEmail = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      message: "이메일 주소를 입력해주세요.",
+    });
+  }
+
+  try {
+    // 이메일로 사용자 조회
+    const user = await prisma.user.findFirst({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "해당 이메일로 등록된 사용자가 없습니다.",
+      });
+    }
+
+    // 유저 ID 반환
+    res.status(200).json({
+      message: "아이디 찾기 성공",
+      user_id: user.user_id, // user.user_id로 접근 가능
+    });
+  } catch (error) {
+    console.error("아이디 찾기 오류:", error);
+    res.status(500).json({
+      message: "아이디 찾기 실패",
+      error: error.message,
+    });
+  }
+};
+
+const handleresetPassword = async (req, res) => {
+  const { user_id, email, newPassword, confirmPassword } = req.body;
+
+  if (!user_id || !email || !newPassword || !confirmPassword) {
+    return res.status(400).json({
+      message: "모든 필드를 입력해주세요.",
+    });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({
+      message: "새 비밀번호와 확인 비밀번호가 일치하지 않습니다.",
+    });
+  }
+
+  try {
+    // 사용자 확인
+    const user = await prisma.user.findUnique({
+      where: { user_id },
+    });
+
+    if (!user || user.user_id.toString() !== user_id) {
+      return res.status(404).json({
+        message: "아이디와 이메일이 일치하는 사용자가 없습니다.",
+      });
+    }
+
+    // 비밀번호 업데이트
+    await prisma.user.update({
+      where: { user_id },
+      data: { password: newPassword }, // 암호화 없이 저장
+    });
+
+    res.status(200).json({
+      message: "비밀번호가 성공적으로 변경되었습니다.",
+    });
+  } catch (error) {
+    console.error("비밀번호 재설정 오류:", error);
+    res.status(500).json({
+      message: "비밀번호 재설정 실패",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   handleEmailCertification,
   handleUserSignUp,
   handleUserLogin,
   handleUserLogout,
+  handleFindUserIdByEmail,
+  handleresetPassword,
 };
