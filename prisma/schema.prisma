@@ -30,16 +30,16 @@ model user {
 }
 
 model post {
-  post_id    Int      @id @default(autoincrement())
-  title      String?
-  content    String?
-  music      String?
-  feeling    String?
-  feel_color String?
-  views      Int      @default(0)
-  storage    Int?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  post_id     Int      @id @default(autoincrement())
+  title       String?
+  content     String?
+  music       String?
+  feeling     String?
+  feel_color  String?
+  views       Int      @default(0)
+  storage     Int?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   post_images post_image[]
 
@@ -51,99 +51,120 @@ model post {
 }
 
 model post_image {
-  p_image_id  Int      @id @default(autoincrement())
-  file_name   String?
+  p_image_id    Int        @id @default(autoincrement())
+  file_name     String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  post_id     Int      
-  post        post     @relation(fields: [post_id], references: [post_id])
+  post_id       Int      
+  post          post     @relation(fields: [post_id], references: [post_id])
 }
 
-model stars {
-  stars_id    Int      @id @default(autoincrement())
-  name        String?
-  views       Int      @default(0)
-  vote_num    Int?
-  created_at  DateTime @default(now())
+model stars { 
+  stars_id      Int      @id @default(autoincrement())
+  name          String?
+  views         Int      @default(0)
+  vote_num      Int?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  stars       star[]
+  stars         star[]
 
-  user_id     String   @unique
-  user        user     @relation(fields: [user_id], references: [user_id])
+  user_id       String   @unique
+  user          user     @relation(fields: [user_id], references: [user_id])
 }
 
 model star {
-  star_id     Int      @id @default(autoincrement())
-  region      String?
+  star_id       Int      @id @default(autoincrement())
+  region        String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  posts       post[]
+  posts         post[]
 
-  stars_id    Int      
-  stars       stars    @relation(fields: [stars_id], references: [stars_id])
+  stars_id      Int      
+  stars         stars    @relation(fields: [stars_id], references: [stars_id])
 }
 
 model day_schedule {
-  day_id      Int      @id @default(autoincrement())
-  date        DateTime?
-  title       String?
-  content     String?
+  day_id        Int      @id @default(autoincrement())
+  date          DateTime?
+  title         String?
+  content       String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  schedules   schedule[]
-  user_id     String    
-  user        user     @relation(fields: [user_id], references: [user_id])
+  schedules     schedule[]
+  user_id       String    
+  user          user     @relation(fields: [user_id], references: [user_id])
 }
 
 model schedule {
   schedule_id       Int           @id @default(autoincrement())
   location          String?
   date_time         DateTime
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
 
   day_id            Int      
   day_schedules     day_schedule  @relation(fields: [day_id], references: [day_id])
 }
 
 model subscrition {
-  sub_id      Int      @id @default(autoincrement())
-  deadline    DateTime?
-  method      Int?
+  sub_id         Int      @id @default(autoincrement())
+  deadline       DateTime?
+  method         Int?
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
 
-  user_id     String   @unique
-  user        user     @relation(fields: [user_id], references: [user_id])
+  user_id        String   @unique
+  user           user     @relation(fields: [user_id], references: [user_id])
 }
 
 model friends {
-  fr_id       Int      @id @default(autoincrement())
+  fr_id         Int      @id @default(autoincrement())
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  user_id     String
-  user        user     @relation(fields: [user_id], references: [user_id])
+  user_id       String
+  user          user     @relation(fields: [user_id], references: [user_id])
 }
 
 model friend_add {
-  add_id      Int      @id @default(autoincrement())
-  fr_id       Int
-  status      Int?
+  add_id        Int      @id @default(autoincrement())
+  fr_id         Int
+  status        Int?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  user_id     String
-  user        user     @relation(fields: [user_id], references: [user_id])
+  user_id       String
+  user          user     @relation(fields: [user_id], references: [user_id])
 }
 
 model user_image {
-  u_image_id  Int      @id @default(autoincrement())
-  file_name   String?
+  u_image_id    Int      @id @default(autoincrement())
+  file_name     String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  user_id     String   @unique
-  user        user     @relation(fields: [user_id], references: [user_id])
+  user_id       String   @unique
+  user          user     @relation(fields: [user_id], references: [user_id])
 }
 
 model user_bgimage {
-  bg_image_id Int      @id @default(autoincrement())
-  file_name   String?
+  bg_image_id   Int      @id @default(autoincrement())
+  file_name     String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  user_id     String   @unique
-  user        user     @relation(fields: [user_id], references: [user_id])
+  user_id       String   @unique
+  user          user     @relation(fields: [user_id], references: [user_id])
 }
 
 model search {
-  search_id   Int      @id @default(autoincrement())
-  word        String?
-  number      Int      @default(0)
+  search_id     Int      @id @default(autoincrement())
+  word          String?
+  number        Int      @default(0)
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 }
