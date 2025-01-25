@@ -92,19 +92,19 @@ app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost);
 app.delete('api/v1/users/:userId/posts/:postsId', handleDeletePost);
 
 // 하루 일정 작성
-app.post('/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
-app.get('/users/:user_id/day-schedules', handleGetDaySchedules); // Day Schedule 조회
-app.get('/users/:user_id/day-schedules/:date', handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
-app.patch('/users/:user_id/day-schedules/:day_id', handleUpdateDaySchedule); // Day Schedule 수정
-app.delete('/users/:user_id/day-schedules/:day_id', handleDeleteDaySchedule); // Day Schedule 삭제
+app.post('/prod/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
+app.get('/prod/users/:user_id/day-schedules', handleGetDaySchedules); // Day Schedule 조회
+app.get('/prod/users/:user_id/day-schedules/:date', handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
+app.patch('/prod/users/:user_id/day-schedules/:day_id', handleUpdateDaySchedule); // Day Schedule 수정
+app.delete('/prod/users/:user_id/day-schedules/:day_id', handleDeleteDaySchedule); // Day Schedule 삭제
 
 
 // 일정 작성
-app.post('/users/:user_id/day-schedules/:day_id/schedules', handleAddSchedule); // Schedule 추가
-app.get('/users/:user_id/day-schedules/:day_id/schedules', handleGetSchedules); // Schedule 조회
-app.get('/users/:user_id/day-schedules/:day_id/schedules/:date', handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
-app.patch('/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleUpdateSchedule); // Schedule 수정
-app.delete('/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleDeleteSchedule); // Schedule 삭제
+app.post('/prod/users/:user_id/day-schedules/:day_id/schedules', handleAddSchedule); // Schedule 추가
+app.get('/prod/users/:user_id/day-schedules/:day_id/schedules', handleGetSchedules); // Schedule 조회
+app.get('/prod/users/:user_id/day-schedules/:day_id/schedules/:date', handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
+app.patch('/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleUpdateSchedule); // Schedule 수정
+app.delete('/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleDeleteSchedule); // Schedule 삭제
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
