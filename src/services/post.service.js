@@ -1,23 +1,38 @@
-const { addPost, getPostById, updatePost } = require("../repositories/post.repository.js");
-const { responseFromPost, UserPostResponseDTO } = require("../dtos/post.dto.js");
+const { 
+    findStarByRegion, 
+    findStarsByUserId,
+    createStar, 
+    savePost, 
+    getPostById, 
+    updatePost 
+} = require("../repositories/post.repository.js");
+const { 
+    UserPostResponseDTO 
+} = require("../dtos/post.dto.js");
 
-const createPost = async (data) => {
-    const postId = await addPost({
-        title: data.title,
-        music: data.music || "",
-        content: data.content,
-        photos: data.photos,
-        feeling: data.feeling,
-        author_id: data.author_id,
-        region: data.region || "default_region",  
-        feel_color: data.feel_color
-    });
-    
-    if (!postId) {
-        throw new Error("게시글 생성에 실패했습니다. 동일한 제목의 게시글이 이미 존재할 수 있습니다.");
+const checkOrCreateStar = async (userId, region) => {
+    console.log("Checking or creating star for userId:", userId, "region:", region);
+
+    // 별자리에서 해당 region에 맞는 별을 찾는다
+    let star = await findStarByRegion(region);
+    console.log("Found star:", star);
+
+    if (!star) {
+        // 별자리 아이디 찾기
+        const stars = await findStarsByUserId(userId);
+        console.log("Stars ID for user:", stars.stars_id);
+
+        // 별이 없다면 새로 생성
+        star = await createStar(region, stars.stars_id);
+        console.log("Created Star ID:", star.star_id);
     }
-    
-    return responseFromPost({ id: postId, ...data });
+
+    return star.star_id;
+};
+
+const registerPost = async (userId, starId, postData) => {
+    const newPost = await savePost(userId, starId, postData);
+    return newPost;
 };
 
 const getUserPost = async (userId, postsId) => {
@@ -40,7 +55,8 @@ const editPost = async (userId, postsId, editData) => {
 };
 
 module.exports = {
-    createPost,
+    checkOrCreateStar,
+    registerPost,
     getUserPost,
     editPost
 };

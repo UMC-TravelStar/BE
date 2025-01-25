@@ -1,34 +1,41 @@
-const { createPost, getUserPost, editPost } = require("../services/post.service.js");
-const { deletePost } = require("../repositories/post.repository.js")
-const { bodyToPost, EditPostDto } = require("../dtos/post.dto.js");
+const { 
+    checkOrCreateStar, 
+    registerPost,
+    getUserPost, 
+    editPost 
+} = require("../services/post.service.js");
+const { 
+    deletePost 
+} = require("../repositories/post.repository.js")
+const { 
+    bodyToPost, 
+    EditPostDto 
+} = require("../dtos/post.dto.js");
 const { StatusCodes } = require("http-status-codes");
 
-const handleAddPost = async (req, res, next) => {
+const handleAddPost = async (req, res) => {
     console.log("Request to add post received");
     console.log("Request body:", req.body);
 
+    const { userId } = req.params;
+    const { region, ...restOfData } = req.body;
+
     try {
-        // 요청 Body를 DTO로 변환
-        const postData = bodyToPost(req.body);
+        // userId에 해당하는 별자리의 별이 존재하는지 확인
+        const starId = await checkOrCreateStar(userId, region);
+        console.log("Star ID:", starId);
 
-        // 서비스 호출로 게시물 생성
-        const postResponse = await createPost(postData);
+        // 서비스 호출로 일지 생성
+        const diary = await registerPost(userId, starId, restOfData);
 
-        // 성공 응답 반환
-        res.status(StatusCodes.CREATED).json({
-            message: "게시글 작성 성공",
-            post: postResponse,
-        });
-    } catch (error) {
-        console.error("Error while creating post:", error.message);
-
-        // 실패 응답 반환
-        res.status(StatusCodes.BAD_REQUEST).json({
-            message: "게시글 작성 실패",
-            error: error.message,
-        });
+        res.status(201).json({
+            message: '일지 작성 성공',
+            data: diary,
+          });
+        } catch (error) {
+          res.status(500).json({ message: error.message });
     }
-};
+}
 
 const handleGetUserPost = async (req, res) => {
     console.log("Request to get user post");
