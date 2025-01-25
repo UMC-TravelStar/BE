@@ -6,6 +6,10 @@ const {
     getPostById, 
     updatePost, 
     getStarById,
+    getPostById2,
+    getRelatedPostsByStarId,
+    deletePost,
+    deleteStar,
 } = require("../repositories/post.repository.js");
 const { 
     UserPostResponseDTO 
@@ -37,11 +41,10 @@ const registerPost = async (userId, starId, postData) => {
 };
 
 const getUserPost = async (userId, postsId) => {
-
-    // 데이터베이스에서 게시글 가져오기
+    // 데이터베이스에서 일지 가져오기
     const post = await getPostById(userId, postsId);
 
-    // 게시글이 없으면 null 반환
+    // 일지가 없으면 null 반환
     if (!post) return null;
 
     const star = await getStarById(post.star_id);
@@ -57,9 +60,41 @@ const editPost = async (userId, postsId, editData) => {
     return updatedPost;
 };
 
+const deleteUserPost = async (userId, postsId) => {
+    try {
+        // 게시글 가져오기
+        const post = await getPostById2(userId, postsId);
+        console.log(post);
+
+        if (!post) {
+            console.log("Post not found.");
+            return null;
+        }
+
+        const starId = post.star_id; 
+
+        // 게시글 삭제
+        await deletePost(userId, postsId);
+        console.log(`Post (ID: ${postsId}) deleted successfully.`);
+
+        const relatedPosts = await getRelatedPostsByStarId(starId);
+        if (relatedPosts.length === 0) {
+            await deleteStar(starId);
+            console.log("Star deleted successfully");
+        }
+        
+        return { success: true, message: '일지 삭제 성공' };
+    } catch (error) {
+        console.error("Error in deleteUserPost:", error);
+        throw error;
+    }
+};
+
+
 module.exports = {
     checkOrCreateStar,
     registerPost,
     getUserPost,
-    editPost
+    editPost,
+    deleteUserPost,
 };

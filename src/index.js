@@ -89,7 +89,7 @@ app.get('/api/v1/users/:userId/posts/:postsId', handleGetUserPost);
 app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost);
 
 //일지 삭제
-app.delete('api/v1/users/:userId/posts/:postsId', handleDeletePost);
+app.delete('/api/v1/users/:userId/posts/:postsId', handleDeletePost);
 
 // 하루 일정 작성
 app.post('/prod/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
@@ -572,7 +572,7 @@ app.listen(port, () => {
 // 일지 작성 API
 /**
  * @swagger
- * prod/users/{user_id}/post:
+ * prod/users/{user_id}/posts:
  *   post:
  *     summary: 일지 작성
  *     description: 로그인된 사용자가 일지를를 작성합니다.
@@ -631,7 +631,7 @@ app.listen(port, () => {
 // 일지 조회 API
 /**
  * @swagger
- * /users/{user_id}/posts/{post_id}:
+ * prod/users/{user_id}/posts/{posts_id}:
  *   get:
  *     summary: 일지 조회
  *     description: 사용자가 작성한 일지을 조회합니다.
@@ -686,7 +686,7 @@ app.listen(port, () => {
 // 일지 수정 API
 /**
  * @swagger
- * /users/{user_id}/posts/{post_id}:
+ * /users/{user_id}/posts/{posts_id}:
  *   patch:
  *     summary: 일지 수정
  *     description: 사용자가 작성한 일지를 수정합니다.

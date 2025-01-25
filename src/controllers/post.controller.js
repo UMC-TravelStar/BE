@@ -2,11 +2,9 @@ const {
     checkOrCreateStar, 
     registerPost,
     getUserPost, 
-    editPost 
+    editPost,
+    deleteUserPost,
 } = require("../services/post.service.js");
-const { 
-    deletePost 
-} = require("../repositories/post.repository.js")
 const { 
     EditPostDto 
 } = require("../dtos/post.dto.js");
@@ -44,7 +42,7 @@ const handleGetUserPost = async (req, res) => {
         const { userId, postsId } = req.params;
         
         if (!userId || !postsId) {
-            throw new Error('userId 또는 postsId 를 확인해주세요.');
+            return res.status(400).json({ success: false, message: "일지 조회 실패 (userId or postsId 누락)" });
         }
 
         // 서비스 호출
@@ -102,15 +100,18 @@ const handleDeletePost = async (req, res) => {
 
     try {
         const { userId, postsId } = req.params;
-
-        // 게시물 삭제 처리
-        const deletedPost = await deletePost(userId, postsId);
         
-        if (!deletedPost) {
+        if (!userId || !postsId) {
+            return res.status(400).json({ success: false, message: "일지 삭제 실패 (userId or postsId 누락)" });
+        }
+        
+        const deletePost = await deleteUserPost(userId, postsId);
+
+        if (!deletePost) {
             return res.status(404).json({ success: false, message: '일지를 찾을 수 없음.' });
         }
 
-        res.status(200).json({ success: true, message: '일지 삭제 성공' });
+        res.status(200).json({ success: true, message: deletePost.message });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: '서버 내부 오류' });

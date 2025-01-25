@@ -101,11 +101,36 @@ const updatePost = async (userId, postsId, editData) => {
     });
 }
 
+const getPostById2 = async (userId, postsId) => {
+    return prisma.post.findUnique({
+        where: { 
+            user_id: userId,
+            post_id: parseInt(postsId),
+        },
+    });
+};
+
+const getRelatedPostsByStarId = async (starId) => {
+    return await prisma.post.findMany({
+        where: { 
+            star_id: parseInt(starId)
+        },
+    });
+};
+
 const deletePost = async (userId, postsId) => {
     return await prisma.post.delete({
         where: {
-            author_id: parseInt(userId),
+            user_id: userId,
             post_id: parseInt(postsId),
+        },
+    });
+};
+
+const deleteStar = async (starId) => {
+    return await prisma.star.delete({
+        where: {
+            star_id: parseInt(starId)
         },
     });
 };
@@ -118,5 +143,8 @@ module.exports = {
     getPostById,
     getStarById,
     updatePost,
-    deletePost
+    getPostById2,
+    getRelatedPostsByStarId,
+    deletePost,
+    deleteStar,
 };
