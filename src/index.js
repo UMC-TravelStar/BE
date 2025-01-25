@@ -75,11 +75,18 @@ app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost);
 //일지 삭제
 app.delete('api/v1/users/:userId/posts/:postsId', handleDeletePost);
 
-// 일정 관리 API
-app.post("/api/users/:user_id/schedules", ScheduleController.addSchedule); // 일정 추가
-app.get("/api/users/:user_id/schedules", ScheduleController.getSchedules); // 일정 조회
-app.patch("/api/users/:user_id/schedules/:schedule_id", ScheduleController.updateSchedule); // 일정 수정
-app.delete("/api/users/:user_id/schedules/:schedule_id", ScheduleController.deleteSchedule); // 일정 삭제
+// 하루 일정 API
+app.post("/api/users/:user_id/day-schedules", ScheduleController.addDaySchedule); // 일정 추가
+app.get("/api/users/:user_id/day-schedules", ScheduleController.getDaySchedules); // 일정 조회
+app.patch("/api/users/:user_id/day-schedules/:day_id", ScheduleController.updateDaySchedule); // 일정 수정
+app.delete("/api/users/:user_id/day-schedules/:day_id", ScheduleController.deleteDaySchedule); // 일정 삭제
+
+// 일정 API
+app.post("/api/users/:user_id/day-schedules/:day_id/schedules", ScheduleController.addSchedule); // 일정 추가
+app.get("/api/users/:user_id/day-schedules/:day_id/schedules", ScheduleController.getSchedulesByDate); // 일정 조회
+app.patch("/api/users/:user_id/day-schedules/:day_id/schedules/:schedule_id", ScheduleController.updateSchedule); // 일정 수정
+app.delete("/api/users/:user_id/day-schedules/:day_id/schedules/:schedule_id", ScheduleController.deleteSchedule); // 일정 삭제
+
 
 // 로그인 API
 /**
