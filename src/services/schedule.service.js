@@ -11,6 +11,11 @@ class ScheduleService {
         return await ScheduleRepository.getDaySchedules(userId);
     }
 
+    // 날짜별 Day Schedule 조회
+    async getDaySchedulesByDate(userId, date) {
+        return await ScheduleRepository.getDaySchedulesByDate(userId, date);
+    }
+
     // Day_schedule 수정
     async updateDaySchedule(dayId, title, content) {
         return await ScheduleRepository.updateDaySchedule(dayId, title, content);
@@ -29,6 +34,11 @@ class ScheduleService {
     // Schedule 조회
     async getSchedules(dayId) {
         return await ScheduleRepository.getSchedules(dayId);
+    }
+
+    // 날짜별 Schedule 조회
+    async getSchedulesByDate(dayId, date) {
+        return await ScheduleRepository.getSchedulesByDate(dayId, date);
     }
 
     // Schedule 수정

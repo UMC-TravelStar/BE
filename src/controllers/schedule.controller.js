@@ -31,6 +31,19 @@ const handleGetDaySchedules = async (req, res) => {
     }
 };
 
+const handleGetDaySchedulesByDateInUrl = async (req, res) => {
+    const userId = req.params.user_id;
+    const { date } = req.params; // URL 파라미터에서 날짜를 가져옴
+
+    try {
+        const daySchedules = await ScheduleService.getDaySchedulesByDate(userId, new Date(date));
+        res.status(200).json(daySchedules.map(ds => new DayScheduleDto(ds)));
+    } catch (error) {
+        console.error("일정 조회 실패:", error);
+        res.status(500).json({ message: "일정 조회 실패", error: error.message });
+    }
+};
+
 const handleUpdateDaySchedule = async (req, res) => {
     const { title, content } = req.body;
     const dayId = parseInt(req.params.day_id);
@@ -86,6 +99,20 @@ const handleGetSchedules = async (req, res) => {
     }
 };
 
+const handleGetSchedulesByDateInUrl = async (req, res) => {
+    const dayId = parseInt(req.params.day_id);
+    const { date } = req.params; // URL 파라미터에서 날짜를 가져옴
+
+    try {
+        const schedules = await ScheduleService.getSchedulesByDate(dayId, new Date(date));
+        res.status(200).json(schedules.map(s => new ScheduleDto(s)));
+    } catch (error) {
+        console.error("일정 조회 실패:", error);
+        res.status(500).json({ message: "일정 조회 실패", error: error.message });
+    }
+};
+
+
 const handleUpdateSchedule = async (req, res) => {
     const { location, date_time } = req.body;
     const scheduleId = parseInt(req.params.schedule_id);
@@ -119,5 +146,6 @@ module.exports = {
     handleAddSchedule,
     handleGetSchedules,
     handleUpdateSchedule,
-    handleDeleteSchedule
+    handleDeleteSchedule,handleGetDaySchedulesByDateInUrl,
+    handleGetSchedulesByDateInUrl 
 };
