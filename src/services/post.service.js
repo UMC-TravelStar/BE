@@ -33,10 +33,6 @@ const getUserPost = async (userId, postsId) => {
 };
 
 const editPost = async (userId, postsId, editData) => {
-    // 해당 게시글이 존재하는지 확인
-    const post = await getPostById(userId, postsId);
-    if (!post) return null;
-
     // 게시글 수정
     const updatedPost = await updatePost(userId, postsId, editData);
 

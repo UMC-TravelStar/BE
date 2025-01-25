@@ -30,6 +30,18 @@ const addPost = async (data) => {
 };
 
 const getPostById = async (userId, postsId) => {
+    await prisma.post.update({
+        where: {
+            author_id: userId,
+            post_id: postsId
+        },
+        data: {
+          views: {
+            increment: 1
+          }
+        }
+    });
+
     return prisma.post.findUnique({
         where: { 
             author_id: parseInt(userId),
@@ -48,8 +60,18 @@ const updatePost = async (userId, postsId, editData) => {
     });
 }
 
+const deletePost = async (userId, postsId) => {
+    return await prisma.post.delete({
+        where: {
+            author_id: parseInt(userId),
+            post_id: parseInt(postsId),
+        },
+    });
+};
+
 module.exports = {
     addPost,
     getPostById,
-    updatePost
+    updatePost,
+    deletePost
 };

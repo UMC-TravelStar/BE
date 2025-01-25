@@ -1,4 +1,5 @@
 const { createPost, getUserPost, editPost } = require("../services/post.service.js");
+const { deletePost } = require("../repositories/post.repository.js")
 const { bodyToPost, EditPostDto } = require("../dtos/post.dto.js");
 const { StatusCodes } = require("http-status-codes");
 
@@ -67,7 +68,7 @@ const handleEditPost = async (req, res) => {
         const editData = new EditPostDto(req.body);
 
         if (!userId || !postsId) {
-            return res.status(400).json({ success: false, message: "Missing required parameters: userId or postsId" });
+            return res.status(400).json({ success: false, message: "일지 수정 실패 (userId or postsId 누락)" });
         }
 
         const post = await getUserPost(userId, postsId);
@@ -77,9 +78,6 @@ const handleEditPost = async (req, res) => {
         }
 
         const updatedPostId = await editPost(userId, postsId, editData);
-        if (!updatedPostId) {
-            return res.status(400).json({ success: false, message: "일지 수정 실패" });
-        }
 
         res.status(200).json({
             success: true,
@@ -93,8 +91,30 @@ const handleEditPost = async (req, res) => {
     }
 };
 
+const handleDeletePost = async (req, res) => {
+    console.log("Request to delete user post");
+
+    try {
+        const { userId, postsId } = req.params;
+
+        // 게시물 삭제 처리
+        const deletedPost = await deletePost(userId, postsId);
+        
+        if (!deletedPost) {
+            return res.status(404).json({ success: false, message: '일지를 찾을 수 없음.' });
+        }
+
+        res.status(200).json({ success: true, message: '일지 삭제 성공' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: '서버 내부 오류' });
+    }
+};
+
+
 module.exports = {
     handleAddPost,
     handleGetUserPost,
-    handleEditPost
+    handleEditPost,
+    handleDeletePost
 };

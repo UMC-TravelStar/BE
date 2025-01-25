@@ -6,7 +6,6 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
 const {
-  handleEmailCertification,
   handleUserSignUp,
   handleUserLogin,
   handleUserLogout,
@@ -16,6 +15,7 @@ const server_ip = process.env.IP;
 const { handleAddPost, 
         handleGetUserPost,
         handleEditPost, 
+        handleDeletePost,
 } = require("./controllers/post.controller.js");
 
 const options = {
@@ -57,8 +57,6 @@ app.get('/', (req, res) => {
 });
 
 //유저관리
-app.post("/email", handleEmailCertification);
-
 app.post("/register", handleUserSignUp);
 
 app.post("/login", handleUserLogin);
@@ -73,6 +71,9 @@ app.get('/api/v1/users/:userId/posts/:postsId', handleGetUserPost);
 
 //일지 수정
 app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost);
+
+//일지 삭제
+app.delete('api/v1/users/:userId/posts/:postsId', handleDeletePost);
 
 // 일정 관리 API
 app.post("/api/users/:user_id/schedules", ScheduleController.addSchedule); // 일정 추가
