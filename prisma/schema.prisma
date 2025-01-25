@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model user {
   user_id       String     @id
   nickname      String 
   password      String 
@@ -18,18 +18,18 @@ model User {
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
 
-  posts         Post[]
-  day_schedules Day_schedule[]
-  friendss      Friends[]
-  friend_adds   Friend_add[]
+  posts         post[]
+  day_schedules day_schedule[]
+  friendss      friends[]
+  friend_adds   friend_add[]
 
-  stars         Stars?
-  subscrition   Subscrition?
-  u_image       User_image?
-  u_bgimage     User_bgimage?
+  stars         stars?
+  subscrition   subscrition?
+  u_image       user_image?
+  u_bgimage     user_bgimage?
 }
 
-model Post {
+model post {
   post_id    Int      @id @default(autoincrement())
   title      String?
   content    String?
@@ -41,108 +41,108 @@ model Post {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  post_images Post_image[]
+  post_images post_image[]
 
   user_id     String      
-  user        User     @relation(fields: [user_id], references: [user_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
 
   star_id     Int      
-  star        Star     @relation(fields: [star_id], references: [star_id])
+  star        star     @relation(fields: [star_id], references: [star_id])
 }
 
-model Post_image {
+model post_image {
   p_image_id  Int      @id @default(autoincrement())
   file_name   String?
 
   post_id     Int      
-  post        Post     @relation(fields: [post_id], references: [post_id])
+  post        post     @relation(fields: [post_id], references: [post_id])
 }
 
-model Stars {
+model stars {
   stars_id    Int      @id @default(autoincrement())
   name        String?
   views       Int      @default(0)
   vote_num    Int?
   created_at  DateTime @default(now())
 
-  stars       Star[]
+  stars       star[]
 
   user_id     String   @unique
-  user        User     @relation(fields: [user_id], references: [user_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
 }
 
-model Star {
+model star {
   star_id     Int      @id @default(autoincrement())
   region      String?
 
-  posts       Post[]
+  posts       post[]
 
   stars_id    Int      
-  stars       Stars    @relation(fields: [stars_id], references: [stars_id])
+  stars       stars    @relation(fields: [stars_id], references: [stars_id])
 }
 
-model Day_schedule {
+model day_schedule {
   day_id      Int      @id @default(autoincrement())
   date        DateTime?
   title       String?
   content     String?
 
-  schedules   Schedule[]
+  schedules   schedule[]
   user_id     String    
-  user        User     @relation(fields: [user_id], references: [user_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
 }
 
-model Schedule {
+model schedule {
   schedule_id       Int           @id @default(autoincrement())
   location          String?
   date_time         DateTime
 
   day_id            Int      
-  day_schedules     Day_schedule  @relation(fields: [day_id], references: [day_id])
+  day_schedules     day_schedule  @relation(fields: [day_id], references: [day_id])
 }
 
-model Subscrition {
+model subscrition {
   sub_id      Int      @id @default(autoincrement())
   deadline    DateTime?
   method      Int?
 
   user_id     String   @unique
-  user        User     @relation(fields: [user_id], references: [user_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
 }
 
-model Friends {
+model friends {
   fr_id       Int      @id @default(autoincrement())
 
   user_id     String
-  user        User     @relation(fields: [user_id], references: [user_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
 }
 
-model Friend_add {
+model friend_add {
   add_id      Int      @id @default(autoincrement())
   fr_id       Int
   status      Int?
 
   user_id     String
-  user        User     @relation(fields: [user_id], references: [user_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
 }
 
-model User_image {
+model user_image {
   u_image_id  Int      @id @default(autoincrement())
   file_name   String?
 
   user_id     String   @unique
-  user        User     @relation(fields: [user_id], references: [user_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
 }
 
-model User_bgimage {
+model user_bgimage {
   bg_image_id Int      @id @default(autoincrement())
   file_name   String?
 
   user_id     String   @unique
-  user        User     @relation(fields: [user_id], references: [user_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
 }
 
-model Search {
+model search {
   search_id   Int      @id @default(autoincrement())
   word        String?
   number      Int      @default(0)
