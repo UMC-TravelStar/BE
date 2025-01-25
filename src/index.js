@@ -9,14 +9,28 @@ const {
   handleUserSignUp,
   handleUserLogin,
   handleUserLogout,
+  handleFindUserIdByEmail,
+  handleresetPassword,
 } = require("./controllers/user.controller.js");
-const ScheduleController = require("./controllers/schedule.controller"); 
+const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
 const { handleAddPost, 
         handleGetUserPost,
         handleEditPost, 
         handleDeletePost,
 } = require("./controllers/post.controller.js");
+const {
+  handleAddDaySchedule,
+  handleGetDaySchedules,
+  handleGetDaySchedulesByDateInUrl,
+  handleUpdateDaySchedule,
+  handleDeleteDaySchedule,
+  handleAddSchedule,
+  handleGetSchedules,
+  handleGetSchedulesByDateInUrl,
+  handleUpdateSchedule,
+  handleDeleteSchedule,
+} = require("./controllers/schedule.controller.js");
 
 const options = {
   swaggerDefinition: {
@@ -37,9 +51,7 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 
-app.listen(port, () => {
-  console.log(`포트가 4000인 서버 실행`);
-});
+
 
 app.use(
   cors({
@@ -52,8 +64,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-app.get('/', (req, res) => {
-  res.send('Welcome to the server!');
+app.get("/", (req, res) => {
+  res.send("Welcome to the server!");
 });
 
 //유저관리
@@ -62,6 +74,10 @@ app.post("/register", handleUserSignUp);
 app.post("/login", handleUserLogin);
 
 app.get("/logout", handleUserLogout);
+
+app.get("/find-id", handleFindUserIdByEmail);
+
+app.get("/reset-pw", handleresetPassword);
 
 //일지 작성
 app.post('/api/v1/users/:userId/posts', handleAddPost);
@@ -75,16 +91,29 @@ app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost);
 //일지 삭제
 app.delete('api/v1/users/:userId/posts/:postsId', handleDeletePost);
 
-// 일정 관리 API
-app.post("/api/users/:user_id/schedules", ScheduleController.addSchedule); // 일정 추가
-app.get("/api/users/:user_id/schedules", ScheduleController.getSchedules); // 일정 조회
-app.patch("/api/users/:user_id/schedules/:schedule_id", ScheduleController.updateSchedule); // 일정 수정
-app.delete("/api/users/:user_id/schedules/:schedule_id", ScheduleController.deleteSchedule); // 일정 삭제
+// 하루 일정 작성
+app.post('/prod/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
+app.get('/prod/users/:user_id/day-schedules', handleGetDaySchedules); // Day Schedule 조회
+app.get('/prod/users/:user_id/day-schedules/:date', handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
+app.patch('/prod/users/:user_id/day-schedules/:day_id', handleUpdateDaySchedule); // Day Schedule 수정
+app.delete('/prod/users/:user_id/day-schedules/:day_id', handleDeleteDaySchedule); // Day Schedule 삭제
+
+
+// 일정 작성
+app.post('/prod/users/:user_id/day-schedules/:day_id/schedules', handleAddSchedule); // Schedule 추가
+app.get('/prod/users/:user_id/day-schedules/:day_id/schedules', handleGetSchedules); // Schedule 조회
+app.get('/prod/users/:user_id/day-schedules/:day_id/schedules/:date', handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
+app.patch('/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleUpdateSchedule); // Schedule 수정
+app.delete('/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleDeleteSchedule); // Schedule 삭제
+
+app.listen(port, () => {
+  console.log(`포트가 4000인 서버 실행`);
+});
 
 // 로그인 API
 /**
  * @swagger
- * prod/login:
+ * /prod/login:
  *   post:
  *     summary: 로그인
  *     description: 사용자가 로그인합니다.
@@ -120,7 +149,7 @@ app.delete("/api/users/:user_id/schedules/:schedule_id", ScheduleController.dele
 // 회원가입 API
 /**
  * @swagger
- * prod/register:
+ * /prod/register:
  *   post:
  *     summary: 회원가입
  *     description: 사용자를 등록합니다.
@@ -176,23 +205,26 @@ app.delete("/api/users/:user_id/schedules/:schedule_id", ScheduleController.dele
  *         description: 회원가입 실패
  */
 
-// 이메일 중복 확인 API
 /**
  * @swagger
- * /register/email-check:
- *   get:
- *     summary: 이메일 중복 확인
- *     description: 사용자가 입력한 이메일이 이미 등록되어 있는지 확인합니다.
- *     parameters:
- *       - in: query
- *         name: email
- *         required: true
- *         schema:
- *           type: string
- *         description: 확인할 이메일 주소
+ * /prod/email:
+ *   post:
+ *     summary: 이메일 인증번호 발송
+ *     description: 사용자가 입력한 이메일로 인증번호를 발송하고 인증 코드를 응답합니다. 이후 사용자의 입력이 적절한지 확인하는 로직을 수행합니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: 인증 코드를 받을 이메일 주소
+ *                 example: "user@example.com"
  *     responses:
  *       200:
- *         description: 이메일 중복 확인 성공
+ *         description: 인증 이메일 발송 성공
  *         content:
  *           application/json:
  *             schema:
@@ -200,12 +232,12 @@ app.delete("/api/users/:user_id/schedules/:schedule_id", ScheduleController.dele
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "이메일 사용 가능"
- *                 available:
- *                   type: boolean
- *                   example: true
- *       409:
- *         description: 이메일이 이미 등록되어 있음
+ *                   example: "인증 이메일이 발송되었습니다."
+ *                 authCode:
+ *                   type: string
+ *                   example: "123456"
+ *       400:
+ *         description: 잘못된 요청
  *         content:
  *           application/json:
  *             schema:
@@ -213,9 +245,162 @@ app.delete("/api/users/:user_id/schedules/:schedule_id", ScheduleController.dele
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "이미 사용 중인 이메일입니다."
+ *                   example: "이메일 주소를 입력해주세요."
+ *       500:
+ *         description: 서버 오류로 인해 이메일 발송 실패
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "이메일 발송 실패"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
  */
 
+/**
+ * @swagger
+ * /prod/reset-pw:
+ *   post:
+ *     summary: 비밀번호 재설정
+ *     description: 아이디와 이메일을 사용하여 비밀번호를 새로 설정합니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *                 description: 유저의 아이디
+ *                 example: "123"
+ *               email:
+ *                 type: string
+ *                 description: 유저의 이메일 주소
+ *                 example: "user@example.com"
+ *               newPassword:
+ *                 type: string
+ *                 description: 새 비밀번호
+ *                 example: "newPassword123"
+ *               confirmPassword:
+ *                 type: string
+ *                 description: 새 비밀번호 확인
+ *                 example: "newPassword123"
+ *     responses:
+ *       200:
+ *         description: 비밀번호 재설정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "비밀번호가 성공적으로 변경되었습니다."
+ *       400:
+ *         description: 잘못된 요청 - 필수 필드 누락 또는 비밀번호 불일치
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "새 비밀번호와 확인 비밀번호가 일치하지 않습니다."
+ *       404:
+ *         description: 아이디와 이메일이 일치하는 사용자가 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "아이디와 이메일이 일치하는 사용자가 없습니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "비밀번호 재설정 실패"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */
+
+/**
+ * @swagger
+ * /prod/find-id:
+ *   post:
+ *     summary: 이메일로 유저 ID 찾기
+ *     description: 사용자가 입력한 이메일로 등록된 유저의 ID를 반환합니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: 유저 ID를 찾을 이메일 주소
+ *                 example: "user@example.com"
+ *     responses:
+ *       200:
+ *         description: 유저 ID 찾기 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "아이디 찾기 성공"
+ *                 user_id:
+ *                   type: integer
+ *                   example: 123
+ *       400:
+ *         description: 잘못된 요청 - 이메일 미입력
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "이메일 주소를 입력해주세요."
+ *       404:
+ *         description: 해당 이메일로 등록된 사용자가 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "해당 이메일로 등록된 사용자가 없습니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "아이디 찾기 실패"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */
 
 // 유저의 일지 조회 API
 /**
@@ -679,7 +864,6 @@ app.delete("/api/users/:user_id/schedules/:schedule_id", ScheduleController.dele
  *       404:
  *         description: 행성을 찾을 수 없음
  */
-
 
 // 다른 사용자의 행성 조회 API
 /**
