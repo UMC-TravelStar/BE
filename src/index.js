@@ -79,17 +79,11 @@ app.get("/find-id", handleFindUserIdByEmail);
 
 app.get("/reset-pw", handleresetPassword);
 
-//일지 작성
-app.post('/api/v1/users/:userId/posts', handleAddPost);
-
-//일지 조회
-app.get('/api/v1/users/:userId/posts/:postsId', handleGetUserPost);
-
-//일지 수정
-app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost);
-
-//일지 삭제
-app.delete('/api/v1/users/:userId/posts/:postsId', handleDeletePost);
+// 일지
+app.post('/api/v1/users/:userId/posts', handleAddPost); // 일지 작성
+app.get('/api/v1/users/:userId/posts/:postsId', handleGetUserPost); // 일지 조회(보기)
+app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost); // 일지 수정
+app.delete('/api/v1/users/:userId/posts/:postsId', handleDeletePost); // 일지 삭제
 
 // 하루 일정 작성
 app.post('/prod/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
@@ -736,7 +730,7 @@ app.listen(port, () => {
 // 일지 삭제 API
 /**
  * @swagger
- * /users/{user_id}/posts/{post_id}:
+ * prod/users/{user_id}/posts/{posts_id}:
  *   delete:
  *     summary: 일지 삭제
  *     description: 사용자가 작성한 일지를 삭제합니다.
