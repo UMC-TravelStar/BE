@@ -3,9 +3,9 @@ POST http://localhost:4000/register
 Content-Type: application/json; charset=UTF-8
 
 {
-  "user_id": "test4",
+  "user_id": "1234",
   "nickname": "qqqq",
-  "password": "qqqq",
+  "password": "1234",
   "name": "qqqq",
   "birth": "1990-01-01",
   "phonenum": "01067058085",
@@ -28,11 +28,30 @@ Content-Type: application/json; charset=UTF-8
   "email": "ri7116@naver.com"
 }
 
+###id찾기
+get http://localhost:4000/find-id
+Content-Type: application/json; charset=UTF-8
+
+{
+  "email": "qqqq@naver.com"
+}
+
+###비밀번호 찾기
+get http://localhost:4000/reset-pw
+Content-Type: application/json; charset=UTF-8
+
+{
+  "user_id": "1234",
+  "email": "qqqq@naver.com",
+  "newPassword":"12345",
+  "confirmPassword":"12345"
+}
+
 ###
 POST https://w94yrmif2m.execute-api.ap-northeast-2.amazonaws.com/prod/login
 Content-Type: application/json; charset=UTF-8
 
 {
-  "id": "1",
+  "id": "1234",
   "pw": "1234"
 }
