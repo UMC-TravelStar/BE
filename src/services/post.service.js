@@ -1,4 +1,4 @@
-const { addPost, getPostById } = require("../repositories/post.repository.js");
+const { addPost, getPostById, updatePost } = require("../repositories/post.repository.js");
 const { responseFromPost, UserPostResponseDTO } = require("../dtos/post.dto.js");
 
 const createPost = async (data) => {
@@ -20,10 +20,10 @@ const createPost = async (data) => {
     return responseFromPost({ id: postId, ...data });
 };
 
-const getUserPost = async (userId, postId) => {
+const getUserPost = async (userId, postsId) => {
 
     // 데이터베이스에서 게시글 가져오기
-    const post = await getPostById(userId, postId);
+    const post = await getPostById(userId, postsId);
 
     // 게시글이 없으면 null 반환
     if (!post) return null;
@@ -32,7 +32,15 @@ const getUserPost = async (userId, postId) => {
     return new UserPostResponseDTO(post);
 };
 
+const editPost = async (userId, postsId, editData) => {
+    // 게시글 수정
+    const updatedPost = await updatePost(userId, postsId, editData);
+
+    return updatedPost;
+};
+
 module.exports = {
     createPost,
-    getUserPost
+    getUserPost,
+    editPost
 };

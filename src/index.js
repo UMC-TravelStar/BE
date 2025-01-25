@@ -12,7 +12,11 @@ const {
 } = require("./controllers/user.controller.js");
 const ScheduleController = require("./controllers/schedule.controller"); 
 const server_ip = process.env.IP;
-const { handleAddPost, handleGetUserPost } = require("./controllers/post.controller.js");
+const { handleAddPost, 
+        handleGetUserPost,
+        handleEditPost, 
+        handleDeletePost,
+} = require("./controllers/post.controller.js");
 
 const options = {
   swaggerDefinition: {
@@ -60,9 +64,16 @@ app.post("/login", handleUserLogin);
 app.get("/logout", handleUserLogout);
 
 //일지 작성
-app.post('/api/v1/users/:user_id/post', handleAddPost);
+app.post('/api/v1/users/:userId/posts', handleAddPost);
+
 //일지 조회
-app.get('/api/v1/users/:userId/posts/:postId', handleGetUserPost);
+app.get('/api/v1/users/:userId/posts/:postsId', handleGetUserPost);
+
+//일지 수정
+app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost);
+
+//일지 삭제
+app.delete('api/v1/users/:userId/posts/:postsId', handleDeletePost);
 
 // 일정 관리 API
 app.post("/api/users/:user_id/schedules", ScheduleController.addSchedule); // 일정 추가
