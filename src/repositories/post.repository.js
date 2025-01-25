@@ -65,8 +65,8 @@ const savePost = async (userId, starId, postData) => {
 const getPostById = async (userId, postsId) => {
     await prisma.post.update({
         where: {
-            author_id: userId,
-            post_id: postsId
+            user_id: userId,
+            post_id: parseInt(postsId),
         },
         data: {
           views: {
@@ -77,8 +77,16 @@ const getPostById = async (userId, postsId) => {
 
     return prisma.post.findUnique({
         where: { 
-            author_id: parseInt(userId),
+            user_id: userId,
             post_id: parseInt(postsId),
+        },
+    });
+};
+
+const getStarById = async (starId) => {
+    return prisma.star.findUnique({
+        where: {
+            star_id: parseInt(starId)
         },
     });
 };
@@ -108,6 +116,7 @@ module.exports = {
     createStar,
     savePost,
     getPostById,
+    getStarById,
     updatePost,
     deletePost
 };

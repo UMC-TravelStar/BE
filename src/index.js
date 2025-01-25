@@ -572,7 +572,7 @@ app.listen(port, () => {
 // 일지 작성 API
 /**
  * @swagger
- * /users/{user_id}/post:
+ * prod/users/{user_id}/post:
  *   post:
  *     summary: 일지 작성
  *     description: 로그인된 사용자가 일지를를 작성합니다.

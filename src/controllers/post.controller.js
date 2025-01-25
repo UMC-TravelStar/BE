@@ -8,7 +8,6 @@ const {
     deletePost 
 } = require("../repositories/post.repository.js")
 const { 
-    bodyToPost, 
     EditPostDto 
 } = require("../dtos/post.dto.js");
 const { StatusCodes } = require("http-status-codes");
@@ -33,7 +32,7 @@ const handleAddPost = async (req, res) => {
             data: diary,
           });
         } catch (error) {
-          res.status(500).json({ message: error.message });
+          res.status(400).json({ message: error.message });
     }
 }
 
@@ -45,7 +44,7 @@ const handleGetUserPost = async (req, res) => {
         const { userId, postsId } = req.params;
         
         if (!userId || !postsId) {
-            throw new Error('Missing required parameters: userId or postId');
+            throw new Error('userId 또는 postsId 를 확인해주세요.');
         }
 
         // 서비스 호출

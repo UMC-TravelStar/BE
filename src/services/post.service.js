@@ -4,7 +4,8 @@ const {
     createStar, 
     savePost, 
     getPostById, 
-    updatePost 
+    updatePost, 
+    getStarById,
 } = require("../repositories/post.repository.js");
 const { 
     UserPostResponseDTO 
@@ -43,8 +44,10 @@ const getUserPost = async (userId, postsId) => {
     // 게시글이 없으면 null 반환
     if (!post) return null;
 
+    const star = await getStarById(post.star_id);
+
     // DTO 변환
-    return new UserPostResponseDTO(post);
+    return new UserPostResponseDTO(post, star);
 };
 
 const editPost = async (userId, postsId, editData) => {
