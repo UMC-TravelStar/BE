@@ -637,7 +637,7 @@ app.listen(port, () => {
  *           type: string
  *         description: "사용자 ID (로그인된 사용자)"
  *       - in: path
- *         name: post_id
+ *         name: posts_id
  *         required: true
  *         schema:
  *           type: integer
@@ -692,7 +692,7 @@ app.listen(port, () => {
  *           type: string
  *         description: "로그인된 사용자 ID"
  *       - in: path
- *         name: post_id
+ *         name: posts_id
  *         required: true
  *         schema:
  *           type: integer
@@ -742,7 +742,7 @@ app.listen(port, () => {
  *           type: string
  *         description: "로그인된 사용자 ID"
  *       - in: path
- *         name: post_id
+ *         name: posts_id
  *         required: true
  *         schema:
  *           type: integer
