@@ -6,6 +6,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
 const {
+  handleEmailCertification,
   handleUserSignUp,
   handleUserLogin,
   handleUserLogout,
@@ -14,10 +15,11 @@ const {
 } = require("./controllers/user.controller.js");
 const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
-const { handleAddPost, 
-        handleGetUserPost,
-        handleEditPost, 
-        handleDeletePost,
+const {
+  handleAddPost,
+  handleGetUserPost,
+  handleEditPost,
+  handleDeletePost,
 } = require("./controllers/post.controller.js");
 const {
   handleAddDaySchedule,
@@ -51,7 +53,9 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 
-
+app.listen(port, () => {
+  console.log(`포트가 4000인 서버 실행`);
+});
 
 app.use(
   cors({
@@ -69,6 +73,8 @@ app.get("/", (req, res) => {
 });
 
 //유저관리
+app.post("/email", handleEmailCertification);
+
 app.post("/register", handleUserSignUp);
 
 app.post("/login", handleUserLogin);
@@ -80,31 +86,42 @@ app.get("/find-id", handleFindUserIdByEmail);
 app.get("/reset-pw", handleresetPassword);
 
 //일지 작성
-app.post('/api/v1/users/:userId/posts', handleAddPost);
+app.post("/api/v1/users/:userId/posts", handleAddPost);
 
 //일지 조회
-app.get('/api/v1/users/:userId/posts/:postsId', handleGetUserPost);
+app.get("/api/v1/users/:userId/posts/:postsId", handleGetUserPost);
 
 //일지 수정
-app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost);
+app.patch("/api/v1/users/:userId/posts/:postsId", handleEditPost);
 
 //일지 삭제
-app.delete('api/v1/users/:userId/posts/:postsId', handleDeletePost);
+app.delete("api/v1/users/:userId/posts/:postsId", handleDeletePost);
 
 // 하루 일정 작성
-app.post('/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
-app.get('/users/:user_id/day-schedules', handleGetDaySchedules); // Day Schedule 조회
-app.get('/users/:user_id/day-schedules/:date', handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
-app.patch('/users/:user_id/day-schedules/:day_id', handleUpdateDaySchedule); // Day Schedule 수정
-app.delete('/users/:user_id/day-schedules/:day_id', handleDeleteDaySchedule); // Day Schedule 삭제
-
+app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
+app.get("/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
+app.get(
+  "/users/:user_id/day-schedules/:date",
+  handleGetDaySchedulesByDateInUrl
+); // 날짜별 Day Schedule 조회
+app.patch("/users/:user_id/day-schedules/:day_id", handleUpdateDaySchedule); // Day Schedule 수정
+app.delete("/users/:user_id/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule 삭제
 
 // 일정 작성
-app.post('/users/:user_id/day-schedules/:day_id/schedules', handleAddSchedule); // Schedule 추가
-app.get('/users/:user_id/day-schedules/:day_id/schedules', handleGetSchedules); // Schedule 조회
-app.get('/users/:user_id/day-schedules/:day_id/schedules/:date', handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
-app.patch('/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleUpdateSchedule); // Schedule 수정
-app.delete('/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleDeleteSchedule); // Schedule 삭제
+app.post("/users/:user_id/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
+app.get("/users/:user_id/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
+app.get(
+  "/users/:user_id/day-schedules/:day_id/schedules/:date",
+  handleGetSchedulesByDateInUrl
+); // 날짜별 Schedule 조회
+app.patch(
+  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
+  handleUpdateSchedule
+); // Schedule 수정
+app.delete(
+  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
+  handleDeleteSchedule
+); // Schedule 삭제
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -405,7 +422,7 @@ app.listen(port, () => {
 // 유저의 일지 조회 API
 /**
  * @swagger
- * /users/{user_id}/posts:
+ * /prod/users/{user_id}/posts:
  *   get:
  *     summary: 유저의 일지 조회
  *     description: 로그인된 사용자의 일지을 조회합니다. 최신순으로 10개씩 반환합니다.

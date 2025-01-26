@@ -28,7 +28,7 @@ Content-Type: application/json; charset=UTF-8
   "email": "ri7116@naver.com"
 }
 
-###id찾기
+###id찾기g
 get http://localhost:4000/find-id
 Content-Type: application/json; charset=UTF-8
 
