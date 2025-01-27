@@ -80,10 +80,10 @@ app.get("/find-id", handleFindUserIdByEmail);
 app.get("/reset-pw", handleresetPassword);
 
 // 일지
-app.post('/api/v1/users/:userId/posts', handleAddPost); // 일지 작성
-app.get('/api/v1/users/:userId/posts/:postsId', handleGetUserPost); // 일지 조회(보기)
-app.patch('/api/v1/users/:userId/posts/:postsId', handleEditPost); // 일지 수정
-app.delete('/api/v1/users/:userId/posts/:postsId', handleDeletePost); // 일지 삭제
+app.post('/users/:userId/posts', handleAddPost); // 일지 작성
+app.get('/users/:userId/posts/:postsId', handleGetUserPost); // 일지 조회(보기)
+app.patch('/users/:userId/posts/:postsId', handleEditPost); // 일지 수정
+app.delete('/users/:userId/posts/:postsId', handleDeletePost); // 일지 삭제
 
 // 하루 일정 작성
 app.post('/prod/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
@@ -91,7 +91,6 @@ app.get('/prod/users/:user_id/day-schedules', handleGetDaySchedules); // Day Sch
 app.get('/prod/users/:user_id/day-schedules/:date', handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
 app.patch('/prod/users/:user_id/day-schedules/:day_id', handleUpdateDaySchedule); // Day Schedule 수정
 app.delete('/prod/users/:user_id/day-schedules/:day_id', handleDeleteDaySchedule); // Day Schedule 삭제
-
 
 // 일정 작성
 app.post('/prod/users/:user_id/day-schedules/:day_id/schedules', handleAddSchedule); // Schedule 추가
