@@ -6,6 +6,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
 const {
+  handleEmailCertification,
   handleUserSignUp,
   handleUserLogin,
   handleUserLogout,
@@ -14,11 +15,12 @@ const {
 } = require("./controllers/user.controller.js");
 const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
-const { handleAddPost, 
-        handleListUserPost,
-        handleGetUserPost,
-        handleEditPost, 
-        handleDeletePost,
+const {
+  handleAddPost,
+  handleListUserPost,
+  handleGetUserPost,
+  handleEditPost,
+  handleDeletePost,
 } = require("./controllers/post.controller.js");
 const {
   handleAddDaySchedule,
@@ -52,7 +54,9 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 
-
+app.listen(port, () => {
+  console.log(`포트가 4000인 서버 실행`);
+});
 
 app.use(
   cors({
@@ -72,6 +76,8 @@ app.get("/", (req, res) => {
 app.set('json spaces', 2);
 
 //유저관리
+app.post("/email", handleEmailCertification);
+
 app.post("/register", handleUserSignUp);
 
 app.post("/login", handleUserLogin);
@@ -411,6 +417,10 @@ app.listen(port, () => {
  *         name: user_id
  *         required: true
  *         schema:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
  *           type: string
  *         description: 사용자 ID (로그인된 사용자)
  *       - in: query
