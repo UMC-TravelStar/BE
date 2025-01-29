@@ -6,8 +6,27 @@ class UserPostResponseDTO {
         this.music = post.music;
         this.feeling = post.feeling;
         this.storage = post.storage;
+        this.created_at = post.created_at;
+        this.updated_at = post.updated_at;
     }
 }
+
+const formatPostResponse = (post) => {
+    if (!post) {
+        console.error('Received undefined or null post:', post); // post가 undefined나 null일 때 로그 출력
+        return {}; // 빈 객체를 반환하거나 에러를 처리
+    }
+
+    return {
+        id: post.post_id,
+        title: post.title,
+        createdAt: post.created_at,
+        star: {
+            id: post.star.star_id,  // star_id 추가
+            region: post.star.region // star 테이블의 region 값 추가
+        }
+    };
+};
 
 class EditPostDto {
     constructor({ title, region, music, content, photos, feeling }) {
@@ -21,6 +40,7 @@ class EditPostDto {
 }
 
 module.exports = {
+    formatPostResponse,
     UserPostResponseDTO,
     EditPostDto
 };
