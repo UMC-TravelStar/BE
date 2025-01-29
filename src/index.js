@@ -85,43 +85,25 @@ app.get("/find-id", handleFindUserIdByEmail);
 
 app.get("/reset-pw", handleresetPassword);
 
-//일지 작성
-app.post("/api/v1/users/:userId/posts", handleAddPost);
-
-//일지 조회
-app.get("/api/v1/users/:userId/posts/:postsId", handleGetUserPost);
-
-//일지 수정
-app.patch("/api/v1/users/:userId/posts/:postsId", handleEditPost);
-
-//일지 삭제
-app.delete("api/v1/users/:userId/posts/:postsId", handleDeletePost);
+// 일지
+app.post('/users/:userId/posts', handleAddPost); // 일지 작성
+app.get('/users/:userId/posts/:postsId', handleGetUserPost); // 일지 조회(보기)
+app.patch('/users/:userId/posts/:postsId', handleEditPost); // 일지 수정
+app.delete('/users/:userId/posts/:postsId', handleDeletePost); // 일지 삭제
 
 // 하루 일정 작성
-app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
-app.get("/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
-app.get(
-  "/users/:user_id/day-schedules/:date",
-  handleGetDaySchedulesByDateInUrl
-); // 날짜별 Day Schedule 조회
-app.patch("/users/:user_id/day-schedules/:day_id", handleUpdateDaySchedule); // Day Schedule 수정
-app.delete("/users/:user_id/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule 삭제
+app.post('/prod/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
+app.get('/prod/users/:user_id/day-schedules', handleGetDaySchedules); // Day Schedule 조회
+app.get('/prod/users/:user_id/day-schedules/:date', handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
+app.patch('/prod/users/:user_id/day-schedules/:day_id', handleUpdateDaySchedule); // Day Schedule 수정
+app.delete('/prod/users/:user_id/day-schedules/:day_id', handleDeleteDaySchedule); // Day Schedule 삭제
 
 // 일정 작성
-app.post("/users/:user_id/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
-app.get("/users/:user_id/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
-app.get(
-  "/users/:user_id/day-schedules/:day_id/schedules/:date",
-  handleGetSchedulesByDateInUrl
-); // 날짜별 Schedule 조회
-app.patch(
-  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleUpdateSchedule
-); // Schedule 수정
-app.delete(
-  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleDeleteSchedule
-); // Schedule 삭제
+app.post('/prod/users/:user_id/day-schedules/:day_id/schedules', handleAddSchedule); // Schedule 추가
+app.get('/prod/users/:user_id/day-schedules/:day_id/schedules', handleGetSchedules); // Schedule 조회
+app.get('/prod/users/:user_id/day-schedules/:day_id/schedules/:date', handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
+app.patch('/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleUpdateSchedule); // Schedule 수정
+app.delete('/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleDeleteSchedule); // Schedule 삭제
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -452,10 +434,6 @@ app.listen(port, () => {
  *                   type: string
  *                   example: "일지 조회 성공"
  *                 posts:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
  *                       post_id:
  *                         type: integer
  *                       title:
@@ -481,6 +459,10 @@ app.listen(port, () => {
  *         name: user_id
  *         required: true
  *         schema:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
  *           type: string
  *         description: 사용자 ID (로그인된 사용자)
  *       - in: query
@@ -589,7 +571,7 @@ app.listen(port, () => {
 // 일지 작성 API
 /**
  * @swagger
- * /users/{user_id}/post:
+ * prod/users/{user_id}/posts:
  *   post:
  *     summary: 일지 작성
  *     description: 로그인된 사용자가 일지를를 작성합니다.
@@ -648,7 +630,7 @@ app.listen(port, () => {
 // 일지 조회 API
 /**
  * @swagger
- * /users/{user_id}/posts/{post_id}:
+ * prod/users/{user_id}/posts/{posts_id}:
  *   get:
  *     summary: 일지 조회
  *     description: 사용자가 작성한 일지을 조회합니다.
@@ -660,7 +642,7 @@ app.listen(port, () => {
  *           type: string
  *         description: "사용자 ID (로그인된 사용자)"
  *       - in: path
- *         name: post_id
+ *         name: posts_id
  *         required: true
  *         schema:
  *           type: integer
@@ -703,7 +685,7 @@ app.listen(port, () => {
 // 일지 수정 API
 /**
  * @swagger
- * /users/{user_id}/posts/{post_id}:
+ * /users/{user_id}/posts/{posts_id}:
  *   patch:
  *     summary: 일지 수정
  *     description: 사용자가 작성한 일지를 수정합니다.
@@ -715,7 +697,7 @@ app.listen(port, () => {
  *           type: string
  *         description: "로그인된 사용자 ID"
  *       - in: path
- *         name: post_id
+ *         name: posts_id
  *         required: true
  *         schema:
  *           type: integer
@@ -753,7 +735,7 @@ app.listen(port, () => {
 // 일지 삭제 API
 /**
  * @swagger
- * /users/{user_id}/posts/{post_id}:
+ * prod/users/{user_id}/posts/{posts_id}:
  *   delete:
  *     summary: 일지 삭제
  *     description: 사용자가 작성한 일지를 삭제합니다.
@@ -765,7 +747,7 @@ app.listen(port, () => {
  *           type: string
  *         description: "로그인된 사용자 ID"
  *       - in: path
- *         name: post_id
+ *         name: posts_id
  *         required: true
  *         schema:
  *           type: integer
