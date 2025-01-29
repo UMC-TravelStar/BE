@@ -78,7 +78,7 @@ const getAllUserPosts = async (skip, userId) => {
         where: {
             user_id: userId,
         },
-        orderBy: { post_id: "asc" },
+        orderBy: { post_id: "desc" },
         skip, // 앞에서 skip 개수만큼 건너뛰기
         take: 10, // 가져올 개수
     });
