@@ -417,11 +417,7 @@ app.listen(port, () => {
  *         name: user_id
  *         required: true
  *         schema:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *           type: string
+ *           type: string   # 여기를 수정했습니다.
  *         description: 사용자 ID (로그인된 사용자)
  *       - in: query
  *         name: page
@@ -460,7 +456,7 @@ app.listen(port, () => {
  *                           type: string
  *                           description: 일지에 첨부된 이미지 파일 이름 (post_image 테이블의 file_name)
  *       404:
- *         description: 일지가가 없어요. 작성해주세요!
+ *         description: 일지가 없어요. 작성해주세요!
  */
 
 //검색 API
