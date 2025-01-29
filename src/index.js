@@ -6,6 +6,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
 const {
+  handleEmailCertification,
   handleUserSignUp,
   handleUserLogin,
   handleUserLogout,
@@ -14,10 +15,11 @@ const {
 } = require("./controllers/user.controller.js");
 const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
-const { handleAddPost, 
-        handleGetUserPost,
-        handleEditPost, 
-        handleDeletePost,
+const {
+  handleAddPost,
+  handleGetUserPost,
+  handleEditPost,
+  handleDeletePost,
 } = require("./controllers/post.controller.js");
 const {
   handleAddDaySchedule,
@@ -51,7 +53,9 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 
-
+app.listen(port, () => {
+  console.log(`포트가 4000인 서버 실행`);
+});
 
 app.use(
   cors({
@@ -69,6 +73,8 @@ app.get("/", (req, res) => {
 });
 
 //유저관리
+app.post("/email", handleEmailCertification);
+
 app.post("/register", handleUserSignUp);
 
 app.post("/login", handleUserLogin);
@@ -398,7 +404,7 @@ app.listen(port, () => {
 // 유저의 일지 조회 API
 /**
  * @swagger
- * /users/{user_id}/posts:
+ * /prod/users/{user_id}/posts:
  *   get:
  *     summary: 유저의 일지 조회
  *     description: 로그인된 사용자의 일지을 조회합니다. 최신순으로 10개씩 반환합니다.
@@ -428,10 +434,6 @@ app.listen(port, () => {
  *                   type: string
  *                   example: "일지 조회 성공"
  *                 posts:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
  *                       post_id:
  *                         type: integer
  *                       title:
@@ -457,6 +459,10 @@ app.listen(port, () => {
  *         name: user_id
  *         required: true
  *         schema:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
  *           type: string
  *         description: 사용자 ID (로그인된 사용자)
  *       - in: query
