@@ -10,9 +10,11 @@ const {
     getRelatedPostsByStarId,
     deletePost,
     deleteStar,
+    getAllUserPosts,
 } = require("../repositories/post.repository.js");
 const { 
-    UserPostResponseDTO 
+    UserPostResponseDTO,
+    formatPostResponse
 } = require("../dtos/post.dto.js");
 
 const checkOrCreateStar = async (userId, region) => {
@@ -38,6 +40,21 @@ const checkOrCreateStar = async (userId, region) => {
 const registerPost = async (userId, starId, postData) => {
     const newPost = await savePost(userId, starId, postData);
     return newPost;
+};
+
+const listUserPosts = async (userId, page, limit) => {
+    const skip = (page - 1) * limit;
+    const posts = await getAllUserPosts(skip, userId);
+
+    if (!Array.isArray(posts)) {
+        throw new Error('Posts is not an array');
+    }
+
+    if (posts.length === 0) {
+        return []; // 빈 배열을 반환할 경우
+    }
+    
+    return posts.map(formatPostResponse);
 };
 
 const getUserPost = async (userId, postsId) => {
@@ -94,6 +111,7 @@ const deleteUserPost = async (userId, postsId) => {
 module.exports = {
     checkOrCreateStar,
     registerPost,
+    listUserPosts,
     getUserPost,
     editPost,
     deleteUserPost,

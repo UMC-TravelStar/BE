@@ -62,6 +62,31 @@ const savePost = async (userId, starId, postData) => {
     });
 };
 
+const getAllUserPosts = async (skip, userId) => {
+    const posts = await prisma.post.findMany({
+        select: {
+            post_id: true,
+            title: true,
+            created_at: true,
+            star: {
+                select: {
+                    star_id: true,
+                    region: true, // star 테이블의 region 컬럼 추가
+                }
+            }
+        },
+        where: {
+            user_id: userId,
+        },
+        orderBy: { post_id: "desc" },
+        skip, // 앞에서 skip 개수만큼 건너뛰기
+        take: 10, // 가져올 개수
+    });
+
+    console.log(posts); // 반환된 posts 확인
+    return posts;
+};
+
 const getPostById = async (userId, postsId) => {
     await prisma.post.update({
         where: {
@@ -147,4 +172,5 @@ module.exports = {
     getRelatedPostsByStarId,
     deletePost,
     deleteStar,
+    getAllUserPosts,
 };

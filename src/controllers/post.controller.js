@@ -1,6 +1,7 @@
 const { 
     checkOrCreateStar, 
     registerPost,
+    listUserPosts,
     getUserPost, 
     editPost,
     deleteUserPost,
@@ -32,7 +33,30 @@ const handleAddPost = async (req, res) => {
         } catch (error) {
           res.status(400).json({ message: error.message });
     }
-}
+};
+
+const handleListUserPost = async (req, res) => {
+    
+    try {
+        const userId = req.params.userId;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+
+        if (!userId) {
+            return res.status(400).json({ message: "userId is required" });
+        }
+
+        const posts = await listUserPosts(userId, page, limit);
+
+        return res.status(200).json({ 
+            message: '일지 조회 성공',
+            data: posts,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "서버 내부 오류" });
+    }
+};
 
 const handleGetUserPost = async (req, res) => {
     console.log("Request to get user post");
@@ -121,6 +145,7 @@ const handleDeletePost = async (req, res) => {
 
 module.exports = {
     handleAddPost,
+    handleListUserPost,
     handleGetUserPost,
     handleEditPost,
     handleDeletePost
