@@ -99,7 +99,7 @@ const handleUserLogin = async (req, res) => {
 
   res.cookie("authToken", token, {
     httpOnly: true,
-    secure: true,
+    secure: false, //둘다 설정은 false
     sameSite: "Lax",
     maxAge: 1000 * 60 * 60 * 10, // 10시간
   });
@@ -205,6 +205,121 @@ const handleresetPassword = async (req, res) => {
   }
 };
 
+//행성 설정
+const setPlanetName = async (req, res) => {
+  try {
+    // 1. 쿠키에서 토큰 추출
+    const token = req.cookies.authToken; // 쿠키에 저장된 토큰
+    if (!token) {
+      return res.status(401).json({ message: "로그인이 필요합니다." });
+    }
+
+    // 2. 토큰 디코딩하여 user_id 추출
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // JWT_SECRET은 환경 변수로 설정
+    console.log("Decoded Token:", decoded);
+    const userId = decoded.id;
+
+    if (!userId) {
+      return res.status(400).json({ message: "유효하지 않은 토큰입니다." });
+    }
+
+    // 3. 요청 바디에서 행성 이름 추출
+    const planetName = req.body.name;
+
+    if (!planetName) {
+      return res.status(400).json({ message: "행성 이름이 필요합니다." });
+    }
+
+    // 4. 데이터베이스에서 user_id로 사용자 정보 업데이트
+    const updatedUser = await prisma.user.update({
+      where: { user_id: userId },
+      data: { planet_name: planetName },
+    });
+
+    // 5. 응답 반환
+    res.status(200).json({
+      message: "행성 이름이 성공적으로 업데이트되었습니다.",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+};
+
+const updatePlanetName = async (req, res) => {
+  try {
+    // 1. 경로 파라미터에서 user_id 추출
+    const userId = req.params.user_id;
+
+    if (!userId) {
+      return res.status(400).json({ message: "사용자 ID가 필요합니다." });
+    }
+
+    // 2. 요청 헤더에서 토큰 추출
+    const token = req.cookies.authToken; // 쿠키에서 인증 토큰 추출
+    if (!token) {
+      return res.status(401).json({ message: "로그인이 필요합니다." });
+    }
+
+    // 3. 토큰 디코딩 및 유효성 확인
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded Token:", decoded);
+
+    if (decoded.id !== userId) {
+      return res.status(403).json({ message: "권한이 없습니다." });
+    }
+
+    // 4. 요청 바디에서 행성 이름 추출
+    const { name: planetName } = req.body;
+
+    if (!planetName) {
+      return res.status(400).json({ message: "행성 이름이 필요합니다." });
+    }
+
+    // 5. 데이터베이스에서 user_id로 사용자 정보 업데이트
+    const updatedUser = await prisma.user.update({
+      where: { user_id: userId },
+      data: { planet_name: planetName },
+    });
+
+    // 6. 응답 반환
+    res.status(200).json({
+      message: "행성 이름이 성공적으로 수정되었습니다.",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("행성 수정 오류:", error);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+};
+
+const getPlanetName = async (req, res) => {
+  try {
+    const userId = req.params.user_id; // URL에서 user_id 추출
+    if (!userId) {
+      return res.status(400).json({ message: "사용자 ID가 필요합니다." });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { user_id: userId },
+      select: { planet_name: true },
+    });
+
+    if (!user || !user.planet_name) {
+      return res.status(404).json({ message: "행성을 찾을 수 없습니다." });
+    }
+
+    res.status(200).json({
+      message: "행성 조회 성공",
+      planet_name: user.planet_name,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+};
+
 module.exports = {
   handleEmailCertification,
   handleUserSignUp,
@@ -212,4 +327,7 @@ module.exports = {
   handleUserLogout,
   handleFindUserIdByEmail,
   handleresetPassword,
+  setPlanetName,
+  updatePlanetName,
+  getPlanetName,
 };
