@@ -82,6 +82,34 @@ const handleUserSignUp = async (req, res) => {
 };
 
 // 로그인 처리
+// const handleUserLogin = async (req, res) => {
+//   const { id, pw } = req.body;
+//   const secretKey = process.env.JWT_SECRET;
+
+//   if (!id || !pw) {
+//     return res.status(400).json({
+//       message: "아이디와 비밀번호를 입력해주세요.",
+//     });
+//   }
+
+//   // JWT 생성 (실제로는 DB에서 사용자 인증 필요)
+//   const token = jwt.sign({ id, pw }, secretKey, {
+//     expiresIn: "10h",
+//   });
+
+//   res.cookie("authToken", token, {
+//     httpOnly: true,
+//     secure: false, //원래는 true로 되어있었음
+//     sameSite: "Lax",
+//     maxAge: 1000 * 60 * 60 * 10, // 10시간
+//   });
+
+//   res.status(200).json({
+//     message: "로그인 성공!",
+//     token,
+//   });
+// };
+
 const handleUserLogin = async (req, res) => {
   const { id, pw } = req.body;
   const secretKey = process.env.JWT_SECRET;
@@ -93,34 +121,20 @@ const handleUserLogin = async (req, res) => {
   }
 
   // JWT 생성 (실제로는 DB에서 사용자 인증 필요)
-  const token = jwt.sign({ id, pw }, secretKey, {
+  const token = jwt.sign({ id }, secretKey, {
     expiresIn: "10h",
-  });
-
-  res.cookie("authToken", token, {
-    httpOnly: true,
-    secure: false, //원래는 true로 되어있었음
-    sameSite: "Lax",
-    maxAge: 1000 * 60 * 60 * 10, // 10시간
   });
 
   res.status(200).json({
     message: "로그인 성공!",
-    token,
+    token, // 프론트엔드에서 저장할 수 있도록 응답으로 보냄
   });
 };
 
 // 로그아웃 처리
 const handleUserLogout = (req, res) => {
-  res.clearCookie("authToken", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "Lax",
-    path: "/",
-  });
-
   res.status(200).json({
-    message: "로그아웃 성공! 쿠키가 삭제되었습니다.",
+    message: "로그아웃 성공! 클라이언트에서 토큰을 삭제하세요.",
   });
 };
 
@@ -208,14 +222,17 @@ const handleresetPassword = async (req, res) => {
 //행성 설정
 const setPlanetName = async (req, res) => {
   try {
-    // 1. 쿠키에서 토큰 추출
-    const token = req.cookies.authToken; // 쿠키에 저장된 토큰
-    if (!token) {
+    // 1. 요청 헤더에서 JWT 토큰 추출
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ message: "로그인이 필요합니다." });
     }
 
+    const token = authHeader.split(" ")[1]; // "Bearer <TOKEN>" 형식에서 토큰 부분만 추출
+
     // 2. 토큰 디코딩하여 user_id 추출
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // JWT_SECRET은 환경 변수로 설정
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log("Decoded Token:", decoded);
     const userId = decoded.id;
 
@@ -257,10 +274,13 @@ const updatePlanetName = async (req, res) => {
     }
 
     // 2. 요청 헤더에서 토큰 추출
-    const token = req.cookies.authToken; // 쿠키에서 인증 토큰 추출
-    if (!token) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ message: "로그인이 필요합니다." });
     }
+
+    const token = authHeader.split(" ")[1]; // "Bearer <TOKEN>"에서 TOKEN만 추출
 
     // 3. 토큰 디코딩 및 유효성 확인
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
