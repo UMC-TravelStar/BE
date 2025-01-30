@@ -58,12 +58,21 @@ app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
 
-app.use(
-  cors({
-    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
-    credentials: true, // 쿠키를 포함한 요청 허용
-  })
-);
+//app.use(
+//  cors({
+//    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
+//    credentials: true, // 쿠키를 포함한 요청 허용
+//  })
+//);
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://travelstar.netlify.app"], // 허용할 도메인 리스트
+  credentials: true, // 쿠키 및 세션 정보를 포함
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // 허용할 메서드
+  allowedHeaders: ["Content-Type", "Authorization"], // 허용할 요청 헤더
+};
+
+app.use(cors(corsOptions));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
