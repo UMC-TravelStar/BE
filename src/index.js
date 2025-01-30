@@ -4,6 +4,7 @@ const port = 4000;
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const {
   handleEmailCertification,
@@ -12,6 +13,9 @@ const {
   handleUserLogout,
   handleFindUserIdByEmail,
   handleresetPassword,
+  setPlanetName,
+  updatePlanetName,
+  getPlanetName,
 } = require("./controllers/user.controller.js");
 const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
@@ -73,6 +77,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
@@ -82,7 +87,7 @@ app.get("/", (req, res) => {
   res.send("Welcome to the server!");
 });
 
-app.set('json spaces', 2);
+app.set("json spaces", 2);
 
 //유저관리
 app.post("/email", handleEmailCertification);
@@ -98,25 +103,49 @@ app.get("/find-id", handleFindUserIdByEmail);
 app.get("/reset-pw", handleresetPassword);
 
 // 일지
-app.post('/users/:userId/posts', handleAddPost); // 일지 작성
-app.get('/users/:userId/posts', handleListUserPost); // 유저의 일지 조회(전체)
-app.get('/users/:userId/posts/:postsId', handleGetUserPost); // 유저의 일지 조회(1개)
-app.patch('/users/:userId/posts/:postsId', handleEditPost); // 일지 수정
-app.delete('/users/:userId/posts/:postsId', handleDeletePost); // 일지 삭제
+app.post("/users/:userId/posts", handleAddPost); // 일지 작성
+app.get("/users/:userId/posts", handleListUserPost); // 유저의 일지 조회(전체)
+app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
+app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
+app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
 
 // 하루 일정 작성
-app.post('/prod/users/:user_id/day-schedules', handleAddDaySchedule); // Day Schedule 추가
-app.get('/prod/users/:user_id/day-schedules', handleGetDaySchedules); // Day Schedule 조회
-app.get('/prod/users/:user_id/day-schedules/:date', handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
-app.patch('/prod/users/:user_id/day-schedules/:day_id', handleUpdateDaySchedule); // Day Schedule 수정
-app.delete('/prod/users/:user_id/day-schedules/:day_id', handleDeleteDaySchedule); // Day Schedule 삭제
+app.post("/prod/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
+app.get("/prod/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
+app.get(
+  "/prod/users/:user_id/day-schedules/:date",
+  handleGetDaySchedulesByDateInUrl
+); // 날짜별 Day Schedule 조회
+app.patch(
+  "/prod/users/:user_id/day-schedules/:day_id",
+  handleUpdateDaySchedule
+); // Day Schedule 수정
+app.delete(
+  "/prod/users/:user_id/day-schedules/:day_id",
+  handleDeleteDaySchedule
+); // Day Schedule 삭제
 
 // 일정 작성
-app.post('/prod/users/:user_id/day-schedules/:day_id/schedules', handleAddSchedule); // Schedule 추가
-app.get('/prod/users/:user_id/day-schedules/:day_id/schedules', handleGetSchedules); // Schedule 조회
-app.get('/prod/users/:user_id/day-schedules/:day_id/schedules/:date', handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
-app.patch('/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleUpdateSchedule); // Schedule 수정
-app.delete('/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id', handleDeleteSchedule); // Schedule 삭제
+app.post(
+  "/prod/users/:user_id/day-schedules/:day_id/schedules",
+  handleAddSchedule
+); // Schedule 추가
+app.get(
+  "/prod/users/:user_id/day-schedules/:day_id/schedules",
+  handleGetSchedules
+); // Schedule 조회
+app.get(
+  "/prod/users/:user_id/day-schedules/:day_id/schedules/:date",
+  handleGetSchedulesByDateInUrl
+); // 날짜별 Schedule 조회
+app.patch(
+  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
+  handleUpdateSchedule
+); // Schedule 수정
+app.delete(
+  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
+  handleDeleteSchedule
+); // Schedule 삭제
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -857,20 +886,13 @@ app.listen(port, () => {
  *         description: 서버 내부 오류
  */
 
-//행성 설정 API
+// 행성 설정 API
 /**
  * @swagger
- * /users/{user_id}/planets:
+ * /prod/planet:
  *   post:
  *     summary: 행성 설정
- *     description: 사용자가 자신의 행성 설정합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
+ *     description: 사용자가 자신의 행성을 설정합니다. JWT 토큰을 통해 사용자 인증을 진행합니다.
  *     requestBody:
  *       required: true
  *       content:
@@ -880,7 +902,8 @@ app.listen(port, () => {
  *             properties:
  *               name:
  *                 type: string
- *                 description: 행성 이름
+ *                 description: 설정할 행성 이름
+ *                 example: "Earth"
  *     responses:
  *       200:
  *         description: 행성 설정 성공
@@ -891,26 +914,55 @@ app.listen(port, () => {
  *               properties:
  *                 message:
  *                   type: string
- *                 planet:
+ *                   example: "행성 이름이 성공적으로 업데이트되었습니다."
+ *                 user:
  *                   type: object
  *                   properties:
- *                     planet_id:
- *                       type: integer
  *                     user_id:
  *                       type: string
- *                     name:
+ *                       example: "1234"
+ *                     planet_name:
  *                       type: string
+ *                       example: "Earth"
  *       400:
- *         description: 행성 설정 실패
+ *         description: 요청 본문에 행성 이름이 없거나 잘못된 요청
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "행성 이름이 필요합니다."
+ *       401:
+ *         description: 유효하지 않은 토큰이거나 인증되지 않은 사용자
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "로그인이 필요합니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
  */
 
 // 행성 수정 API
 /**
  * @swagger
- * /users/{user_id}/planets:
+ * /prod/planet/{user_id}:
  *   patch:
- *     summary: 행성 수정
- *     description: 사용자가 자신의 행성을 수정합니다.
+ *     summary: "행성 수정"
+ *     description: "사용자가 자신의 행성을 수정합니다."
  *     parameters:
  *       - in: path
  *         name: user_id
@@ -928,9 +980,10 @@ app.listen(port, () => {
  *               name:
  *                 type: string
  *                 description: "수정된 행성 이름"
+ *                 example: "My New Planet"
  *     responses:
  *       200:
- *         description: 행성 수정 성공
+ *         description: "행성 수정 성공"
  *         content:
  *           application/json:
  *             schema:
@@ -938,18 +991,126 @@ app.listen(port, () => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "행성 수정 성공"
- *                 planet:
+ *                   example: "행성 이름이 성공적으로 수정되었습니다."
+ *                 user:
  *                   type: object
  *                   properties:
  *                     user_id:
  *                       type: string
- *                     name:
+ *                       example: "12345"
+ *                     planet_name:
  *                       type: string
+ *                       example: "My New Planet"
  *       400:
- *         description: 행성 수정 실패
+ *         description: "요청이 잘못됨 (예: 행성 이름 누락)"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "행성 이름이 필요합니다."
+ *       401:
+ *         description: "인증 실패 (토큰 없음 또는 유효하지 않음)"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "로그인이 필요합니다."
+ *       403:
+ *         description: "권한 없음 (user_id가 일치하지 않음)"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "권한이 없습니다."
+ *       404:
+ *         description: "사용자 또는 행성을 찾을 수 없음"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "행성을 찾을 수 없습니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ */
+
+// 행성 조회 API
+/**
+ * @swagger
+ * /prod/planet/{user_id}:
+ *   get:
+ *     summary: 행성 이름 조회
+ *     description: 사용자의 행성이 있는지 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "사용자 ID (로그인된 사용자)"
+ *     responses:
+ *       200:
+ *         description: 행성 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "행성 조회 성공"
+ *                 planet_name:
+ *                   type: string
+ *                   example: "지구"  # 예시 행성 이름
+ *       400:
+ *         description: 잘못된 요청
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "사용자 ID가 필요합니다."
  *       404:
  *         description: 행성을 찾을 수 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "행성을 찾을 수 없습니다."
+ *       500:
+ *         description: 서버 오류 발생
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
  */
 
 // 다른 사용자의 행성 조회 API
@@ -994,42 +1155,6 @@ app.listen(port, () => {
  *         description: 사용자를 찾을 수 없음
  *       403:
  *         description: 접근 권한 없음
- */
-
-// 행성 조회 API
-/**
- * @swagger
- * /users/{user_id}/planets:
- *   get:
- *     summary: 행성 조회
- *     description: 로그인된 사용자의 행성을 조회합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
- *     responses:
- *       200:
- *         description: 행성 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "행성 조회 성공"
- *                 planets:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       planet_id:
- *                         type: integer
- *                       name:
- *                         type: string
  */
 
 /**
