@@ -58,10 +58,6 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 
-app.listen(port, () => {
-  console.log(`포트가 4000인 서버 실행`);
-});
-
 //app.use(
 //  cors({
 //    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
@@ -101,6 +97,11 @@ app.get("/logout", handleUserLogout);
 app.get("/find-id", handleFindUserIdByEmail);
 
 app.get("/reset-pw", handleresetPassword);
+
+//행성
+app.post("/planet", setPlanetName);
+app.get("/planet/:user_id", getPlanetName);
+app.patch("/planet/:user_id", updatePlanetName);
 
 // 일지
 app.post("/users/:userId/posts", handleAddPost); // 일지 작성
