@@ -21,6 +21,7 @@ const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
 const {
   handleAddPost,
+  handleListUserPost,
   handleGetUserPost,
   handleEditPost,
   handleDeletePost,
@@ -61,12 +62,21 @@ app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
 
-app.use(
-  cors({
-    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
-    credentials: true, // 쿠키를 포함한 요청 허용
-  })
-);
+//app.use(
+//  cors({
+//    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
+//    credentials: true, // 쿠키를 포함한 요청 허용
+//  })
+//);
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://travelstar.netlify.app"], // 허용할 도메인 리스트
+  credentials: true, // 쿠키 및 세션 정보를 포함
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // 허용할 메서드
+  allowedHeaders: ["Content-Type", "Authorization"], // 허용할 요청 헤더
+};
+
+app.use(cors(corsOptions));
+
 app.use(cookieParser());
 
 app.use(express.json());
@@ -76,6 +86,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.get("/", (req, res) => {
   res.send("Welcome to the server!");
 });
+
+app.set("json spaces", 2);
 
 //유저관리
 app.post("/email", handleEmailCertification);
@@ -89,48 +101,55 @@ app.get("/logout", handleUserLogout);
 app.get("/find-id", handleFindUserIdByEmail);
 
 app.get("/reset-pw", handleresetPassword);
-//행성
-app.post("/planet", setPlanetName);
-app.get("/planet/:user_id", getPlanetName);
-app.patch("/planet/:user_id", updatePlanetName);
 
-//일지 작성
-app.post("/api/v1/users/:userId/posts", handleAddPost);
-
-//일지 조회
-app.get("/api/v1/users/:userId/posts/:postsId", handleGetUserPost);
-
-//일지 수정
-app.patch("/api/v1/users/:userId/posts/:postsId", handleEditPost);
-
-//일지 삭제
-app.delete("api/v1/users/:userId/posts/:postsId", handleDeletePost);
+// 일지
+app.post("/users/:userId/posts", handleAddPost); // 일지 작성
+app.get("/users/:userId/posts", handleListUserPost); // 유저의 일지 조회(전체)
+app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
+app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
+app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
 
 // 하루 일정 작성
-app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
-app.get("/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
+app.post("/prod/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
+app.get("/prod/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
 app.get(
-  "/users/:user_id/day-schedules/:date",
+  "/prod/users/:user_id/day-schedules/:date",
   handleGetDaySchedulesByDateInUrl
 ); // 날짜별 Day Schedule 조회
-app.patch("/users/:user_id/day-schedules/:day_id", handleUpdateDaySchedule); // Day Schedule 수정
-app.delete("/users/:user_id/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule 삭제
+app.patch(
+  "/prod/users/:user_id/day-schedules/:day_id",
+  handleUpdateDaySchedule
+); // Day Schedule 수정
+app.delete(
+  "/prod/users/:user_id/day-schedules/:day_id",
+  handleDeleteDaySchedule
+); // Day Schedule 삭제
 
 // 일정 작성
-app.post("/users/:user_id/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
-app.get("/users/:user_id/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
+app.post(
+  "/prod/users/:user_id/day-schedules/:day_id/schedules",
+  handleAddSchedule
+); // Schedule 추가
 app.get(
-  "/users/:user_id/day-schedules/:day_id/schedules/:date",
+  "/prod/users/:user_id/day-schedules/:day_id/schedules",
+  handleGetSchedules
+); // Schedule 조회
+app.get(
+  "/prod/users/:user_id/day-schedules/:day_id/schedules/:date",
   handleGetSchedulesByDateInUrl
 ); // 날짜별 Schedule 조회
 app.patch(
-  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
+  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
   handleUpdateSchedule
 ); // Schedule 수정
 app.delete(
-  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
+  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
   handleDeleteSchedule
 ); // Schedule 삭제
+
+app.listen(port, () => {
+  console.log(`포트가 4000인 서버 실행`);
+});
 
 // 로그인 API
 /**
@@ -424,56 +443,6 @@ app.delete(
  *                   example: "Internal Server Error"
  */
 
-// 유저의 일지 조회 API
-/**
- * @swagger
- * /prod/users/{user_id}/posts:
- *   get:
- *     summary: 유저의 일지 조회
- *     description: 로그인된 사용자의 일지을 조회합니다. 최신순으로 10개씩 반환합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
- *       - in: query
- *         name: page
- *         required: false
- *         schema:
- *           type: integer
- *           example: 1
- *         description: "페이지 번호 (기본값: 1)"
- *     responses:
- *       200:
- *         description: 일지 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "일지 조회 성공"
- *                 posts:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       post_id:
- *                         type: integer
- *                       title:
- *                         type: string
- *                       content:
- *                         type: string
- *                       created_at:
- *                         type: string
- *                         format: date-time
- *       404:
- *         description: 일지이 없어요. 작성해주세요!
- */
-
 // 메인 페이지 API
 /**
  * @swagger
@@ -486,7 +455,7 @@ app.delete(
  *         name: user_id
  *         required: true
  *         schema:
- *           type: string
+ *           type: string   # 여기를 수정했습니다.
  *         description: 사용자 ID (로그인된 사용자)
  *       - in: query
  *         name: page
@@ -525,7 +494,7 @@ app.delete(
  *                           type: string
  *                           description: 일지에 첨부된 이미지 파일 이름 (post_image 테이블의 file_name)
  *       404:
- *         description: 일지가가 없어요. 작성해주세요!
+ *         description: 일지가 없어요. 작성해주세요!
  */
 
 //검색 API
@@ -594,13 +563,13 @@ app.delete(
 // 일지 작성 API
 /**
  * @swagger
- * /users/{user_id}/post:
+ * /prod/users/{userId}/posts:
  *   post:
  *     summary: 일지 작성
- *     description: 로그인된 사용자가 일지를를 작성합니다.
+ *     description: 로그인된 사용자가 일지를 작성합니다.
  *     parameters:
  *       - in: path
- *         name: user_id
+ *         name: userId
  *         required: true
  *         schema:
  *           type: string
@@ -615,23 +584,21 @@ app.delete(
  *               title:
  *                 type: string
  *                 description: 일지 제목
- *               location:
+ *               region:
  *                 type: string
- *                 description: 위치
+ *                 description: 위치 (지역)
  *               music:
  *                 type: string
  *                 description: "음악 (선택 사항)"
  *               content:
  *                 type: string
  *                 description: 본문 내용
- *               photos:
- *                 type: array
- *                 items:
- *                   type: string
- *                   description: 사진 파일 이름
  *               feeling:
  *                 type: string
  *                 description: 이번 여행을 통해 느낀 감정
+ *               storage:
+ *                 type: integer
+ *                 description: 저장 공간 여부
  *     responses:
  *       201:
  *         description: 일지 작성 성공
@@ -643,29 +610,141 @@ app.delete(
  *                 message:
  *                   type: string
  *                   example: "일지 작성 성공"
- *                 post_id:
- *                   type: integer
- *                   description: 작성된 일지의 ID
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     post_id:
+ *                       type: integer
+ *                       description: 작성된 일지의 ID
+ *                     title:
+ *                       type: string
+ *                       description: 일지 제목
+ *                     content:
+ *                       type: string
+ *                       description: 본문 내용
+ *                     music:
+ *                       type: string
+ *                       description: 음악
+ *                     feeling:
+ *                       type: string
+ *                       description: 감정
+ *                     storage:
+ *                       type: integer
+ *                       description: 저장 공간 여부
+ *                     created_at:
+ *                       type: string
+ *                       description: 일지 생성 시간
+ *                     updated_at:
+ *                       type: string
+ *                       description: 일지 업데이트 시간
+ *                     user_id:
+ *                       type: string
+ *                       description: 사용자 ID
+ *                     star_id:
+ *                       type: integer
+ *                       description: 별자리 ID
  *       400:
  *         description: 일지 작성 실패
  */
 
-// 일지 조회 API
+// 유저의 일지 조회(전체) API
 /**
  * @swagger
- * /users/{user_id}/posts/{post_id}:
+ * /prod/users/{userId}/posts:
  *   get:
- *     summary: 일지 조회
- *     description: 사용자가 작성한 일지을 조회합니다.
+ *     summary: 유저의 일지 조회(전체)
+ *     description: 로그인된 사용자의 일지를 조회합니다. 최신순으로 10개씩 반환합니다.
  *     parameters:
  *       - in: path
- *         name: user_id
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "사용자 ID (로그인된 사용자)"
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: "페이지 번호 (기본값: 1)"
+ *     responses:
+ *       200:
+ *         description: 일지 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "일지 조회 성공"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       title:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       star:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           region:
+ *                             type: string
+ *             example:
+ *               message: "일지 조회 성공"
+ *               data:
+ *                 - id: 17
+ *                   title: "post1"
+ *                   createdAt: "2025-01-25T18:53:48.928Z"
+ *                   star:
+ *                     id: 16
+ *                     region: "여수2"
+ *                 - id: 18
+ *                   title: "post1"
+ *                   createdAt: "2025-01-25T18:53:49.508Z"
+ *                   star:
+ *                     id: 16
+ *                     region: "여수2"
+ *                 - id: 19
+ *                   title: "post1"
+ *                   createdAt: "2025-01-25T18:53:49.988Z"
+ *                   star:
+ *                     id: 16
+ *                     region: "여수2"
+ *                 - id: 20
+ *                   title: "post1"
+ *                   createdAt: "2025-01-25T18:53:50.428Z"
+ *                   star:
+ *                     id: 16
+ *                     region: "여수2"
+ *       404:
+ *         description: 일지가 없어요. 작성해주세요!
+ */
+
+// 유저의 일지 조회(1개) API
+/**
+ * @swagger
+ * /prod/users/{userId}/posts/{postsId}:
+ *   get:
+ *     summary: 유저의 일지 조회(1개)
+ *     description: 사용자가 작성한 일지를 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: userId
  *         required: true
  *         schema:
  *           type: string
  *         description: "사용자 ID (로그인된 사용자)"
  *       - in: path
- *         name: post_id
+ *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
@@ -684,31 +763,44 @@ app.delete(
  *                 post:
  *                   type: object
  *                   properties:
- *                     post_id:
- *                       type: integer
+ *                     region:
+ *                       type: string
+ *                       description: 위치 (지역)
  *                     title:
  *                       type: string
- *                     location:
- *                       type: string
- *                     music:
- *                       type: string
+ *                       description: 일지 제목
  *                     content:
  *                       type: string
- *                     photos:
- *                       type: array
- *                       items:
- *                         type: string
+ *                       description: 본문 내용
+ *                     music:
+ *                       type: string
+ *                       description: 음악
+ *                     feeling:
+ *                       type: string
+ *                       description: 감정
+ *                     storage:
+ *                       type: integer
+ *                       description: 저장 공간 여부
  *                     created_at:
  *                       type: string
  *                       format: date-time
+ *                       description: 일지 생성 시간
+ *                     updated_at:
+ *                       type: string
+ *                       format: date-time
+ *                       description: 일지 업데이트 시간
  *       404:
- *         description: 일지을 찾을 수 없음
+ *         description: 일지를 찾을 수 없음
+ *       400:
+ *         description: 파라미터 누락 또는 잘못된 요청
+ *       500:
+ *         description: 서버 내부 오류
  */
 
 // 일지 수정 API
 /**
  * @swagger
- * /users/{user_id}/posts/{post_id}:
+ * /users/:userId/posts/:postsId:
  *   patch:
  *     summary: 일지 수정
  *     description: 사용자가 작성한 일지를 수정합니다.
@@ -720,7 +812,7 @@ app.delete(
  *           type: string
  *         description: "로그인된 사용자 ID"
  *       - in: path
- *         name: post_id
+ *         name: posts_id
  *         required: true
  *         schema:
  *           type: integer
@@ -758,19 +850,19 @@ app.delete(
 // 일지 삭제 API
 /**
  * @swagger
- * /users/{user_id}/posts/{post_id}:
+ * /prod/users/{userId}/posts/{postsId}:
  *   delete:
  *     summary: 일지 삭제
  *     description: 사용자가 작성한 일지를 삭제합니다.
  *     parameters:
  *       - in: path
- *         name: user_id
+ *         name: userId
  *         required: true
  *         schema:
  *           type: string
  *         description: "로그인된 사용자 ID"
  *       - in: path
- *         name: post_id
+ *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
@@ -786,10 +878,12 @@ app.delete(
  *                 message:
  *                   type: string
  *                   example: "일지 삭제 성공"
+ *       400:
+ *         description: 파라미터 누락 또는 잘못된 요청
  *       404:
  *         description: 일지를 찾을 수 없음
- *       403:
- *         description: 접근 권한 없음
+ *       500:
+ *         description: 서버 내부 오류
  */
 
 // 행성 설정 API

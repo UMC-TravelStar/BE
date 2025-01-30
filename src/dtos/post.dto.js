@@ -1,39 +1,32 @@
-const bodyToPost = (body) => {
-    return {
-        title: body.title,
-        music: body.music || "",
-        content: body.content,
-        photos: body.photos,
-        feeling: body.feeling,
-        author_id: body.author_id, // 작성자 ID를 추가로 받도록 수정
-        region: body.region || "default_region",  // region도 추가
-        feel_color: body.feel_color
-    };
-};
-
-const responseFromPost = (post) => {
-    return {
-        id: post.id,
-        title: post.title,
-        music: post.music || "",
-        content: post.content,
-        photos: post.photos,
-        feeling: post.feeling,
-        createdAt: post.createdAt
-    };
-};
-
 class UserPostResponseDTO {
-    constructor(post) {
-      this.post_id = post.id;
-      this.title = post.title;
-      this.music = post.music;
-      this.content = post.content;
-      this.photos = post.photos || [];
-      this.createdAt = post.createdAt;
-      this.updatedAt = post.updatedAt;
+    constructor(post, star) {
+        this.region = star.region;
+        this.title = post.title;
+        this.content = post.content;
+        this.music = post.music;
+        this.feeling = post.feeling;
+        this.storage = post.storage;
+        this.created_at = post.created_at;
+        this.updated_at = post.updated_at;
     }
 }
+
+const formatPostResponse = (post) => {
+    if (!post) {
+        console.error('Received undefined or null post:', post); // post가 undefined나 null일 때 로그 출력
+        return {}; // 빈 객체를 반환하거나 에러를 처리
+    }
+
+    return {
+        id: post.post_id,
+        title: post.title,
+        createdAt: post.created_at,
+        star: {
+            id: post.star.star_id,  // star_id 추가
+            region: post.star.region // star 테이블의 region 값 추가
+        }
+    };
+};
 
 class EditPostDto {
     constructor({ title, region, music, content, photos, feeling }) {
@@ -47,8 +40,7 @@ class EditPostDto {
 }
 
 module.exports = {
-    bodyToPost,
-    responseFromPost,
+    formatPostResponse,
     UserPostResponseDTO,
     EditPostDto
 };

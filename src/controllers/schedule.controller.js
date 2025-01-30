@@ -138,14 +138,15 @@ const handleDeleteSchedule = async (req, res) => {
     }
 };
 
+
 module.exports = {
     handleAddDaySchedule,
     handleGetDaySchedules,
+    handleDeleteSchedule,handleGetDaySchedulesByDateInUrl,
     handleUpdateDaySchedule,
     handleDeleteDaySchedule,
     handleAddSchedule,
     handleGetSchedules,
-    handleUpdateSchedule,
-    handleDeleteSchedule,handleGetDaySchedulesByDateInUrl,
-    handleGetSchedulesByDateInUrl 
+    handleGetSchedulesByDateInUrl,
+    handleUpdateSchedule
 };

@@ -99,7 +99,7 @@ const handleUserLogin = async (req, res) => {
 
   res.cookie("authToken", token, {
     httpOnly: true,
-    secure: false, //둘다 설정은 false
+    secure: false, //원래는 true로 되어있었음
     sameSite: "Lax",
     maxAge: 1000 * 60 * 60 * 10, // 10시간
   });
