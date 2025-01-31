@@ -813,19 +813,19 @@ app.listen(port, () => {
 // 일지 수정 API
 /**
  * @swagger
- * /users/:userId/posts/:postsId:
+ * /prod/users/{userId}/posts/{postsId}:
  *   patch:
  *     summary: 일지 수정
  *     description: 사용자가 작성한 일지를 수정합니다.
  *     parameters:
  *       - in: path
- *         name: user_id
+ *         name: userId
  *         required: true
  *         schema:
  *           type: string
  *         description: "로그인된 사용자 ID"
  *       - in: path
- *         name: posts_id
+ *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
@@ -843,6 +843,18 @@ app.listen(port, () => {
  *               content:
  *                 type: string
  *                 description: "수정된 일지 내용"
+ *               region:
+ *                 type: string
+ *                 description: "수정된 지역 정보"
+ *               music:
+ *                 type: string
+ *                 description: "새로운 음악 링크"
+ *               feeling:
+ *                 type: string
+ *                 description: "수정된 감정"
+ *               storage:
+ *                 type: integer
+ *                 description: "스토리지 여부 (0 또는 1)"
  *     responses:
  *       200:
  *         description: 일지 수정 성공
@@ -851,14 +863,61 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *                 message:
  *                   type: string
  *                   example: "일지 수정 성공"
+ *                 postId:
+ *                   type: object
+ *                   properties:
+ *                     post_id:
+ *                       type: integer
+ *                       example: 31
+ *                     title:
+ *                       type: string
+ *                       example: "수정된 제목"
+ *                     content:
+ *                       type: string
+ *                       example: "수정된 내용입니다."
+ *                     music:
+ *                       type: string
+ *                       example: "새로운 음악 링크"
+ *                     feeling:
+ *                       type: string
+ *                       example: "행복"
+ *                     feel_color:
+ *                       type: string
+ *                       nullable: true
+ *                     views:
+ *                       type: integer
+ *                       example: 8
+ *                     storage:
+ *                       type: integer
+ *                       example: 0
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-01-31T14:53:09.466Z"
+ *                     updated_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-01-31T16:42:51.980Z"
+ *                     user_id:
+ *                       type: string
+ *                       example: "1"
+ *                     star_id:
+ *                       type: integer
+ *                       example: 19
  *       400:
- *         description: 수정 실패 (잘못된 입력 등)
+ *         description: 파라미터 누락 또는 잘못된 요청
  *       404:
  *         description: 일지를 찾을 수 없음
+ *       500:
+ *         description: 서버 내부 오류
  */
+
 
 // 일지 삭제 API
 /**

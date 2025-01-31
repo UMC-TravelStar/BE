@@ -113,13 +113,74 @@ const getStarById = async (starId) => {
     });
 };
 
-const updatePost = async (userId, postsId, editData) => {
+const updatePost = async (post, editData) => {
+    const star_id = post.star_id;
+
+    const existingStar = await prisma.star.findUnique({
+        where: { star_id: star_id },
+        select: { region: true }, // region 칼럼만 가져오기
+    });
+
+    if (!existingStar) {
+        throw new Error('Star 데이터가 존재하지 않습니다.');
+    }
+
+    const newRegion = editData.region;
+    const oldRegion = existingStar.region;
+
+    if (oldRegion !== newRegion) {
+        console.log(`Region 변경됨: ${oldRegion} -> ${newRegion}`);
+
+        // 같은 region을 가진 star가 이미 있는지 확인
+        const existingNewStar = await prisma.star.findFirst({
+            where: { region: newRegion },
+        });
+        console.log('existingNewStar:', existingNewStar);
+        
+        // 해당 star_id의 post 개수 확인
+        const postCount = await prisma.post.count({
+            where: { star_id: star_id },
+        });
+
+        console.log(`해당 star_id의 post 개수: ${postCount}`);
+
+        let targetStarId;
+
+        if (!existingNewStar) {
+            // 같은 region을 가진 star가 없으면 새로 생성
+            const newStar = await prisma.star.create({
+                data: { region: newRegion },
+            });
+            targetStarId = newStar.star_id;
+            console.log('새로운 star 생성:', targetStarId);
+        } else {
+            // 같은 region을 가진 star가 이미 있으면 해당 star_id 사용
+            targetStarId = existingNewStar.star_id;
+            console.log('기존 star_id 사용:', targetStarId);
+        }
+
+        // 현재 post의 star_id를 새로운 star_id로 변경
+        await prisma.post.update({
+            where: { post_id: post.post_id },
+            data: { star_id: targetStarId },
+        });
+
+        console.log('해당 post의 star_id 변경 완료.');
+
+        if (postCount === 1) {
+            await prisma.star.delete({
+                where: { star_id: star_id },
+            })
+        }
+    } else {
+        console.log('Region 변경되지 않음.');
+    }
+
+    const { region, photos, ...postData } = editData;
+
     return await prisma.post.update({
-        where: { 
-            author_id: parseInt(userId),
-            post_id: parseInt(postsId) 
-        },
-        data: editData,
+        where: { post_id: post.post_id },
+        data: postData,
     });
 }
 
