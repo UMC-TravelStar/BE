@@ -38,6 +38,11 @@ const {
   handleUpdateSchedule,
   handleDeleteSchedule,
 } = require("./controllers/schedule.controller.js");
+const {
+  handleListMainPost,
+  handleSearchPosts,
+  handleGetSearchRankings
+} = require("./controllers/mainpage.controller.js");
 
 const options = {
   swaggerDefinition: {
@@ -147,6 +152,13 @@ app.delete(
   "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
   handleDeleteSchedule
 ); // Schedule 삭제
+
+
+// 메인 페이지
+app.get("/prod/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
+app.get("/prod/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
+app.get("/prod/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
+
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
