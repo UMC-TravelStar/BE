@@ -1,7 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// 일지지 조회
+// 일지 조회
 const getUserPosts = async (skip, limit) => {
     return await prisma.post.findMany({
         include: {
