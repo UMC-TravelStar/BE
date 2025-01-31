@@ -92,11 +92,11 @@ app.post("/register", handleUserSignUp);
 
 app.post("/login", handleUserLogin);
 
-app.get("/logout", handleUserLogout);
+app.post("/logout", handleUserLogout);
 
-app.get("/find-id", handleFindUserIdByEmail);
+app.post("/find-id", handleFindUserIdByEmail);
 
-app.get("/reset-pw", handleresetPassword);
+app.post("/reset-pw", handleresetPassword);
 
 //행성
 app.post("/planet", setPlanetName);
