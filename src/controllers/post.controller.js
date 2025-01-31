@@ -19,7 +19,7 @@ const handleAddPost = async (req, res) => {
     const { region, ...restOfData } = req.body;
 
     try {
-        // userId에 해당하는 별자리의 별이 존재하는지 확인
+        // userId에 해당하는 별이 존재하는지 확인
         const starId = await checkOrCreateStar(userId, region);
         console.log("Star ID:", starId);
 

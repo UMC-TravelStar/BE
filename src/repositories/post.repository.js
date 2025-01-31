@@ -23,14 +23,11 @@ const findStarsByUserId = async (userId) => {
     return stars; 
 };
 
-const createStar = async (region, starsId) => {
+const createStar = async (region) => {
     try {
         const star = await prisma.star.create({
             data: {
                 region: region,
-                stars: {
-                    connect: { stars_id: starsId }, // starsId와 연결
-                },
             }});
         return star; // star 객체를 반환
     } catch (error) {
