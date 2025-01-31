@@ -3,6 +3,7 @@ const {
     registerPost,
     listUserPosts,
     getUserPost, 
+    checkUserPost,
     editPost,
     deleteUserPost,
 } = require("../services/post.service.js");
@@ -99,13 +100,13 @@ const handleEditPost = async (req, res) => {
             return res.status(400).json({ success: false, message: "일지 수정 실패 (userId or postsId 누락)" });
         }
 
-        const post = await getUserPost(userId, postsId);
+        const post = await checkUserPost(userId, postsId);
 
         if (!post) {
             return res.status(404).json({ success: false, message: "일지를 찾을 수 없음." });
         }
 
-        const updatedPostId = await editPost(userId, postsId, editData);
+        const updatedPostId = await editPost(post, editData);
 
         res.status(200).json({
             success: true,

@@ -66,9 +66,13 @@ const getUserPost = async (userId, postsId) => {
     return new UserPostResponseDTO(post, star);
 };
 
-const editPost = async (userId, postsId, editData) => {
+const checkUserPost = async (userId, postsId) => {
+    return getPostById(userId, postsId);
+};
+
+const editPost = async (post, editData) => {
     // 게시글 수정
-    const updatedPost = await updatePost(userId, postsId, editData);
+    const updatedPost = await updatePost(post, editData);
 
     return updatedPost;
 };
@@ -109,6 +113,7 @@ module.exports = {
     registerPost,
     listUserPosts,
     getUserPost,
+    checkUserPost,
     editPost,
     deleteUserPost,
 };
