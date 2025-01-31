@@ -1,7 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// 포스트 조회
+// 일지 조회
 const getUserPosts = async (skip, limit) => {
     return await prisma.post.findMany({
         include: {
@@ -32,7 +32,7 @@ const getUserPosts = async (skip, limit) => {
     });
 };
 
-// 포스트 개수 카운트
+// 일지 개수 카운트
 const countUserPosts = async () => {
     return await prisma.post.count();
 };
