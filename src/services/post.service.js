@@ -25,12 +25,8 @@ const checkOrCreateStar = async (userId, region) => {
     console.log("Found star:", star);
 
     if (!star) {
-        // 별자리 아이디 찾기
-        const stars = await findStarsByUserId(userId);
-        console.log("Stars ID for user:", stars.stars_id);
-
         // 별이 없다면 새로 생성
-        star = await createStar(region, stars.stars_id);
+        star = await createStar(region);
         console.log("Created Star ID:", star.star_id);
     }
 
