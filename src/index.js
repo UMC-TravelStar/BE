@@ -26,6 +26,7 @@ const {
   handleEditPost,
   handleDeletePost,
   handleGetPost,
+  handleAddComment,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require('./auth');
 const {
@@ -117,6 +118,7 @@ app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지
 app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
 app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조회(전체)
+app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
 app.post("/prod/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
@@ -958,6 +960,75 @@ app.listen(port, () => {
  *         description: 일지를 찾을 수 없음
  *       500:
  *         description: 서버 내부 오류
+ */
+
+// 일지 화면 코멘트 작성 API
+/**
+ * @swagger
+ * /prod/posts/comment:
+ *   post:
+ *     summary: "일지 화면 코멘트 작성"
+ *     description: "사용자가 특정 게시글에 코멘트를 작성하는 API"
+ *     tags:
+ *       - "Comments"
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               comment:
+ *                 type: string
+ *                 example: "지호의 여행일지"
+ *             required:
+ *               - comment
+ *     responses:
+ *       200:
+ *         description: "코멘트 등록 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "코멘트 등록 성공"
+ *                 data:
+ *                   type: string
+ *                   example: "지호의 여행일지"
+ *       400:
+ *         description: "잘못된 요청 (예: 누락된 필드)"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "잘못된 요청입니다."
+ *       401:
+ *         description: "인증 실패 (토큰 없음 또는 유효하지 않음)"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "유효하지 않은 토큰입니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류 발생"
  */
 
 // 행성 설정 API

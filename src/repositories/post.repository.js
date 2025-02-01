@@ -281,6 +281,17 @@ const deleteStar = async (starId) => {
     });
 };
 
+const createComment = async (userId, commentData) => {
+    return prisma.user.update({
+        where: {
+            user_id: userId,
+        },
+        data: {
+            comment: commentData.comment,
+        }
+    });
+};
+
 module.exports = {
     findStarByRegion,
     findStarsByUserId,
@@ -297,4 +308,5 @@ module.exports = {
     deletePost,
     deleteStar,
     getAllUserPosts,
+    createComment,
 };

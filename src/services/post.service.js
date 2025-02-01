@@ -13,6 +13,7 @@ const {
     deletePost,
     deleteStar,
     getAllUserPosts,
+    createComment,
 } = require("../repositories/post.repository.js");
 const { 
     UserPostResponseDTO,
@@ -130,6 +131,11 @@ const deleteUserPost = async (userId, postsId) => {
     }
 };
 
+const registerComment = async (userId, comment) => {
+    const commentData = await createComment(userId, comment);
+
+    return commentData;
+};
 
 module.exports = {
     checkOrCreateStar,
@@ -140,4 +146,5 @@ module.exports = {
     checkUserPost,
     editPost,
     deleteUserPost,
+    registerComment,
 };
