@@ -89,7 +89,7 @@ const specs = swaggerJsDoc(options);
 const corsOptions = {
   origin: ["http://localhost:5173", "https://travelstar.netlify.app"], // 허용할 도메인 리스트
   credentials: true, // 쿠키 및 세션 정보를 포함
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // 허용할 메서드
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH","OPTIONS"], // 허용할 메서드
   allowedHeaders: ["Content-Type", "Authorization"], // 허용할 요청 헤더
 };
 
