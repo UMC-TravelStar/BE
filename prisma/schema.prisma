@@ -124,7 +124,7 @@ model subscrition {
 }
 
 model friends {
-  fr_id         Int      @id @default(autoincrement())
+  fr_id         String     @id
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
 
@@ -134,7 +134,7 @@ model friends {
 
 model friend_add {
   add_id        Int      @id @default(autoincrement())
-  fr_id         Int
+  fr_id         String
   status        Int?
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt

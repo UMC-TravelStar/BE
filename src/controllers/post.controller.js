@@ -62,8 +62,9 @@ const handleListUserPost = async (req, res) => {
 
 const handleGetPost = async (req, res) => {
     try {
-        const userId = req.params; // 조회할 postId & 작성자 userId
+        const userId = req.params.userId.toString(); // 조회할 postId & 작성자 userId
         const viewerId = req.userId; // JWT에서 가져온 현재 로그인 유저 ID
+        console.log('viewerId:', viewerId);
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
 
