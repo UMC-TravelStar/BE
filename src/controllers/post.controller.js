@@ -7,6 +7,7 @@ const {
     checkUserPost,
     editPost,
     deleteUserPost,
+    registerComment,
 } = require("../services/post.service.js");
 const { 
     EditPostDto 
@@ -165,6 +166,25 @@ const handleDeletePost = async (req, res) => {
     }
 };
 
+const handleAddComment = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const comment = req.body;
+
+        const commentData = await registerComment(userId, comment);
+
+        res.status(200).json({
+            message: '코멘트 등록 성공',
+            data: commentData,
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+const handleEditComment = async (req, res) => {
+
+};
 
 module.exports = {
     handleAddPost,
@@ -172,5 +192,7 @@ module.exports = {
     handleGetUserPost,
     handleGetPost,
     handleEditPost,
-    handleDeletePost
+    handleDeletePost,
+    handleAddComment,
+    handleEditComment
 };

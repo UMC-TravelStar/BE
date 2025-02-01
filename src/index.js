@@ -26,6 +26,8 @@ const {
   handleEditPost,
   handleDeletePost,
   handleGetPost,
+  handleAddComment,
+  handleEditComment,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require('./auth');
 const {
@@ -117,6 +119,9 @@ app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지
 app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
 app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조회(전체)
+
+app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
+app.patch("/posts/comment", authenticateUser, handleEditComment); // 일지 화면 코멘트 수정
 
 // 하루 일정 작성
 app.post("/prod/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
