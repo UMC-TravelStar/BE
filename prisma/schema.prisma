@@ -16,6 +16,7 @@ model user {
   phonenum      String?
   email         String?
   planet_name   String?
+  comment       String?
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
 

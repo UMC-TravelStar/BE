@@ -3,6 +3,7 @@ const {
     registerPost,
     listUserPosts,
     getUserPost, 
+    getPostWithStatus,
     checkUserPost,
     editPost,
     deleteUserPost,
@@ -56,6 +57,26 @@ const handleListUserPost = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "서버 내부 오류" });
+    }
+};
+
+const handleGetPost = async (req, res) => {
+    try {
+        const userId = req.params; // 조회할 postId & 작성자 userId
+        const viewerId = req.userId; // JWT에서 가져온 현재 로그인 유저 ID
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+
+        const result = await getPostWithStatus(userId, viewerId, page, limit);
+
+        if (!result) {
+            return res.status(404).json({ message: "해당 게시글을 찾을 수 없습니다." });
+        }
+
+        return res.status(200).json({ message: "조회 성공", data: result });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "서버 오류" });
     }
 };
 
@@ -148,6 +169,7 @@ module.exports = {
     handleAddPost,
     handleListUserPost,
     handleGetUserPost,
+    handleGetPost,
     handleEditPost,
     handleDeletePost
 };

@@ -1,9 +1,11 @@
 const { 
     findStarByRegion, 
-    findStarsByUserId,
+    checkFriendship,
     createStar, 
     savePost, 
     getPostById, 
+    getFrPost,
+    getPostList,
     updatePost, 
     getStarById,
     getPostById2,
@@ -66,6 +68,25 @@ const getUserPost = async (userId, postsId) => {
     return new UserPostResponseDTO(post, star);
 };
 
+const getPostWithStatus = async (userId, viewerId, page, limit) => {
+    const isFriend = await checkFriendship(userId, viewerId);
+
+    const skip = (page - 1) * limit;
+
+    let posts
+    if (isFriend) {
+        posts = await getFrPost(skip, userId);
+    } else {
+        posts = await getPostList(skip, userId);
+    }
+
+    if (posts.length === 0) {
+        return []; // 빈 배열을 반환할 경우
+    }
+    
+    return posts.map(formatPostResponse);
+};
+
 const checkUserPost = async (userId, postsId) => {
     return getPostById(userId, postsId);
 };
@@ -113,6 +134,7 @@ module.exports = {
     registerPost,
     listUserPosts,
     getUserPost,
+    getPostWithStatus,
     checkUserPost,
     editPost,
     deleteUserPost,

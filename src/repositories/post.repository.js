@@ -84,6 +84,56 @@ const getAllUserPosts = async (skip, userId) => {
     return posts;
 };
 
+const getFrPost = async (skip, userId) => {
+    return prisma.post.findMany({
+        select: {
+            post_id: true,
+            title: true,
+            created_at: true,
+            star: {
+                select: {
+                    star_id: true,
+                    region: true,
+                }
+            }
+        },
+        where: {
+            user_id: userId,
+            storage: { in: [0, 1] }
+        },
+        orderBy: {
+            post_id: "desc"
+        },
+        skip,
+        take: 10,
+    });
+};
+
+const getPostList = async (skip, userId) => {
+    return prisma.post.findMany({
+        select: {
+            post_id: true,
+            title: true,
+            created_at: true,
+            star: {
+                select: {
+                    star_id: true,
+                    region: true,
+                }
+            }
+        },
+        where: {
+            user_id: userId,
+            storage: 0,
+        },
+        orderBy: {
+            post_id: "desc"
+        },
+        skip,
+        take: 10,
+    });
+};
+
 const getPostById = async (userId, postsId) => {
     await prisma.post.update({
         where: {
@@ -109,6 +159,17 @@ const getStarById = async (starId) => {
     return prisma.star.findUnique({
         where: {
             star_id: parseInt(starId)
+        },
+    });
+};
+
+const checkFriendship = async (userId, viewerId) => {
+    return prisma.friends.findFirst({
+        where: {
+            OR: [
+                { user_id: parseInt(userId), friend_id: parseInt(viewerId) },
+                { user_id: parseInt(viewerId), friend_id: parseInt(userId) }
+            ],
         },
     });
 };
@@ -224,6 +285,9 @@ module.exports = {
     createStar,
     savePost,
     getPostById,
+    getFrPost,
+    getPostList,
+    checkFriendship,
     getStarById,
     updatePost,
     getPostById2,
