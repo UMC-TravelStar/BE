@@ -1,12 +1,18 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-// 사용자 관련 별자리 정보 조회
+
+// 사용자 ID로 별자리 조회
 const findStarsByUserId = async (userId) => {
-  return await prisma.stars.findFirst({
-    where: { user_id: userId },
+  return await prisma.stars.findUnique({
+    where: {
+      user_id: String(userId), // user_id를 그대로 사용
+    },
+    select: {
+      stars_id: true,
+      updated_at: true, // updated_at 값을 가져옴
+    },
   });
 };
-
 // 특정 조건에 따라 star 테이블에서 region 조회
 const findFilteredStarRegions = async (starsId, updatedAt) => {
   return await prisma.star.findMany({

@@ -4,32 +4,23 @@ const {
   setStarsNameService,
   getStarsRankingService,
 } = require("../services/stars.service.js");
-const { extractUserIdFromToken } = require("../dtos/stars.dto.js");
+const {
+  extractUserIdFromToken,
+  validateUserId,
+} = require("../dtos/stars.dto.js");
 
-const getFilteredStarRegions = async (req, res, next) => {
+const getFilteredStarRegions = async (req, res) => {
   try {
-    console.log("별 region 필터링 요청 도착!");
+    // req.params에서 user_id 추출 및 검증
+    const { user_id } = validateUserId(req.params);
 
-    const userId = extractUserIdFromToken(req);
+    // 서비스 호출
+    const regions = await getFilteredStarRegionsService(user_id);
 
-    if (!userId) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: "로그인이 필요합니다." });
-    }
-
-    const regions = await getFilteredStarRegionsService(userId);
-
-    res.status(StatusCodes.OK).json({
-      message: "조건에 맞는 별의 region 조회 성공",
-      regions,
-    });
+    // 결과 반환
+    res.status(200).json({ regions });
   } catch (error) {
-    console.error("별 region 필터링 오류:", error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: "서버 오류가 발생했습니다.",
-      error: error.message,
-    });
+    res.status(400).json({ error: error.message });
   }
 };
 
