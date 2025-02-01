@@ -7,6 +7,8 @@ require("dotenv").config();
 
 // 1. 이메일 인증
 const handleEmailCertification = async (req, res) => {
+  console.log("이메일 인증을 요청 했습니다");
+
   const { email } = req.body;
 
   if (!email) {
@@ -52,18 +54,37 @@ const handleUserSignUp = async (req, res) => {
     req.body;
 
   try {
-    const newUser = await prisma.user.create({
-      data: {
-        user_id, // Primary Key
-        nickname: nickname || null,
-        password, // 암호화 없이 저장
-        name: name || null,
-        birth: birth ? new Date(birth) : null, // Date로 변환
-        phonenum: phonenum || null,
-        email: email || null,
-      },
+    // 트랜잭션 사용으로 데이터 일관성 유지
+    const newUser = await prisma.$transaction(async (prisma) => {
+      // 1. 사용자 데이터 생성
+      const createdUser = await prisma.user.create({
+        data: {
+          user_id, // Primary Key
+          nickname: nickname || null,
+          password, // 암호화 없이 저장
+          name: name || null,
+          birth: birth ? new Date(birth) : null, // Date로 변환
+          phonenum: phonenum || null,
+          email: email || null,
+        },
+      });
+
+      // 2. stars 테이블에 초기 값 설정
+      await prisma.stars.create({
+        data: {
+          user_id: createdUser.user_id,
+          name: "Default Name", // 초기 이름 설정
+          views: 0, // 초기 조회수
+          vote_num: 0, // 초기 투표 수
+          created_at: new Date(), // 현재 시간으로 설정
+          updated_at: new Date(), // 현재 시간으로 설정
+        },
+      });
+
+      return createdUser;
     });
 
+    // 성공 응답
     res.status(201).json({
       message: "회원가입 성공",
       user: {
@@ -81,35 +102,43 @@ const handleUserSignUp = async (req, res) => {
   }
 };
 
-// 로그인 처리
-// const handleUserLogin = async (req, res) => {
-//   const { id, pw } = req.body;
-//   const secretKey = process.env.JWT_SECRET;
+const handleCheckUserId = async (req, res) => {
+  const { user_id } = req.body;
 
-//   if (!id || !pw) {
-//     return res.status(400).json({
-//       message: "아이디와 비밀번호를 입력해주세요.",
-//     });
-//   }
+  if (!user_id) {
+    return res.status(400).json({
+      message: "아이디를 입력해주세요.",
+    });
+  }
 
-//   // JWT 생성 (실제로는 DB에서 사용자 인증 필요)
-//   const token = jwt.sign({ id, pw }, secretKey, {
-//     expiresIn: "10h",
-//   });
+  try {
+    // 아이디로 사용자 조회
+    const user = await prisma.user.findUnique({
+      where: { user_id },
+    });
 
-//   res.cookie("authToken", token, {
-//     httpOnly: true,
-//     secure: false, //원래는 true로 되어있었음
-//     sameSite: "Lax",
-//     maxAge: 1000 * 60 * 60 * 10, // 10시간
-//   });
+    if (user) {
+      return res.status(200).json({
+        message: "이미 사용 중인 아이디입니다.",
+        isDuplicate: true, // 아이디 중복 여부
+      });
+    }
 
-//   res.status(200).json({
-//     message: "로그인 성공!",
-//     token,
-//   });
-// };
+    // 중복 아이디가 없을 경우
+    res.status(200).json({
+      message: "사용 가능한 아이디입니다.",
+      isDuplicate: false,
+    });
+  } catch (error) {
+    console.error("아이디 중복 확인 오류:", error);
+    res.status(500).json({
+      message: "아이디 중복 확인 실패",
+      error: error.message,
+    });
+  }
+};
 
+//로그인 처리
 const handleUserLogin = async (req, res) => {
   const { id, pw } = req.body;
   const secretKey = process.env.JWT_SECRET;
@@ -347,6 +376,7 @@ module.exports = {
   handleUserLogout,
   handleFindUserIdByEmail,
   handleresetPassword,
+  handleCheckUserId,
   setPlanetName,
   updatePlanetName,
   getPlanetName,

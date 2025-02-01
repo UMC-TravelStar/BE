@@ -4,11 +4,11 @@ const port = 4000;
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
-const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const {
   handleEmailCertification,
   handleUserSignUp,
+  handleCheckUserId,
   handleUserLogin,
   handleUserLogout,
   handleFindUserIdByEmail,
@@ -28,7 +28,7 @@ const {
   handleGetPost,
   handleAddComment,
 } = require("./controllers/post.controller.js");
-const { authenticateUser } = require('./auth');
+const { authenticateUser } = require("./auth");
 const {
   handleAddDaySchedule,
   handleGetDaySchedules,
@@ -47,19 +47,26 @@ const {
   handleGetSentFriendRequests,
   handleGetReceivedFriendRequests,
   handleGetFriendsList,
-  handleDeleteFriend
+  handleDeleteFriend,
 } = require("./controllers/friends.controller.js");
 const {
   handleListMainPost,
   handleSearchPosts,
-  handleGetSearchRankings
+  handleGetSearchRankings,
 } = require("./controllers/mainpage.controller.js");
 const {
+  getFilteredStarRegions,
+  setStarsName,
+  getStarsRanking,
+} = require("./controllers/stars.controller.js");
+
+const{
   handleCreatePlanet,
   handleGetPlanet,
   handleUpdatePlanet,
   handleGetOtherPlanet,
 } = require("./controllers/planet.controller.js");
+
 
 const options = {
   swaggerDefinition: {
@@ -80,12 +87,6 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 
-//app.use(
-//  cors({
-//    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
-//    credentials: true, // 쿠키를 포함한 요청 허용
-//  })
-//);
 const corsOptions = {
   origin: ["http://localhost:5173", "https://travelstar.netlify.app"], // 허용할 도메인 리스트
   credentials: true, // 쿠키 및 세션 정보를 포함
@@ -94,9 +95,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-app.use(cookieParser());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
@@ -109,15 +107,11 @@ app.set("json spaces", 2);
 
 //유저관리
 app.post("/email", handleEmailCertification);
-
+app.post("/check-id", handleCheckUserId);
 app.post("/register", handleUserSignUp);
-
 app.post("/login", handleUserLogin);
-
 app.post("/logout", handleUserLogout);
-
 app.post("/find-id", handleFindUserIdByEmail);
-
 app.post("/reset-pw", handleresetPassword);
 
 //행성
@@ -172,12 +166,10 @@ app.delete(
   handleDeleteSchedule
 ); // Schedule 삭제
 
-
 // 메인 페이지
 app.get("/prod/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
 app.get("/prod/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
 app.get("/prod/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
-
 
 // 친구 관리
 app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
@@ -187,16 +179,20 @@ app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게
 app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 
-// 행성
+
+app.get("/stars/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
+app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
+app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
+
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
 app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 수정(행성 이름 수정)
 app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 조회
 
+
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
-
 
 // 로그인 API
 /**
@@ -232,6 +228,69 @@ app.listen(port, () => {
  *                   type: string
  *       401:
  *         description: 로그인 실패
+ */
+/**
+ * @swagger
+ * /prod/check-id:
+ *   post:
+ *     summary: 아이디 중복 체크
+ *     description: 사용자가 입력한 아이디가 중복되었는지 확인합니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *                 description: "중복 체크를 할 사용자 ID"
+ *                 example: test_user
+ *     responses:
+ *       200:
+ *         description: 아이디 중복 체크 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: "처리 결과 메시지"
+ *                 isDuplicate:
+ *                   type: boolean
+ *                   description: "중복 여부 (true: 중복됨, false: 중복되지 않음)"
+ *               example:
+ *                 message: "이미 사용 중인 아이디입니다."
+ *                 isDuplicate: true
+ *       400:
+ *         description: 잘못된 요청
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: "에러 메시지"
+ *               example:
+ *                 message: "아이디를 입력해주세요."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: "에러 메시지"
+ *                 error:
+ *                   type: string
+ *                   description: "서버에서 발생한 에러 상세 정보"
+ *               example:
+ *                 message: "아이디 중복 확인 실패"
+ *                 error: "Internal server error"
  */
 
 // 회원가입 API
@@ -1060,7 +1119,7 @@ app.listen(port, () => {
  *                   example: "서버 오류 발생"
  */
 
-// 행성 설정 API
+// 행성 이름 초기 설정 API
 /**
  * @swagger
  * /prod/planet:
@@ -1130,7 +1189,7 @@ app.listen(port, () => {
  *                   example: "서버 오류가 발생했습니다."
  */
 
-// 행성 수정 API
+// 행성 이름 수정 API
 /**
  * @swagger
  * /prod/planet/{user_id}:
@@ -1331,38 +1390,6 @@ app.listen(port, () => {
  *         description: 접근 권한 없음
  */
 
-/**
- * @swagger
- * /users/{user_id}/stars/ranking:
- *   get:
- *     summary: 별자리 랭킹 조회
- *     description: 조회수 순으로 별자리 랭킹을 반환합니다.
- *     responses:
- *       200:
- *         description: 별자리 랭킹 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "별자리 랭킹 조회 성공"
- *                 rankings:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       star_id:
- *                         type: integer
- *                       name:
- *                         type: string
- *                       views:
- *                         type: integer
- *       404:
- *         description: 별자리 데이터가 없습니다.
- */
-
 // 마이페이지 조회 API
 /**
  * @swagger
@@ -1498,4 +1525,203 @@ app.listen(port, () => {
  *                         description: "친구의 프로필 사진 (user_image 테이블의 file_name)"
  *       404:
  *         description: 친구가 존재하지 않음
+ */
+
+/**
+ * @swagger
+ * /prod/stars/regions:
+ *   get:
+ *     summary: 조건에 맞는 별의 Region 조회
+ *     description: JWT 토큰을 사용하여 조건에 맞는 별의 Region 데이터를 필터링하여 반환합니다.
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 조건에 맞는 별의 Region 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "조건에 맞는 별의 region 조회 성공"
+ *                 regions:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["일본", "한국", "미국"]
+ *       401:
+ *         description: 로그인이 필요합니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "로그인이 필요합니다."
+ *       404:
+ *         description: 별자리를 찾을 수 없습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리를 찾을 수 없습니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 error:
+ *                   type: string
+ *                   example: "Error message details"
+ */
+
+/**
+ * @swagger
+ * /prod/stars/name:
+ *   patch:
+ *     summary: 별자리 이름 설정 및 업데이트
+ *     description: JWT 토큰을 사용하여 사용자의 별자리 이름을 설정 또는 업데이트합니다.
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: 새로 설정할 별자리 이름
+ *                 example: "오리온자리"
+ *     responses:
+ *       200:
+ *         description: 별자리 이름 설정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리 이름 설정 성공"
+ *                 stars:
+ *                   type: object
+ *                   properties:
+ *                     stars_id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     views:
+ *                       type: integer
+ *                     vote_num:
+ *                       type: integer
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                     updated_at:
+ *                       type: string
+ *                       format: date-time
+ *       400:
+ *         description: 별자리 이름이 필요합니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리 이름이 필요합니다."
+ *       401:
+ *         description: 로그인이 필요합니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "로그인이 필요합니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 error:
+ *                   type: string
+ *                   example: "Error message details"
+ */
+
+/**
+ * @swagger
+ * /prod/stars/ranking:
+ *   get:
+ *     summary: 별자리 랭킹 조회
+ *     description: 투표 수(vote_num)를 기준으로 상위 10개의 별자리를 반환합니다.
+ *     responses:
+ *       200:
+ *         description: 별자리 랭킹 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리 랭킹 조회 성공"
+ *                 rankings:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       stars_id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       vote_num:
+ *                         type: integer
+ *                       views:
+ *                         type: integer
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *       404:
+ *         description: 별자리 랭킹 데이터를 찾을 수 없습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리 랭킹 데이터를 찾을 수 없습니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 error:
+ *                   type: string
+ *                   example: "Error message details"
  */
