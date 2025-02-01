@@ -164,11 +164,13 @@ const getStarById = async (starId) => {
 };
 
 const checkFriendship = async (userId, viewerId) => {
+    console.log(typeof userId, userId); 
+    console.log(typeof viewerId, viewerId);
     return prisma.friends.findFirst({
         where: {
             OR: [
-                { user_id: parseInt(userId), friend_id: parseInt(viewerId) },
-                { user_id: parseInt(viewerId), friend_id: parseInt(userId) }
+                { user_id: userId, fr_id: viewerId },
+                { user_id: viewerId, fr_id: userId }
             ],
         },
     });

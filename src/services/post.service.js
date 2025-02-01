@@ -70,6 +70,7 @@ const getUserPost = async (userId, postsId) => {
 
 const getPostWithStatus = async (userId, viewerId, page, limit) => {
     const isFriend = await checkFriendship(userId, viewerId);
+    console.log(`isFriend: `, isFriend);
 
     const skip = (page - 1) * limit;
 
@@ -79,6 +80,7 @@ const getPostWithStatus = async (userId, viewerId, page, limit) => {
     } else {
         posts = await getPostList(skip, userId);
     }
+    console.log(posts)
 
     if (posts.length === 0) {
         return []; // 빈 배열을 반환할 경우

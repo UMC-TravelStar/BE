@@ -11,6 +11,10 @@ const authenticateUser = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.id; // 요청 객체에 userId 저장
+
+        console.log("Decoded JWT:", decoded);  // JWT 내용 확인
+        console.log("req.userId:", req.userId);  // req.userId 확인
+        
         next();
     } catch (error) {
         return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
