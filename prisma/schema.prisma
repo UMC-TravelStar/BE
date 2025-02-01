@@ -21,8 +21,6 @@ model user {
 
   posts         post[]
   day_schedules day_schedule[]
-  friendss      friends[]
-  friend_adds   friend_add[]
 
   stars         stars?
   subscrition   subscrition?
@@ -126,13 +124,13 @@ model subscrition {
 }
 
 model Friend {
-  request_id            Int     @id @default(autoincrement())
-  from_user_id  Int
-  to_user_id    Int
+  request_id    Int     @id @default(autoincrement())
+  from_user_id  String
+  to_user_id    String
   are_we_friend Boolean @default(false)
   created_at    DateTime  @default(now())
 
-  from_user     User   @relation("FromUser", fields: [from_user_id], references: [user_id])
+  from_user     user   @relation("FromUser", fields: [from_user_id], references: [user_id])
   to_user       user   @relation("ToUser", fields: [to_user_id], references: [user_id])
 }
 
