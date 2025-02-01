@@ -22,7 +22,6 @@ model user {
 
   posts         post[]
   day_schedules day_schedule[]
-  planets       planet[]
 
   stars         stars?
   subscrition   subscrition?

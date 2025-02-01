@@ -5,7 +5,9 @@ const {
     savePost, 
     getPostById, 
     getFrPost,
+    getFrPost2,
     getPostList,
+    getPostList2,
     updatePost, 
     getStarById,
     getPostById2,
@@ -17,7 +19,8 @@ const {
 } = require("../repositories/post.repository.js");
 const { 
     UserPostResponseDTO,
-    formatPostResponse
+    formatPostResponse,
+    PostResponseDTO
 } = require("../dtos/post.dto.js");
 
 const checkOrCreateStar = async (userId, region) => {
@@ -81,13 +84,28 @@ const getPostWithStatus = async (userId, viewerId, page, limit) => {
     } else {
         posts = await getPostList(skip, userId);
     }
-    console.log(posts)
+    console.log(posts);
 
     if (posts.length === 0) {
         return []; // 빈 배열을 반환할 경우
     }
     
-    return posts.map(formatPostResponse);
+    return new PostResponseDTO(posts);
+};
+
+const getPost = async (userId, viewerId, postsId) => {
+    const isFriend = await checkFriendship(userId, viewerId);
+    console.log(`isFriend: `, isFriend);
+
+    let posts
+    if (isFriend) {
+        posts = await getFrPost2(userId, postsId);
+    } else {
+        posts = await getPostList2(userId, postsId);
+    }
+    console.log(posts);
+
+    return 
 };
 
 const checkUserPost = async (userId, postsId) => {
@@ -142,6 +160,7 @@ module.exports = {
     registerPost,
     listUserPosts,
     getUserPost,
+    getPost,
     getPostWithStatus,
     checkUserPost,
     editPost,

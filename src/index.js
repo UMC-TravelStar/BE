@@ -26,6 +26,7 @@ const {
   handleEditPost,
   handleDeletePost,
   handleGetPost,
+  handleGetUPost,
   handleAddComment,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
@@ -48,6 +49,14 @@ const {
   handleGetReceivedFriendRequests,
   handleGetFriendsList,
   handleDeleteFriend,
+} = require("./controllers/friends.controller.js");
+const {
+  handleSendFriendRequest,
+  handleAcceptFriendRequest,
+  handleGetSentFriendRequests,
+  handleGetReceivedFriendRequests,
+  handleGetFriendsList,
+  handleDeleteFriend
 } = require("./controllers/friends.controller.js");
 const {
   handleListMainPost,
@@ -125,6 +134,7 @@ app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지
 app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
 app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조회(전체)
+app.get("/posts/:postsId/user/:userId", authenticateUser, handleGetUPost); // 일지 조회(1개)
 app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
@@ -163,9 +173,18 @@ app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
 app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 수정(행성 이름 수정)
 app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 조회
 
+// 친구 관리
+app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
+app.patch("/friends/request/:requestId", handleAcceptFriendRequest); // 친구 요청 수락
+app.get("/friends/list/sent", handleGetSentFriendRequests); // 내가 친구 요청한 목록 조회
+app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게 친구 요청한 목록 조회
+app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
+app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
+
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
+
 
 // 로그인 API
 /**
