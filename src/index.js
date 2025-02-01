@@ -42,6 +42,14 @@ const {
   handleDeleteSchedule,
 } = require("./controllers/schedule.controller.js");
 const {
+  handleSendFriendRequest,
+  handleAcceptFriendRequest,
+  handleGetSentFriendRequests,
+  handleGetReceivedFriendRequests,
+  handleGetFriendsList,
+  handleDeleteFriend
+} = require("./controllers/friends.controller.js");
+const {
   handleListMainPost,
   handleSearchPosts,
   handleGetSearchRankings
@@ -165,9 +173,18 @@ app.get("/prod/users/:user_id/home/search", handleSearchPosts); // 메인 페이
 app.get("/prod/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
 
 
+// 친구 관리
+app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
+app.patch("/friends/request/:requestId", handleAcceptFriendRequest); // 친구 요청 수락
+app.get("/friends/list/sent", handleGetSentFriendRequests); // 내가 친구 요청한 목록 조회
+app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게 친구 요청한 목록 조회
+app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
+app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
+
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
+
 
 // 로그인 API
 /**
