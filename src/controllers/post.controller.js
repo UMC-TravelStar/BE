@@ -3,8 +3,11 @@ const {
     registerPost,
     listUserPosts,
     getUserPost, 
+    getPostWithStatus,
+    checkUserPost,
     editPost,
     deleteUserPost,
+    registerComment,
 } = require("../services/post.service.js");
 const { 
     EditPostDto 
@@ -19,7 +22,7 @@ const handleAddPost = async (req, res) => {
     const { region, ...restOfData } = req.body;
 
     try {
-        // userId에 해당하는 별자리의 별이 존재하는지 확인
+        // userId에 해당하는 별이 존재하는지 확인
         const starId = await checkOrCreateStar(userId, region);
         console.log("Star ID:", starId);
 
@@ -55,6 +58,27 @@ const handleListUserPost = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "서버 내부 오류" });
+    }
+};
+
+const handleGetPost = async (req, res) => {
+    try {
+        const userId = req.params.userId.toString(); // 조회할 postId & 작성자 userId
+        const viewerId = req.userId; // JWT에서 가져온 현재 로그인 유저 ID
+        console.log('viewerId:', viewerId);
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+
+        const result = await getPostWithStatus(userId, viewerId, page, limit);
+
+        if (!result) {
+            return res.status(404).json({ message: "해당 게시글을 찾을 수 없습니다." });
+        }
+
+        return res.status(200).json({ message: "조회 성공", data: result });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "서버 오류" });
     }
 };
 
@@ -99,13 +123,13 @@ const handleEditPost = async (req, res) => {
             return res.status(400).json({ success: false, message: "일지 수정 실패 (userId or postsId 누락)" });
         }
 
-        const post = await getUserPost(userId, postsId);
+        const post = await checkUserPost(userId, postsId);
 
         if (!post) {
             return res.status(404).json({ success: false, message: "일지를 찾을 수 없음." });
         }
 
-        const updatedPostId = await editPost(userId, postsId, editData);
+        const updatedPostId = await editPost(post, editData);
 
         res.status(200).json({
             success: true,
@@ -142,11 +166,28 @@ const handleDeletePost = async (req, res) => {
     }
 };
 
+const handleAddComment = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const comment = req.body;
+
+        const commentData = await registerComment(userId, comment);
+
+        res.status(200).json({
+            message: '코멘트 등록 성공',
+            data: commentData.comment,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 module.exports = {
     handleAddPost,
     handleListUserPost,
     handleGetUserPost,
+    handleGetPost,
     handleEditPost,
-    handleDeletePost
+    handleDeletePost,
+    handleAddComment,
 };

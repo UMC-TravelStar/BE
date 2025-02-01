@@ -1,9 +1,11 @@
 const { 
     findStarByRegion, 
-    findStarsByUserId,
+    checkFriendship,
     createStar, 
     savePost, 
     getPostById, 
+    getFrPost,
+    getPostList,
     updatePost, 
     getStarById,
     getPostById2,
@@ -11,6 +13,7 @@ const {
     deletePost,
     deleteStar,
     getAllUserPosts,
+    createComment,
 } = require("../repositories/post.repository.js");
 const { 
     UserPostResponseDTO,
@@ -25,12 +28,8 @@ const checkOrCreateStar = async (userId, region) => {
     console.log("Found star:", star);
 
     if (!star) {
-        // 별자리 아이디 찾기
-        const stars = await findStarsByUserId(userId);
-        console.log("Stars ID for user:", stars.stars_id);
-
         // 별이 없다면 새로 생성
-        star = await createStar(region, stars.stars_id);
+        star = await createStar(region);
         console.log("Created Star ID:", star.star_id);
     }
 
@@ -70,9 +69,34 @@ const getUserPost = async (userId, postsId) => {
     return new UserPostResponseDTO(post, star);
 };
 
-const editPost = async (userId, postsId, editData) => {
+const getPostWithStatus = async (userId, viewerId, page, limit) => {
+    const isFriend = await checkFriendship(userId, viewerId);
+    console.log(`isFriend: `, isFriend);
+
+    const skip = (page - 1) * limit;
+
+    let posts
+    if (isFriend) {
+        posts = await getFrPost(skip, userId);
+    } else {
+        posts = await getPostList(skip, userId);
+    }
+    console.log(posts)
+
+    if (posts.length === 0) {
+        return []; // 빈 배열을 반환할 경우
+    }
+    
+    return posts.map(formatPostResponse);
+};
+
+const checkUserPost = async (userId, postsId) => {
+    return getPostById(userId, postsId);
+};
+
+const editPost = async (post, editData) => {
     // 게시글 수정
-    const updatedPost = await updatePost(userId, postsId, editData);
+    const updatedPost = await updatePost(post, editData);
 
     return updatedPost;
 };
@@ -107,12 +131,20 @@ const deleteUserPost = async (userId, postsId) => {
     }
 };
 
+const registerComment = async (userId, comment) => {
+    const commentData = await createComment(userId, comment);
+
+    return commentData;
+};
 
 module.exports = {
     checkOrCreateStar,
     registerPost,
     listUserPosts,
     getUserPost,
+    getPostWithStatus,
+    checkUserPost,
     editPost,
     deleteUserPost,
+    registerComment,
 };

@@ -29,7 +29,7 @@ Content-Type: application/json; charset=UTF-8
 }
 
 ###id찾기g
-get http://localhost:4000/find-id
+get http://15.165.117.176:4000/find-id
 Content-Type: application/json; charset=UTF-8
 
 {
@@ -37,14 +37,14 @@ Content-Type: application/json; charset=UTF-8
 }
 
 ###비밀번호 찾기
-get http://localhost:4000/reset-pw
+get http://15.165.117.176:4000/reset-pw
 Content-Type: application/json; charset=UTF-8
 
 {
   "user_id": "1234",
   "email": "qqqq@naver.com",
-  "newPassword":"12345",
-  "confirmPassword":"12345"
+  "newPassword":"1234",
+  "confirmPassword":"1234"
 }
 
 ###

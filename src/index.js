@@ -25,7 +25,10 @@ const {
   handleGetUserPost,
   handleEditPost,
   handleDeletePost,
+  handleGetPost,
+  handleAddComment,
 } = require("./controllers/post.controller.js");
+const { authenticateUser } = require('./auth');
 const {
   handleAddDaySchedule,
   handleGetDaySchedules,
@@ -46,6 +49,11 @@ const {
   handleGetFriendsList,
   handleDeleteFriend
 } = require("./controllers/friends.controller.js");
+const {
+  handleListMainPost,
+  handleSearchPosts,
+  handleGetSearchRankings
+} = require("./controllers/mainpage.controller.js");
 
 const options = {
   swaggerDefinition: {
@@ -100,11 +108,11 @@ app.post("/register", handleUserSignUp);
 
 app.post("/login", handleUserLogin);
 
-app.get("/logout", handleUserLogout);
+app.post("/logout", handleUserLogout);
 
-app.get("/find-id", handleFindUserIdByEmail);
+app.post("/find-id", handleFindUserIdByEmail);
 
-app.get("/reset-pw", handleresetPassword);
+app.post("/reset-pw", handleresetPassword);
 
 //행성
 app.post("/planet", setPlanetName);
@@ -117,6 +125,8 @@ app.get("/users/:userId/posts", handleListUserPost); // 유저의 일지 조회(
 app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
 app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
+app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조회(전체)
+app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
 app.post("/prod/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
@@ -155,6 +165,13 @@ app.delete(
   "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
   handleDeleteSchedule
 ); // Schedule 삭제
+
+
+// 메인 페이지
+app.get("/prod/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
+app.get("/prod/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
+app.get("/prod/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
+
 
 // 친구 관리
 app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
@@ -818,19 +835,19 @@ app.listen(port, () => {
 // 일지 수정 API
 /**
  * @swagger
- * /users/:userId/posts/:postsId:
+ * /prod/users/{userId}/posts/{postsId}:
  *   patch:
  *     summary: 일지 수정
  *     description: 사용자가 작성한 일지를 수정합니다.
  *     parameters:
  *       - in: path
- *         name: user_id
+ *         name: userId
  *         required: true
  *         schema:
  *           type: string
  *         description: "로그인된 사용자 ID"
  *       - in: path
- *         name: posts_id
+ *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
@@ -848,6 +865,18 @@ app.listen(port, () => {
  *               content:
  *                 type: string
  *                 description: "수정된 일지 내용"
+ *               region:
+ *                 type: string
+ *                 description: "수정된 지역 정보"
+ *               music:
+ *                 type: string
+ *                 description: "새로운 음악 링크"
+ *               feeling:
+ *                 type: string
+ *                 description: "수정된 감정"
+ *               storage:
+ *                 type: integer
+ *                 description: "스토리지 여부 (0 또는 1)"
  *     responses:
  *       200:
  *         description: 일지 수정 성공
@@ -856,13 +885,59 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *                 message:
  *                   type: string
  *                   example: "일지 수정 성공"
+ *                 postId:
+ *                   type: object
+ *                   properties:
+ *                     post_id:
+ *                       type: integer
+ *                       example: 31
+ *                     title:
+ *                       type: string
+ *                       example: "수정된 제목"
+ *                     content:
+ *                       type: string
+ *                       example: "수정된 내용입니다."
+ *                     music:
+ *                       type: string
+ *                       example: "새로운 음악 링크"
+ *                     feeling:
+ *                       type: string
+ *                       example: "행복"
+ *                     feel_color:
+ *                       type: string
+ *                       nullable: true
+ *                     views:
+ *                       type: integer
+ *                       example: 8
+ *                     storage:
+ *                       type: integer
+ *                       example: 0
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-01-31T14:53:09.466Z"
+ *                     updated_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-01-31T16:42:51.980Z"
+ *                     user_id:
+ *                       type: string
+ *                       example: "1"
+ *                     star_id:
+ *                       type: integer
+ *                       example: 19
  *       400:
- *         description: 수정 실패 (잘못된 입력 등)
+ *         description: 파라미터 누락 또는 잘못된 요청
  *       404:
  *         description: 일지를 찾을 수 없음
+ *       500:
+ *         description: 서버 내부 오류
  */
 
 // 일지 삭제 API
@@ -902,6 +977,75 @@ app.listen(port, () => {
  *         description: 일지를 찾을 수 없음
  *       500:
  *         description: 서버 내부 오류
+ */
+
+// 일지 화면 코멘트 작성 API
+/**
+ * @swagger
+ * /prod/posts/comment:
+ *   post:
+ *     summary: "일지 화면 코멘트 작성"
+ *     description: "사용자가 특정 게시글에 코멘트를 작성하는 API"
+ *     tags:
+ *       - "Comments"
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               comment:
+ *                 type: string
+ *                 example: "지호의 여행일지"
+ *             required:
+ *               - comment
+ *     responses:
+ *       200:
+ *         description: "코멘트 등록 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "코멘트 등록 성공"
+ *                 data:
+ *                   type: string
+ *                   example: "지호의 여행일지"
+ *       400:
+ *         description: "잘못된 요청 (예: 누락된 필드)"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "잘못된 요청입니다."
+ *       401:
+ *         description: "인증 실패 (토큰 없음 또는 유효하지 않음)"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "유효하지 않은 토큰입니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류 발생"
  */
 
 // 행성 설정 API
