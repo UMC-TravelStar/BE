@@ -64,9 +64,8 @@ Content-Type: application/json; charset=UTF-8
   "pw": "1234"
 }
 
-### 별자리 지역 필터 조회
-GET http://localhost:4000/stars/regions
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg0MTQwNDcsImV4cCI6MTczODQ1MDA0N30.d5NcLUEUHqWguLq6g6Pi0V6ji_7MnHu9698-S1r17tc
+### 별자리 조회(아이디 기반반)
+GET http://localhost:4000/stars/1234/regions
 Content-Type: application/json
 
 ### 별자리 이름 설정 변경 및 여행한 별들 추가

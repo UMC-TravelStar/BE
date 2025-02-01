@@ -17,5 +17,19 @@ const extractUserIdFromToken = (req) => {
     return null;
   }
 };
+const validateUserId = (params) => {
+  const { user_id } = params;
 
-module.exports = { extractUserIdFromToken };
+  if (!user_id) {
+    throw new Error("user_id는 필수입니다.");
+  }
+
+  const parsedUserId = parseInt(user_id, 10);
+  if (isNaN(parsedUserId)) {
+    throw new Error("user_id는 숫자여야 합니다.");
+  }
+
+  return { user_id: parsedUserId };
+};
+
+module.exports = { extractUserIdFromToken, validateUserId };

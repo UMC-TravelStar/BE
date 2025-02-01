@@ -60,13 +60,12 @@ const {
   getStarsRanking,
 } = require("./controllers/stars.controller.js");
 
-const{
+const {
   handleCreatePlanet,
   handleGetPlanet,
   handleUpdatePlanet,
   handleGetOtherPlanet,
 } = require("./controllers/planet.controller.js");
-
 
 const options = {
   swaggerDefinition: {
@@ -90,7 +89,7 @@ const specs = swaggerJsDoc(options);
 const corsOptions = {
   origin: ["http://localhost:5173", "https://travelstar.netlify.app"], // 허용할 도메인 리스트
   credentials: true, // 쿠키 및 세션 정보를 포함
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH","OPTIONS"], // 허용할 메서드
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], // 허용할 메서드
   allowedHeaders: ["Content-Type", "Authorization"], // 허용할 요청 헤더
 };
 
@@ -179,8 +178,7 @@ app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게
 app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 
-
-app.get("/stars/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
+app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
 app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
 
@@ -188,7 +186,6 @@ app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
 app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 수정(행성 이름 수정)
 app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 조회
-
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -1529,12 +1526,18 @@ app.listen(port, () => {
 
 /**
  * @swagger
- * /prod/stars/regions:
+ * /prod/stars/{user_id}/regions:
  *   get:
- *     summary: 조건에 맞는 별의 Region 조회
- *     description: JWT 토큰을 사용하여 조건에 맞는 별의 Region 데이터를 필터링하여 반환합니다.
- *     security:
- *       - BearerAuth: []
+ *     summary: 특정 사용자와 조건에 맞는 별의 Region 조회
+ *     description: 사용자 ID를 경로 매개변수로 받아 조건에 맞는 별의 Region 데이터를 필터링하여 반환합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         description: 사용자 ID
+ *         schema:
+ *           type: integer
+ *           example: 12345
  *     responses:
  *       200:
  *         description: 조건에 맞는 별의 Region 조회 성공
@@ -1551,8 +1554,18 @@ app.listen(port, () => {
  *                   items:
  *                     type: string
  *                   example: ["일본", "한국", "미국"]
+ *       400:
+ *         description: 잘못된 요청 (유효하지 않은 user_id)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "user_id가 유효하지 않습니다."
  *       401:
- *         description: 로그인이 필요합니다.
+ *         description: 인증 실패 (로그인 필요)
  *         content:
  *           application/json:
  *             schema:
