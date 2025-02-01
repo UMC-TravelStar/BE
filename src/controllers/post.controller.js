@@ -175,15 +175,11 @@ const handleAddComment = async (req, res) => {
 
         res.status(200).json({
             message: '코멘트 등록 성공',
-            data: commentData,
+            data: commentData.comment,
         });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
-};
-
-const handleEditComment = async (req, res) => {
-
 };
 
 module.exports = {
@@ -194,5 +190,4 @@ module.exports = {
     handleEditPost,
     handleDeletePost,
     handleAddComment,
-    handleEditComment
 };
