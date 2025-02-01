@@ -1,19 +1,90 @@
-const FriendService = require('../services/friends.service');
+const FriendsService = require('../services/friends.service');
 
-class FriendsController {
-  // 친구 요청 기능
-  async sendFriendRequest(req, res) {
-    try{
-        console.log('친구 요청');
-        console.log("body: ",req.body);
+// 친구 요청
+const handleSendFriendRequest = async (req, res) => {
+  try{
+    console.log('친구 요청');
+    console.log("body: ",req.body);
 
-        const { fromUserId, toUserId } = req.body;
-        const result = await FriendService.sendFriendRequest(fromUserId, toUserId);
-        res.status(200).json(result);
-    } catch(error) {
-        res.status(500).json({ message: error.message });
-    }
-  }
+    const fromUserId = req.user.id;
+    const {toUserId} = req.params;
+    const result = await FriendsService.sendFriendRequest(fromUserId, toUserId);
+    res.status(200).json(result);
+} catch(error) {
+    res.status(500).json({ message: error.message });
 }
+};
 
-module.exports = new FriendsController();
+// 친구 요청 수락
+const handleAcceptFriendRequest = async (req, res) => {
+  try{
+    console.log('친구 요청 수락');
+    console.log("params: ",req.params);
+
+    const {requestId} = req.params;
+    const result = await FriendsService.acceptFriendRequest(requestId);
+    res.status(200).json(result);
+  } catch(error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+
+// 내가 친구 요청한 목록 조회
+const handleGetSentFriendRequests = async (req, res) => {
+  try{
+    console.log('내가 친구 요청한 목록 조회');
+    const userId = req.user.id;
+    const result = await FriendsService.getSentFriendRequests(userId);
+    res.status(200).json(result);
+  } catch(error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+
+// 나에게 친구 요청한 목록 조회
+const handleGetReceivedFriendRequests = async (req, res) => {
+  try{
+    console.log('나에게 친구 요청한 목록 조회');
+    const userId = req.user.id;
+    const result = await FriendsService.getReceivedFriendRequests(userId);
+    res.status(200).json(result);
+  } catch(error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+
+// 서로 친구인 목록 조회
+const handleGetFriendsList = async (req, res) => {
+  try{
+    console.log('서로 친구인 목록 조회');
+    const userId = req.user.id;
+    const result = await FriendsService.getFriendsList(userId);  
+    res.status(200).json(result);
+  } catch(error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+
+// 친구 삭제
+const handleDeleteFriend = async (req, res) => {
+  try{
+    console.log('친구 삭제');
+    console.log("params: ",req.params);
+
+    const userId = req.user.id;
+    const {friendId} = req.params;
+    const result = await FriendsService.deleteFriend(userId, friendId);
+    res.status(200).json(result);
+  } catch(error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  handleSendFriendRequest,
+  handleAcceptFriendRequest,
+  handleGetSentFriendRequests,
+  handleGetReceivedFriendRequests,
+  handleGetFriendsList,
+  handleDeleteFriend
+}

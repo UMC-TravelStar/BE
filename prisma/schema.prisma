@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,32 +8,158 @@ datasource db {
 }
 
 model user {
-  user_id    String   @id // Primary Key
-  nickname   String?  // Nullable, VARCHAR(255)
-  password   String?  // Nullable, VARCHAR(255)
-  name       String?  // Nullable, VARCHAR(255)
-  birth      DateTime? // Nullable, DATE
-  phonenum   String?  // Nullable, VARCHAR(15)
-  email      String?  // Nullable, VARCHAR(255)
-  created_at DateTime @default(now()) // Default CURRENT_TIMESTAMP
-  updated_at DateTime @updatedAt      // Automatically updated on change
+  user_id       String     @id
+  nickname      String 
+  password      String 
+  name          String?
+  birth         DateTime?
+  phonenum      String?
+  email         String?
+  planet_name   String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  //관계 정의
-  sentFriendRequests   Friend[] @relation("FromUser")
-  receivedFriendRequests Friend[] @relation("ToUser")
+  posts         post[]
+  day_schedules day_schedule[]
+  friendss      friends[]
+  friend_adds   friend_add[]
+
+  stars         stars?
+  subscrition   subscrition?
+  u_image       user_image?
+  u_bgimage     user_bgimage?
+
+  from_friends Friend[] @relation("FromUser")
+  to_friends   Friend[] @relation("ToUser")
+}
+
+model post {
+  post_id     Int      @id @default(autoincrement())
+  title       String?
+  content     String?
+  music       String?
+  feeling     String?
+  feel_color  String?
+  views       Int      @default(0)
+  storage     Int?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  post_images post_image[]
+
+  user_id     String      
+  user        user     @relation(fields: [user_id], references: [user_id])
+
+  star_id     Int      
+  star        star     @relation(fields: [star_id], references: [star_id])
+}
+
+model post_image {
+  p_image_id    Int        @id @default(autoincrement())
+  file_name     String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  post_id       Int      
+  post          post     @relation(fields: [post_id], references: [post_id])
+}
+
+model stars { 
+  stars_id      Int      @id @default(autoincrement())
+  name          String?
+  views         Int      @default(0)
+  vote_num      Int?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  stars         star[]
+
+  user_id       String   @unique
+  user          user     @relation(fields: [user_id], references: [user_id])
+}
+
+model star {
+  star_id       Int      @id @default(autoincrement())
+  region        String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  posts         post[]
+
+  stars_id      Int      
+  stars         stars    @relation(fields: [stars_id], references: [stars_id])
+}
+
+model day_schedule {
+  day_id        Int      @id @default(autoincrement())
+  date          DateTime?
+  title         String?
+  content       String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  schedules     schedule[]
+  user_id       String    
+  user          user     @relation(fields: [user_id], references: [user_id])
+}
+
+model schedule {
+  schedule_id       Int           @id @default(autoincrement())
+  location          String?
+  date_time         DateTime
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
+
+  day_id            Int      
+  day_schedules     day_schedule  @relation(fields: [day_id], references: [day_id])
+}
+
+model subscrition {
+  sub_id         Int      @id @default(autoincrement())
+  deadline       DateTime?
+  method         Int?
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+
+  user_id        String   @unique
+  user           user     @relation(fields: [user_id], references: [user_id])
 }
 
 model Friend {
-  id  Int @id @default(autoincrement()) //Primary Key
-  from_user_id  String //친구 요청을 보낸 사용자의 id
-  to_user_id  String //친구 요청을 받은 사용자의 id
-  are_we_friend Boolean @default(false) //친구 상태 여부
-  created_date  DateTime @default(now())  
-  last_modified_date  DateTime @updatedAt
+  request_id            Int     @id @default(autoincrement())
+  from_user_id  Int
+  to_user_id    Int
+  are_we_friend Boolean @default(false)
+  created_at    DateTime  @default(now())
 
-  from_user user @relation("FromUser", fields: [from_user_id], references: [user_id])
-  to_user user @relation("ToUser", fields:[to_user_id], references:[user_id])
+  from_user     User   @relation("FromUser", fields: [from_user_id], references: [user_id])
+  to_user       user   @relation("ToUser", fields: [to_user_id], references: [user_id])
+}
 
-  //중복 요청 방지
-  @@unique([from_user_id, to_user_id])
+model user_image {
+  u_image_id    Int      @id @default(autoincrement())
+  file_name     String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  user_id       String   @unique
+  user          user     @relation(fields: [user_id], references: [user_id])
+}
+
+model user_bgimage {
+  bg_image_id   Int      @id @default(autoincrement())
+  file_name     String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  user_id       String   @unique
+  user          user     @relation(fields: [user_id], references: [user_id])
+}
+
+model search {
+  search_id     Int      @id @default(autoincrement())
+  word          String?
+  number        Int      @default(0)
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 }
