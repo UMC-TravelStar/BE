@@ -60,6 +60,14 @@ const {
   getStarsRanking,
 } = require("./controllers/stars.controller.js");
 
+const{
+  handleCreatePlanet,
+  handleGetPlanet,
+  handleUpdatePlanet,
+  handleGetOtherPlanet,
+} = require("./controllers/planet.controller.js");
+
+
 const options = {
   swaggerDefinition: {
     openapi: "3.0.0",
@@ -82,7 +90,7 @@ const specs = swaggerJsDoc(options);
 const corsOptions = {
   origin: ["http://localhost:5173", "https://travelstar.netlify.app"], // 허용할 도메인 리스트
   credentials: true, // 쿠키 및 세션 정보를 포함
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // 허용할 메서드
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH","OPTIONS"], // 허용할 메서드
   allowedHeaders: ["Content-Type", "Authorization"], // 허용할 요청 헤더
 };
 
@@ -171,10 +179,16 @@ app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게
 app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 
-// 별자리
+
 app.get("/stars/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
 app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
+
+app.post("/planets", handleCreatePlanet); // 행성 생성
+app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
+app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 수정(행성 이름 수정)
+app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 조회
+
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
