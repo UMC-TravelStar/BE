@@ -89,7 +89,7 @@ const specs = swaggerJsDoc(options);
 const corsOptions = {
   origin: ["http://localhost:5173", "https://travelstar.netlify.app"], // 허용할 도메인 리스트
   credentials: true, // 쿠키 및 세션 정보를 포함
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], // 허용할 메서드
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // 허용할 메서드
   allowedHeaders: ["Content-Type", "Authorization"], // 허용할 요청 헤더
 };
 
@@ -128,47 +128,23 @@ app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조�
 app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
-app.post("/prod/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
-app.get("/prod/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
-app.get(
-  "/prod/users/:user_id/day-schedules/:date",
-  handleGetDaySchedulesByDateInUrl
-); // 날짜별 Day Schedule 조회
-app.patch(
-  "/prod/users/:user_id/day-schedules/:day_id",
-  handleUpdateDaySchedule
-); // Day Schedule 수정
-app.delete(
-  "/prod/users/:user_id/day-schedules/:day_id",
-  handleDeleteDaySchedule
-); // Day Schedule 삭제
+app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
+app.get("/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
+app.get("/users/:user_id/day-schedules/:date",handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
+app.patch("/users/:user_id/day-schedules/:day_id",handleUpdateDaySchedule); // Day Schedule 수정
+app.delete("/users/:user_id/day-schedules/:day_id",handleDeleteDaySchedule); // Day Schedule 삭제
 
 // 일정 작성
-app.post(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules",
-  handleAddSchedule
-); // Schedule 추가
-app.get(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules",
-  handleGetSchedules
-); // Schedule 조회
-app.get(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules/:date",
-  handleGetSchedulesByDateInUrl
-); // 날짜별 Schedule 조회
-app.patch(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleUpdateSchedule
-); // Schedule 수정
-app.delete(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleDeleteSchedule
-); // Schedule 삭제
+app.post("/users/:user_id/day-schedules/:day_id/schedules",handleAddSchedule); // Schedule 추가
+app.get("/users/:user_id/day-schedules/:day_id/schedules",handleGetSchedules); // Schedule 조회
+app.get("/users/:user_id/day-schedules/:day_id/schedules/:date",handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
+app.patch("/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",handleUpdateSchedule); // Schedule 수정
+app.delete("/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",handleDeleteSchedule); // Schedule 삭제
 
 // 메인 페이지
-app.get("/prod/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
-app.get("/prod/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
-app.get("/prod/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
+app.get("/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
+app.get("/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
+app.get("/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
 
 // 친구 관리
 app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
@@ -546,67 +522,13 @@ app.listen(port, () => {
  *                   example: "Internal Server Error"
  */
 
-// 메인 페이지 API
+// 메인 페이지 일지 조회 API
 /**
  * @swagger
- * /users/{user_id}/main:
+ * /prod/users/{user_id}/home:
  *   get:
- *     summary: 메인 페이지 (추천 일지 조회)
- *     description: 조회수 순으로 추천 일지를 10개씩 반환합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string   # 여기를 수정했습니다.
- *         description: 사용자 ID (로그인된 사용자)
- *       - in: query
- *         name: page
- *         required: false
- *         schema:
- *           type: integer
- *           example: 1
- *         description: "페이지 번호 (기본값: 1)"
- *     responses:
- *       200:
- *         description: 추천 일지 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "추천 일지 조회 성공"
- *                 posts:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       post_id:
- *                         type: integer
- *                       title:
- *                         type: string
- *                       content:
- *                         type: string
- *                       views:
- *                         type: integer
- *                       images:
- *                         type: array
- *                         items:
- *                           type: string
- *                           description: 일지에 첨부된 이미지 파일 이름 (post_image 테이블의 file_name)
- *       404:
- *         description: 일지가 없어요. 작성해주세요!
- */
-
-//검색 API
-/**
- * @swagger
- * /users/{user_id}/posts/search:
- *   get:
- *     summary: 일지 검색
- *     description: 키워드를 기반으로 사용자의 일지를 검색합니다.
+ *     summary: 메인 페이지의 일지 조회
+ *     description: 사용자의 일지를 조회합니다.
  *     parameters:
  *       - in: path
  *         name: user_id
@@ -614,12 +536,6 @@ app.listen(port, () => {
  *         schema:
  *           type: string
  *         description: "로그인된 사용자 ID"
- *       - in: query
- *         name: keyword
- *         required: true
- *         schema:
- *           type: string
- *         description: 검색할 키워드
  *       - in: query
  *         name: page
  *         required: false
@@ -636,7 +552,7 @@ app.listen(port, () => {
  *         description: "한 페이지에 표시할 일지 수 (기본값: 10)"
  *     responses:
  *       200:
- *         description: 일지 검색 성공
+ *         description: 포스트 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -644,24 +560,165 @@ app.listen(port, () => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "일지 검색 성공"
- *                 posts:
+ *                   example: "포스트 조회 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     posts:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           post_id:
+ *                             type: integer
+ *                           user_id:
+ *                             type: string
+ *                           title:
+ *                             type: string
+ *                           updated_at:
+ *                             type: string
+ *                             format: date-time
+ *                           region:
+ *                             type: string
+ *                           images:
+ *                             type: array
+ *                             items:
+ *                               type: string
+ *                           user:
+ *                             type: object
+ *                             properties:
+ *                               nickname:
+ *                                 type: string
+ *                               profileImage:
+ *                                 type: string
+ *                           isFriend:
+ *                             type: boolean
+ *                     totalPosts:
+ *                       type: integer
+ *                     currentPage:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ */
+
+// 메인 페이지 검색 API
+/**
+ * @swagger
+ * /prod/users/{user_id}/home/search:
+ *   get:
+ *     summary: 메인 페이지에서 검색
+ *     description: 특정 키워드를 사용하여 포스트를 검색합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: query
+ *         name: term
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 검색어
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: "페이지 번호 (기본값: 1)"
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: "한 페이지에 표시할 포스트 수 (기본값: 10)"
+ *     responses:
+ *       200:
+ *         description: 검색 결과
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "검색 결과"
+ *                 data:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
  *                       post_id:
  *                         type: integer
+ *                       user_id:
+ *                         type: string
  *                       title:
  *                         type: string
- *                       content:
- *                         type: string
- *                       created_at:
+ *                       updated_at:
  *                         type: string
  *                         format: date-time
- *       404:
- *         description: 검색 결과가 없음
+ *                       region:
+ *                         type: string
+ *                       images:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                       user:
+ *                         type: object
+ *                         properties:
+ *                           nickname:
+ *                             type: string
+ *                           profileImage:
+ *                             type: string
+ *                       isFriend:
+ *                         type: boolean
+ *       400:
+ *         description: 검색어가 필요합니다.
+ *       500:
+ *         description: 서버 내부 오류
  */
+
+// 검색 순위 조회 API
+/**
+ * @swagger
+ * /prod/users/{user_id}/home/search/rankings:
+ *   get:
+ *     summary: 검색 순위 조회
+ *     description: 사용자의 검색 순위를 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *     responses:
+ *       200:
+ *         description: 검색 순위 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "검색 순위"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       word:
+ *                         type: string
+ *                       number:
+ *                         type: integer
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
 
 // 일지 작성 API
 /**
@@ -1738,3 +1795,464 @@ app.listen(port, () => {
  *                   type: string
  *                   example: "Error message details"
  */
+
+
+// 하루 일정 작성 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules:
+ *   post:
+ *     summary: 하루 일정 추가
+ *     description: 사용자의 하루 일정을 추가합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: 하루 일정 추가 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 day_id:
+ *                   type: integer
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                 title:
+ *                   type: string
+ *                 content:
+ *                   type: string
+ *       400:
+ *         description: 날짜가 누락됨
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 하루 일정 조회 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules:
+ *   get:
+ *     summary: 하루 일정 조회
+ *     description: 사용자의 하루 일정을 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *     responses:
+ *       200:
+ *         description: 하루 일정 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   day_id:
+ *                     type: integer
+ *                   date:
+ *                     type: string
+ *                     format: date-time
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 날짜별 하루 일정 조회 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{date}:
+ *   get:
+ *     summary: 날짜별 하루 일정 조회
+ *     description: 특정 날짜의 하루 일정을 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
+ *     responses:
+ *       200:
+ *         description: 날짜별 하루 일정 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   day_id:
+ *                     type: integer
+ *                   date:
+ *                     type: string
+ *                     format: date-time
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 하루 일정 수정 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}:
+ *   patch:
+ *     summary: 하루 일정 수정
+ *     description: 사용자의 하루 일정을 수정합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "수정할 하루 일정 ID"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: 하루 일정 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 day_id:
+ *                   type: integer
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                 title:
+ *                   type: string
+ *                 content:
+ *                   type: string
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 하루 일정 삭제 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}:
+ *   delete:
+ *     summary: 하루 일정 삭제
+ *     description: 사용자의 하루 일정을 삭제합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "삭제할 하루 일정 ID"
+ *     responses:
+ *       200:
+ *         description: 하루 일정 삭제 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "일정 삭제 성공"
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 일정 추가 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules:
+ *   post:
+ *     summary: 일정 추가
+ *     description: 사용자의 하루 일정에 일정을 추가합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               location:
+ *                 type: string
+ *               date_time:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       201:
+ *         description: 일정 추가 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 schedule_id:
+ *                   type: integer
+ *                 location:
+ *                   type: string
+ *                 date_time:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: 위치 또는 날짜가 누락됨
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 일정 조회 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules:
+ *   get:
+ *     summary: 일정 조회
+ *     description: 사용자의 하루 일정에 등록된 일정을 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *     responses:
+ *       200:
+ *         description: 일정 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   schedule_id:
+ *                     type: integer
+ *                   location:
+ *                     type: string
+ *                   date_time:
+ *                     type: string
+ *                     format: date-time
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 날짜별 일정 조회 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules/{date}:
+ *   get:
+ *     summary: 날짜별 일정 조회
+ *     description: 특정 날짜의 일정을 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *       - in: path
+ *         name: date
+ *         required: true
+  *         schema:
+ *           type: string
+ *           format: date
+ *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
+ *     responses:
+ *       200:
+ *         description: 날짜별 일정 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   schedule_id:
+ *                     type: integer
+ *                   location:
+ *                     type: string
+ *                   date_time:
+ *                     type: string
+ *                     format: date-time
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 일정 수정 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules/{schedule_id}:
+ *   patch:
+ *     summary: 일정 수정
+ *     description: 사용자의 특정 일정을 수정합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *       - in: path
+ *         name: schedule_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "수정할 일정 ID"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               location:
+ *                 type: string
+ *               date_time:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       200:
+ *         description: 일정 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 schedule_id:
+ *                   type: integer
+ *                 location:
+ *                   type: string
+ *                 date_time:
+ *                   type: string
+ *                   format: date-time
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 일정 삭제 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules/{schedule_id}:
+ *   delete:
+ *     summary: 일정 삭제
+ *     description: 사용자의 특정 일정을 삭제합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *       - in: path
+ *         name: schedule_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "삭제할 일정 ID"
+ *     responses:
+ *       200:
+ *         description: 일정 삭제 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "일정 삭제 성공"
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
