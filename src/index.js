@@ -129,47 +129,23 @@ app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조�
 app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
-app.post("/prod/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
-app.get("/prod/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
-app.get(
-  "/prod/users/:user_id/day-schedules/:date",
-  handleGetDaySchedulesByDateInUrl
-); // 날짜별 Day Schedule 조회
-app.patch(
-  "/prod/users/:user_id/day-schedules/:day_id",
-  handleUpdateDaySchedule
-); // Day Schedule 수정
-app.delete(
-  "/prod/users/:user_id/day-schedules/:day_id",
-  handleDeleteDaySchedule
-); // Day Schedule 삭제
+app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
+app.get("/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
+app.get("/users/:user_id/day-schedules/:date",handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
+app.patch("/users/:user_id/day-schedules/:day_id",handleUpdateDaySchedule); // Day Schedule 수정
+app.delete("/users/:user_id/day-schedules/:day_id",handleDeleteDaySchedule); // Day Schedule 삭제
 
 // 일정 작성
-app.post(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules",
-  handleAddSchedule
-); // Schedule 추가
-app.get(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules",
-  handleGetSchedules
-); // Schedule 조회
-app.get(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules/:date",
-  handleGetSchedulesByDateInUrl
-); // 날짜별 Schedule 조회
-app.patch(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleUpdateSchedule
-); // Schedule 수정
-app.delete(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleDeleteSchedule
-); // Schedule 삭제
+app.post("/users/:user_id/day-schedules/:day_id/schedules",handleAddSchedule); // Schedule 추가
+app.get("/users/:user_id/day-schedules/:day_id/schedules",handleGetSchedules); // Schedule 조회
+app.get("/users/:user_id/day-schedules/:day_id/schedules/:date",handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
+app.patch("/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",handleUpdateSchedule); // Schedule 수정
+app.delete("/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",handleDeleteSchedule); // Schedule 삭제
 
 // 메인 페이지
-app.get("/prod/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
-app.get("/prod/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
-app.get("/prod/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
+app.get("/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
+app.get("/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
+app.get("/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
 
 // 친구 관리
 app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
