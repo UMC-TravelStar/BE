@@ -4,11 +4,11 @@ const port = 4000;
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
-const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const {
   handleEmailCertification,
   handleUserSignUp,
+  handleCheckUserId,
   handleUserLogin,
   handleUserLogout,
   handleFindUserIdByEmail,
@@ -28,7 +28,7 @@ const {
   handleGetPost,
   handleAddComment,
 } = require("./controllers/post.controller.js");
-const { authenticateUser } = require('./auth');
+const { authenticateUser } = require("./auth");
 const {
   handleAddDaySchedule,
   handleGetDaySchedules,
@@ -47,13 +47,19 @@ const {
   handleGetSentFriendRequests,
   handleGetReceivedFriendRequests,
   handleGetFriendsList,
-  handleDeleteFriend
+  handleDeleteFriend,
 } = require("./controllers/friends.controller.js");
 const {
   handleListMainPost,
   handleSearchPosts,
-  handleGetSearchRankings
+  handleGetSearchRankings,
 } = require("./controllers/mainpage.controller.js");
+const {
+  getFilteredStarRegions,
+  setStarsName,
+  getStarsRanking,
+} = require("./controllers/stars.controller.js");
+
 const {
   handleCreatePlanet,
   handleGetPlanet,
@@ -85,12 +91,6 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 
-//app.use(
-//  cors({
-//    origin: "*", //origin: "https://travelstar.netlify.app", // HTTPS를 사용하는 프론트엔드 도메인
-//    credentials: true, // 쿠키를 포함한 요청 허용
-//  })
-//);
 const corsOptions = {
   origin: ["http://localhost:5173", "https://travelstar.netlify.app"], // 허용할 도메인 리스트
   credentials: true, // 쿠키 및 세션 정보를 포함
@@ -99,9 +99,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-app.use(cookieParser());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
@@ -114,15 +111,11 @@ app.set("json spaces", 2);
 
 //유저관리
 app.post("/email", handleEmailCertification);
-
+app.post("/check-id", handleCheckUserId);
 app.post("/register", handleUserSignUp);
-
 app.post("/login", handleUserLogin);
-
 app.post("/logout", handleUserLogout);
-
 app.post("/find-id", handleFindUserIdByEmail);
-
 app.post("/reset-pw", handleresetPassword);
 
 //행성
@@ -140,49 +133,23 @@ app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조�
 app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
-app.post("/prod/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
-app.get("/prod/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
-app.get(
-  "/prod/users/:user_id/day-schedules/:date",
-  handleGetDaySchedulesByDateInUrl
-); // 날짜별 Day Schedule 조회
-app.patch(
-  "/prod/users/:user_id/day-schedules/:day_id",
-  handleUpdateDaySchedule
-); // Day Schedule 수정
-app.delete(
-  "/prod/users/:user_id/day-schedules/:day_id",
-  handleDeleteDaySchedule
-); // Day Schedule 삭제
+app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
+app.get("/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
+app.get("/users/:user_id/day-schedules/:date",handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
+app.patch("/users/:user_id/day-schedules/:day_id",handleUpdateDaySchedule); // Day Schedule 수정
+app.delete("/users/:user_id/day-schedules/:day_id",handleDeleteDaySchedule); // Day Schedule 삭제
 
 // 일정 작성
-app.post(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules",
-  handleAddSchedule
-); // Schedule 추가
-app.get(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules",
-  handleGetSchedules
-); // Schedule 조회
-app.get(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules/:date",
-  handleGetSchedulesByDateInUrl
-); // 날짜별 Schedule 조회
-app.patch(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleUpdateSchedule
-); // Schedule 수정
-app.delete(
-  "/prod/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleDeleteSchedule
-); // Schedule 삭제
-
+app.post("/users/:user_id/day-schedules/:day_id/schedules",handleAddSchedule); // Schedule 추가
+app.get("/users/:user_id/day-schedules/:day_id/schedules",handleGetSchedules); // Schedule 조회
+app.get("/users/:user_id/day-schedules/:day_id/schedules/:date",handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
+app.patch("/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",handleUpdateSchedule); // Schedule 수정
+app.delete("/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",handleDeleteSchedule); // Schedule 삭제
 
 // 메인 페이지
-app.get("/prod/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
-app.get("/prod/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
-app.get("/prod/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
-
+app.get("/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
+app.get("/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
+app.get("/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
 
 // 친구 관리
 app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
@@ -192,7 +159,10 @@ app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게
 app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 
-// 행성
+app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
+app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
+app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
+
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
 app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 수정(행성 이름 수정)
@@ -205,7 +175,6 @@ app.patch("/mypage", updateMyPage); // 유저 정보 수정
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
-
 
 // 로그인 API
 /**
@@ -241,6 +210,69 @@ app.listen(port, () => {
  *                   type: string
  *       401:
  *         description: 로그인 실패
+ */
+/**
+ * @swagger
+ * /prod/check-id:
+ *   post:
+ *     summary: 아이디 중복 체크
+ *     description: 사용자가 입력한 아이디가 중복되었는지 확인합니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *                 description: "중복 체크를 할 사용자 ID"
+ *                 example: test_user
+ *     responses:
+ *       200:
+ *         description: 아이디 중복 체크 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: "처리 결과 메시지"
+ *                 isDuplicate:
+ *                   type: boolean
+ *                   description: "중복 여부 (true: 중복됨, false: 중복되지 않음)"
+ *               example:
+ *                 message: "이미 사용 중인 아이디입니다."
+ *                 isDuplicate: true
+ *       400:
+ *         description: 잘못된 요청
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: "에러 메시지"
+ *               example:
+ *                 message: "아이디를 입력해주세요."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: "에러 메시지"
+ *                 error:
+ *                   type: string
+ *                   description: "서버에서 발생한 에러 상세 정보"
+ *               example:
+ *                 message: "아이디 중복 확인 실패"
+ *                 error: "Internal server error"
  */
 
 // 회원가입 API
@@ -499,67 +531,13 @@ app.listen(port, () => {
  *                   example: "Internal Server Error"
  */
 
-// 메인 페이지 API
+// 메인 페이지 일지 조회 API
 /**
  * @swagger
- * /users/{user_id}/main:
+ * /prod/users/{user_id}/home:
  *   get:
- *     summary: 메인 페이지 (추천 일지 조회)
- *     description: 조회수 순으로 추천 일지를 10개씩 반환합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string   # 여기를 수정했습니다.
- *         description: 사용자 ID (로그인된 사용자)
- *       - in: query
- *         name: page
- *         required: false
- *         schema:
- *           type: integer
- *           example: 1
- *         description: "페이지 번호 (기본값: 1)"
- *     responses:
- *       200:
- *         description: 추천 일지 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "추천 일지 조회 성공"
- *                 posts:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       post_id:
- *                         type: integer
- *                       title:
- *                         type: string
- *                       content:
- *                         type: string
- *                       views:
- *                         type: integer
- *                       images:
- *                         type: array
- *                         items:
- *                           type: string
- *                           description: 일지에 첨부된 이미지 파일 이름 (post_image 테이블의 file_name)
- *       404:
- *         description: 일지가 없어요. 작성해주세요!
- */
-
-//검색 API
-/**
- * @swagger
- * /users/{user_id}/posts/search:
- *   get:
- *     summary: 일지 검색
- *     description: 키워드를 기반으로 사용자의 일지를 검색합니다.
+ *     summary: 메인 페이지의 일지 조회
+ *     description: 사용자의 일지를 조회합니다.
  *     parameters:
  *       - in: path
  *         name: user_id
@@ -567,12 +545,6 @@ app.listen(port, () => {
  *         schema:
  *           type: string
  *         description: "로그인된 사용자 ID"
- *       - in: query
- *         name: keyword
- *         required: true
- *         schema:
- *           type: string
- *         description: 검색할 키워드
  *       - in: query
  *         name: page
  *         required: false
@@ -589,7 +561,7 @@ app.listen(port, () => {
  *         description: "한 페이지에 표시할 일지 수 (기본값: 10)"
  *     responses:
  *       200:
- *         description: 일지 검색 성공
+ *         description: 포스트 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -597,24 +569,165 @@ app.listen(port, () => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "일지 검색 성공"
- *                 posts:
+ *                   example: "포스트 조회 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     posts:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           post_id:
+ *                             type: integer
+ *                           user_id:
+ *                             type: string
+ *                           title:
+ *                             type: string
+ *                           updated_at:
+ *                             type: string
+ *                             format: date-time
+ *                           region:
+ *                             type: string
+ *                           images:
+ *                             type: array
+ *                             items:
+ *                               type: string
+ *                           user:
+ *                             type: object
+ *                             properties:
+ *                               nickname:
+ *                                 type: string
+ *                               profileImage:
+ *                                 type: string
+ *                           isFriend:
+ *                             type: boolean
+ *                     totalPosts:
+ *                       type: integer
+ *                     currentPage:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ */
+
+// 메인 페이지 검색 API
+/**
+ * @swagger
+ * /prod/users/{user_id}/home/search:
+ *   get:
+ *     summary: 메인 페이지에서 검색
+ *     description: 특정 키워드를 사용하여 포스트를 검색합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: query
+ *         name: term
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 검색어
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: "페이지 번호 (기본값: 1)"
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: "한 페이지에 표시할 포스트 수 (기본값: 10)"
+ *     responses:
+ *       200:
+ *         description: 검색 결과
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "검색 결과"
+ *                 data:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
  *                       post_id:
  *                         type: integer
+ *                       user_id:
+ *                         type: string
  *                       title:
  *                         type: string
- *                       content:
- *                         type: string
- *                       created_at:
+ *                       updated_at:
  *                         type: string
  *                         format: date-time
- *       404:
- *         description: 검색 결과가 없음
+ *                       region:
+ *                         type: string
+ *                       images:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                       user:
+ *                         type: object
+ *                         properties:
+ *                           nickname:
+ *                             type: string
+ *                           profileImage:
+ *                             type: string
+ *                       isFriend:
+ *                         type: boolean
+ *       400:
+ *         description: 검색어가 필요합니다.
+ *       500:
+ *         description: 서버 내부 오류
  */
+
+// 검색 순위 조회 API
+/**
+ * @swagger
+ * /prod/users/{user_id}/home/search/rankings:
+ *   get:
+ *     summary: 검색 순위 조회
+ *     description: 사용자의 검색 순위를 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *     responses:
+ *       200:
+ *         description: 검색 순위 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "검색 순위"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       word:
+ *                         type: string
+ *                       number:
+ *                         type: integer
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
 
 // 일지 작성 API
 /**
@@ -1069,7 +1182,7 @@ app.listen(port, () => {
  *                   example: "서버 오류 발생"
  */
 
-// 행성 설정 API
+// 행성 이름 초기 설정 API
 /**
  * @swagger
  * /prod/planet:
@@ -1139,7 +1252,7 @@ app.listen(port, () => {
  *                   example: "서버 오류가 발생했습니다."
  */
 
-// 행성 수정 API
+// 행성 이름 수정 API
 /**
  * @swagger
  * /prod/planet/{user_id}:
@@ -1340,38 +1453,6 @@ app.listen(port, () => {
  *         description: 접근 권한 없음
  */
 
-/**
- * @swagger
- * /users/{user_id}/stars/ranking:
- *   get:
- *     summary: 별자리 랭킹 조회
- *     description: 조회수 순으로 별자리 랭킹을 반환합니다.
- *     responses:
- *       200:
- *         description: 별자리 랭킹 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "별자리 랭킹 조회 성공"
- *                 rankings:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       star_id:
- *                         type: integer
- *                       name:
- *                         type: string
- *                       views:
- *                         type: integer
- *       404:
- *         description: 별자리 데이터가 없습니다.
- */
-
 // 마이페이지 조회 API
 /**
  * @swagger
@@ -1508,3 +1589,679 @@ app.listen(port, () => {
  *       404:
  *         description: 친구가 존재하지 않음
  */
+
+/**
+ * @swagger
+ * /prod/stars/{user_id}/regions:
+ *   get:
+ *     summary: 특정 사용자와 조건에 맞는 별의 Region 조회
+ *     description: 사용자 ID를 경로 매개변수로 받아 조건에 맞는 별의 Region 데이터를 필터링하여 반환합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         description: 사용자 ID
+ *         schema:
+ *           type: integer
+ *           example: 12345
+ *     responses:
+ *       200:
+ *         description: 조건에 맞는 별의 Region 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "조건에 맞는 별의 region 조회 성공"
+ *                 regions:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["일본", "한국", "미국"]
+ *       400:
+ *         description: 잘못된 요청 (유효하지 않은 user_id)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "user_id가 유효하지 않습니다."
+ *       401:
+ *         description: 인증 실패 (로그인 필요)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "로그인이 필요합니다."
+ *       404:
+ *         description: 별자리를 찾을 수 없습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리를 찾을 수 없습니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 error:
+ *                   type: string
+ *                   example: "Error message details"
+ */
+
+/**
+ * @swagger
+ * /prod/stars/name:
+ *   patch:
+ *     summary: 별자리 이름 설정 및 업데이트
+ *     description: JWT 토큰을 사용하여 사용자의 별자리 이름을 설정 또는 업데이트합니다.
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: 새로 설정할 별자리 이름
+ *                 example: "오리온자리"
+ *     responses:
+ *       200:
+ *         description: 별자리 이름 설정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리 이름 설정 성공"
+ *                 stars:
+ *                   type: object
+ *                   properties:
+ *                     stars_id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     views:
+ *                       type: integer
+ *                     vote_num:
+ *                       type: integer
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                     updated_at:
+ *                       type: string
+ *                       format: date-time
+ *       400:
+ *         description: 별자리 이름이 필요합니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리 이름이 필요합니다."
+ *       401:
+ *         description: 로그인이 필요합니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "로그인이 필요합니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 error:
+ *                   type: string
+ *                   example: "Error message details"
+ */
+
+/**
+ * @swagger
+ * /prod/stars/ranking:
+ *   get:
+ *     summary: 별자리 랭킹 조회
+ *     description: 투표 수(vote_num)를 기준으로 상위 10개의 별자리를 반환합니다.
+ *     responses:
+ *       200:
+ *         description: 별자리 랭킹 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리 랭킹 조회 성공"
+ *                 rankings:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       stars_id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       vote_num:
+ *                         type: integer
+ *                       views:
+ *                         type: integer
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *       404:
+ *         description: 별자리 랭킹 데이터를 찾을 수 없습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "별자리 랭킹 데이터를 찾을 수 없습니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 error:
+ *                   type: string
+ *                   example: "Error message details"
+ */
+
+
+// 하루 일정 작성 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules:
+ *   post:
+ *     summary: 하루 일정 추가
+ *     description: 사용자의 하루 일정을 추가합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: 하루 일정 추가 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 day_id:
+ *                   type: integer
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                 title:
+ *                   type: string
+ *                 content:
+ *                   type: string
+ *       400:
+ *         description: 날짜가 누락됨
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 하루 일정 조회 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules:
+ *   get:
+ *     summary: 하루 일정 조회
+ *     description: 사용자의 하루 일정을 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *     responses:
+ *       200:
+ *         description: 하루 일정 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   day_id:
+ *                     type: integer
+ *                   date:
+ *                     type: string
+ *                     format: date-time
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 날짜별 하루 일정 조회 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{date}:
+ *   get:
+ *     summary: 날짜별 하루 일정 조회
+ *     description: 특정 날짜의 하루 일정을 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
+ *     responses:
+ *       200:
+ *         description: 날짜별 하루 일정 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   day_id:
+ *                     type: integer
+ *                   date:
+ *                     type: string
+ *                     format: date-time
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 하루 일정 수정 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}:
+ *   patch:
+ *     summary: 하루 일정 수정
+ *     description: 사용자의 하루 일정을 수정합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "수정할 하루 일정 ID"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: 하루 일정 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 day_id:
+ *                   type: integer
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                 title:
+ *                   type: string
+ *                 content:
+ *                   type: string
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 하루 일정 삭제 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}:
+ *   delete:
+ *     summary: 하루 일정 삭제
+ *     description: 사용자의 하루 일정을 삭제합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "삭제할 하루 일정 ID"
+ *     responses:
+ *       200:
+ *         description: 하루 일정 삭제 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "일정 삭제 성공"
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 일정 추가 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules:
+ *   post:
+ *     summary: 일정 추가
+ *     description: 사용자의 하루 일정에 일정을 추가합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               location:
+ *                 type: string
+ *               date_time:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       201:
+ *         description: 일정 추가 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 schedule_id:
+ *                   type: integer
+ *                 location:
+ *                   type: string
+ *                 date_time:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: 위치 또는 날짜가 누락됨
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 일정 조회 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules:
+ *   get:
+ *     summary: 일정 조회
+ *     description: 사용자의 하루 일정에 등록된 일정을 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *     responses:
+ *       200:
+ *         description: 일정 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   schedule_id:
+ *                     type: integer
+ *                   location:
+ *                     type: string
+ *                   date_time:
+ *                     type: string
+ *                     format: date-time
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 날짜별 일정 조회 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules/{date}:
+ *   get:
+ *     summary: 날짜별 일정 조회
+ *     description: 특정 날짜의 일정을 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *       - in: path
+ *         name: date
+ *         required: true
+  *         schema:
+ *           type: string
+ *           format: date
+ *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
+ *     responses:
+ *       200:
+ *         description: 날짜별 일정 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   schedule_id:
+ *                     type: integer
+ *                   location:
+ *                     type: string
+ *                   date_time:
+ *                     type: string
+ *                     format: date-time
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 일정 수정 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules/{schedule_id}:
+ *   patch:
+ *     summary: 일정 수정
+ *     description: 사용자의 특정 일정을 수정합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *       - in: path
+ *         name: schedule_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "수정할 일정 ID"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               location:
+ *                 type: string
+ *               date_time:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       200:
+ *         description: 일정 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 schedule_id:
+ *                   type: integer
+ *                 location:
+ *                   type: string
+ *                 date_time:
+ *                   type: string
+ *                   format: date-time
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+// 일정 삭제 API
+/**
+ * @swagger
+ * /users/{user_id}/day-schedules/{day_id}/schedules/{schedule_id}:
+ *   delete:
+ *     summary: 일정 삭제
+ *     description: 사용자의 특정 일정을 삭제합니다.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "로그인된 사용자 ID"
+ *       - in: path
+ *         name: day_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "하루 일정 ID"
+ *       - in: path
+ *         name: schedule_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "삭제할 일정 ID"
+ *     responses:
+ *       200:
+ *         description: 일정 삭제 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "일정 삭제 성공"
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
