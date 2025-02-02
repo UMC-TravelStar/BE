@@ -61,8 +61,10 @@ const {
   handleGetOtherPlanet,
 } = require("./controllers/planet.controller.js");
 const {
-  getMyPage
+  getMyPage,
+  updateMyPage
 } = require("./controllers/mypage.controller.js");
+
 
 const options = {
   swaggerDefinition: {
@@ -197,7 +199,8 @@ app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 �
 app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 조회
 
 // 마이페이지
-app.get("/mypage", getMyPage);
+app.get("/mypage", getMyPage); // 유저 정보 조회
+app.patch("/mypage", updateMyPage); // 유저 정보 수정
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);

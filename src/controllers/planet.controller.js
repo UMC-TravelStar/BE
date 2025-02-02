@@ -6,7 +6,7 @@ const handleCreatePlanet = async (req, res) => {
         console.log('행성 생성');
         console.log("body: ",req.body);
 
-        const userId = req.user.id;
+        const userId = req.userId;
         const {planetName} = req.body;
         if(!planetName){
             return res.status(400).json({message: '행성 이름을 입력하세요.'});
@@ -23,7 +23,7 @@ const handleCreatePlanet = async (req, res) => {
 const handleGetPlanet = async (req, res) => {
     try{
         console.log('행성 조회');
-        const userId = req.user.id;
+        const userId = req.userId;
         const result = await PlanetService.getPlanet(userId);
         res.status(200).json(result);
     } catch(error) {
@@ -37,7 +37,7 @@ const handleUpdatePlanet = async (req, res) => {
         console.log('행성 이름 변경');
         console.log("body: ",req.body);
 
-        const userId = req.user.id;
+        const userId = req.userId;
         const {planetName} = req.body;
         if(!planetName){
             return res.status(400).json({message: '행성 이름을 입력하세요.'});

@@ -1,7 +1,7 @@
 const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const MyPageRepository = {
+class MyPageRepository {
     // 유저 정보 조회
     async findUserById(userId){
         return await prisma.user.findFirst({
@@ -14,9 +14,38 @@ const MyPageRepository = {
                 birth: true,
                 phonenum: true,
                 email: true,
-                planet_name: true,
             }
         })
-    },
+    };
+
+    // 유저 정보 수정
+    async updateUserById(userId, userData){
+        return await prisma.user.update({
+            where: {user_id: userId},
+            data: userData,
+            select: {
+                user_id: true,
+                nickname: true,
+                name: true,
+                birth: true,
+                phonenum: true,
+                email: true,
+            }
+        })
+    };
+
+    // 보관 글 목록 조회
+    async findStoragedPost(userId){
+        return await prisma.post.findMany({
+            where: {user_id: userId, storage: 2},
+            select: {
+                post_id: true,
+                title: true,
+                content: true,
+                created_at: true,
+                updated_at: true,
+            }
+        })
+    };
 };
 module.exports = new MyPageRepository();

@@ -6,7 +6,7 @@ const handleSendFriendRequest = async (req, res) => {
     console.log('친구 요청');
     console.log("body: ",req.body);
 
-    const fromUserId = req.user.id;
+    const fromUserId = req.userId;
     const {toUserId} = req.params;
     const result = await FriendsService.sendFriendRequest(fromUserId, toUserId);
     res.status(200).json(result);
@@ -33,7 +33,7 @@ const handleAcceptFriendRequest = async (req, res) => {
 const handleGetSentFriendRequests = async (req, res) => {
   try{
     console.log('내가 친구 요청한 목록 조회');
-    const userId = req.user.id;
+    const userId = req.userId;
     const result = await FriendsService.getSentFriendRequests(userId);
     res.status(200).json(result);
   } catch(error) {
@@ -45,7 +45,7 @@ const handleGetSentFriendRequests = async (req, res) => {
 const handleGetReceivedFriendRequests = async (req, res) => {
   try{
     console.log('나에게 친구 요청한 목록 조회');
-    const userId = req.user.id;
+    const userId = req.userId;
     const result = await FriendsService.getReceivedFriendRequests(userId);
     res.status(200).json(result);
   } catch(error) {
@@ -57,7 +57,7 @@ const handleGetReceivedFriendRequests = async (req, res) => {
 const handleGetFriendsList = async (req, res) => {
   try{
     console.log('서로 친구인 목록 조회');
-    const userId = req.user.id;
+    const userId = req.userId;
     const result = await FriendsService.getFriendsList(userId);  
     res.status(200).json(result);
   } catch(error) {
@@ -71,7 +71,7 @@ const handleDeleteFriend = async (req, res) => {
     console.log('친구 삭제');
     console.log("params: ",req.params);
 
-    const userId = req.user.id;
+    const userId = req.userId;
     const {friendId} = req.params;
     const result = await FriendsService.deleteFriend(userId, friendId);
     res.status(200).json(result);
