@@ -3,13 +3,14 @@ const FriendsService = require('../services/friends.service');
 // 친구 요청
 const handleSendFriendRequest = async (req, res) => {
   try{
-    console.log('친구 요청');
-    console.log("body: ",req.body);
-
     const fromUserId = req.userId;
     const {toUserId} = req.params;
     const result = await FriendsService.sendFriendRequest(fromUserId, toUserId);
-    res.status(200).json(result);
+    res.status(200).json({
+      resultType: 'success',
+      message: '친구 요청 완료',
+      data: result
+    });
 } catch(error) {
     res.status(500).json({ message: error.message });
 }
@@ -18,12 +19,13 @@ const handleSendFriendRequest = async (req, res) => {
 // 친구 요청 수락
 const handleAcceptFriendRequest = async (req, res) => {
   try{
-    console.log('친구 요청 수락');
-    console.log("params: ",req.params);
-
     const {requestId} = req.params;
     const result = await FriendsService.acceptFriendRequest(requestId);
-    res.status(200).json(result);
+    res.status(200).json({
+      resultType: 'success',
+      message: '친구 요청 수락 완료',
+      data: result
+    });
   } catch(error) {
       res.status(500).json({ message: error.message });
   }
@@ -32,10 +34,13 @@ const handleAcceptFriendRequest = async (req, res) => {
 // 내가 친구 요청한 목록 조회
 const handleGetSentFriendRequests = async (req, res) => {
   try{
-    console.log('내가 친구 요청한 목록 조회');
     const userId = req.userId;
     const result = await FriendsService.getSentFriendRequests(userId);
-    res.status(200).json(result);
+    res.status(200).json({
+      resultType: 'success',
+      message: '내가 친구 요청한 목록 조회 완료',
+      data: result
+    });
   } catch(error) {
       res.status(500).json({ message: error.message });
   }
@@ -44,10 +49,13 @@ const handleGetSentFriendRequests = async (req, res) => {
 // 나에게 친구 요청한 목록 조회
 const handleGetReceivedFriendRequests = async (req, res) => {
   try{
-    console.log('나에게 친구 요청한 목록 조회');
     const userId = req.userId;
     const result = await FriendsService.getReceivedFriendRequests(userId);
-    res.status(200).json(result);
+    res.status(200).json({
+      resultType: 'success',
+      message: '나에게 친구 요청한 목록 조회 완료',
+      data: result
+    });
   } catch(error) {
       res.status(500).json({ message: error.message });
   }
@@ -56,10 +64,13 @@ const handleGetReceivedFriendRequests = async (req, res) => {
 // 서로 친구인 목록 조회
 const handleGetFriendsList = async (req, res) => {
   try{
-    console.log('서로 친구인 목록 조회');
     const userId = req.userId;
     const result = await FriendsService.getFriendsList(userId);  
-    res.status(200).json(result);
+    res.status(200).json({
+      resultType: 'success',
+      message: '서로 친구인 목록 조회 완료',
+      data: result
+    });
   } catch(error) {
       res.status(500).json({ message: error.message });
   }
@@ -74,7 +85,11 @@ const handleDeleteFriend = async (req, res) => {
     const userId = req.userId;
     const {friendId} = req.params;
     const result = await FriendsService.deleteFriend(userId, friendId);
-    res.status(200).json(result);
+    res.status(200).json({
+      resultType: 'success',
+      message: '친구 삭제 완료',
+      // data: result
+    });
   } catch(error) {
       res.status(500).json({ message: error.message });
   }

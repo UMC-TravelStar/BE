@@ -3,9 +3,6 @@ const PlanetService = require('../services/planet.service');
 // 행성 생성
 const handleCreatePlanet = async (req, res) => {
     try{
-        console.log('행성 생성');
-        console.log("body: ",req.body);
-
         const userId = req.userId;
         const {planetName} = req.body;
         if(!planetName){
@@ -13,7 +10,11 @@ const handleCreatePlanet = async (req, res) => {
         }
 
         const result = await PlanetService.createPlanet(userId, planetName);
-        res.status(200).json(result);
+        res.status(200).json({
+            resultType: 'success',
+            message: '행성 생성 완료',
+            data: result
+        });
     } catch(error) {
         res.status(500).json({ message: error.message });
     }
@@ -22,10 +23,13 @@ const handleCreatePlanet = async (req, res) => {
 // 유저 행성 조회
 const handleGetPlanet = async (req, res) => {
     try{
-        console.log('행성 조회');
         const userId = req.userId;
         const result = await PlanetService.getPlanet(userId);
-        res.status(200).json(result);
+        res.status(200).json({
+            resultType: 'success',
+            message: '행성 조회 완료',
+            data: result
+        });
     } catch(error) {
         res.status(500).json({ message: error.message });
     }
@@ -34,9 +38,6 @@ const handleGetPlanet = async (req, res) => {
 // 행성 이름 변경
 const handleUpdatePlanet = async (req, res) => {
     try{
-        console.log('행성 이름 변경');
-        console.log("body: ",req.body);
-
         const userId = req.userId;
         const {planetName} = req.body;
         if(!planetName){
@@ -44,7 +45,11 @@ const handleUpdatePlanet = async (req, res) => {
         }
 
         const result = await PlanetService.updatePlanet(userId, planetName);
-        res.status(200).json(result);
+        res.status(200).json({
+            resultType: 'success',
+            message: '행성 이름 변경 완료',
+            data: result
+        });
     } catch(error) {
         res.status(500).json({ message: error.message });
     }
@@ -56,7 +61,11 @@ const handleGetOtherPlanet = async (req, res) => {
         console.log('다른 유저의 행성 조회');
         const userId = req.params.userId;
         const result = await PlanetService.getPlanet(userId);
-        res.status(200).json(result);
+        res.status(200).json({
+            resultType: 'success',
+            message: '다른 유저의 행성 조회 완료',
+            data: result
+        });
     } catch(error) {
         res.status(500).json({ message: error.message });
     }

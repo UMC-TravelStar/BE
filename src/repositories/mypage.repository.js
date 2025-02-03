@@ -41,7 +41,6 @@ class MyPageRepository {
             select: {
                 post_id: true,
                 title: true,
-                content: true,
                 created_at: true,
                 updated_at: true,
             }
