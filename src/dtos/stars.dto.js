@@ -24,12 +24,11 @@ const validateUserId = (params) => {
     throw new Error("user_id는 필수입니다.");
   }
 
-  const parsedUserId = parseInt(user_id, 10);
-  if (isNaN(parsedUserId)) {
-    throw new Error("user_id는 숫자여야 합니다.");
+  if (typeof user_id !== "string") {
+    throw new Error("user_id는 문자열이어야 합니다.");
   }
 
-  return { user_id: parsedUserId };
+  return { user_id }; // 그대로 문자열로 반환
 };
 
 module.exports = { extractUserIdFromToken, validateUserId };

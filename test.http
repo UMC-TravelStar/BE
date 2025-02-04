@@ -13,13 +13,14 @@ Content-Type: application/json; charset=UTF-8
 }
 
 ###로그인15.165.117.176
-POST http://localhost:4000/login
+POST http://15.165.117.176:4000/login
 Content-Type: application/json; charset=UTF-8
 
 {
   "id": "1234",
   "pw": "1234"
 }
+
 ###이메일 인증코드 발송
 POST http://localhost:4000/email
 Content-Type: application/json; charset=UTF-8
