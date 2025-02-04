@@ -109,6 +109,26 @@ const getFrPost = async (skip, userId) => {
     });
 };
 
+const getFrPost2 = async (userId, postsId) => {
+    return prisma.post.findUnique({
+        where: {
+            user_id: userId,
+            post_id: postsId,
+            storage: { in: [0, 1] }
+        }
+    })
+};
+
+const getPostList2 = async (userId, postsId) => {
+    return prisma.post.findUnique({
+        where: {
+            user_id: userId,
+            post_id: postsId,
+            storage: 0
+        }
+    })
+};
+
 const getPostList = async (skip, userId) => {
     return prisma.post.findMany({
         select: {
@@ -166,11 +186,13 @@ const getStarById = async (starId) => {
 const checkFriendship = async (userId, viewerId) => {
     console.log(typeof userId, userId); 
     console.log(typeof viewerId, viewerId);
-    return prisma.friends.findFirst({
+    console.log('prisma.Friend:', prisma.Friend);
+    return prisma.Friend.findFirst({
         where: {
-            OR: [
-                { user_id: userId, fr_id: viewerId },
-                { user_id: viewerId, fr_id: userId }
+            are_we_friend: true,
+            AND: [
+                { from_user_id: userId, to_user_id: viewerId },
+                { from_user_id: viewerId, to_user_id: userId }
             ],
         },
     });
@@ -299,7 +321,9 @@ module.exports = {
     savePost,
     getPostById,
     getFrPost,
+    getFrPost2,
     getPostList,
+    getPostList2,
     checkFriendship,
     getStarById,
     updatePost,

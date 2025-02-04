@@ -4,6 +4,7 @@ const {
     listUserPosts,
     getUserPost, 
     getPostWithStatus,
+    getPost,
     checkUserPost,
     editPost,
     deleteUserPost,
@@ -76,6 +77,24 @@ const handleGetPost = async (req, res) => {
         }
 
         return res.status(200).json({ message: "조회 성공", data: result });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "서버 오류" });
+    }
+};
+
+const handleGetUPost = async (req, res) => {
+    try {
+        const { userId, postsId } = req.params;
+        const viewerId = req.userId;
+
+        const post = await getPost(userId, viewerId, postsId);
+
+        if (!post) {
+            return res.status(404).json({ message: "해당 게시글을 찾을 수 없습니다." });
+        }
+
+        return res.status(200).json({ message: "조회 성공", data: post });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "서버 오류" });
@@ -187,6 +206,7 @@ module.exports = {
     handleListUserPost,
     handleGetUserPost,
     handleGetPost,
+    handleGetUPost,
     handleEditPost,
     handleDeletePost,
     handleAddComment,

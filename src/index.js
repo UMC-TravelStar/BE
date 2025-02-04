@@ -26,6 +26,7 @@ const {
   handleEditPost,
   handleDeletePost,
   handleGetPost,
+  handleGetUPost,
   handleAddComment,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
@@ -139,6 +140,7 @@ app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지
 app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
 app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조회(전체)
+app.get("/posts/:postsId/user/:userId", authenticateUser, handleGetUPost); // 일지 조회(1개)
 app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
@@ -185,6 +187,7 @@ app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
+
 
 // 로그인 API
 /**

@@ -11,6 +11,19 @@ class UserPostResponseDTO {
     }
 }
 
+class PostResponseDTO {
+    constructor(post) {
+        this.title = post.title;
+        this.content = post.content;
+        this.music = post.music;
+        this.created_at = post.created_at;
+        this.star = {
+            id: post.star.star_id,
+            region: post.star.region
+        };
+    }
+}
+
 const formatPostResponse = (post) => {
     if (!post) {
         console.error('Received undefined or null post:', post); // post가 undefined나 null일 때 로그 출력
@@ -42,5 +55,6 @@ class EditPostDto {
 module.exports = {
     formatPostResponse,
     UserPostResponseDTO,
-    EditPostDto
+    EditPostDto,
+    PostResponseDTO,
 };
