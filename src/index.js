@@ -1195,7 +1195,6 @@ app.listen(port, () => {
  *                   example: "서버 오류 발생"
  */
 
-
 // 행성 이름 초기 설정 API
 /**
  * @swagger
