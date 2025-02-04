@@ -11,12 +11,10 @@ class FriendsService{
         }
 
         //양방향 관계 생성
-        await FriendsRepository.createFriendRequest(fromUserId, toUserId, true);
-        await FriendsRepository.createFriendRequest(toUserId, fromUserId, false);
+        const createdRequestFromUser = await FriendsRepository.createFriendRequest(fromUserId, toUserId, true);
+        const ceratedReqeustToUser = await FriendsRepository.createFriendRequest(toUserId, fromUserId, false);
     
-        return {
-            message: '친구 요청을 보냈습니다.'
-        }
+        return {createdRequestFromUser, ceratedReqeustToUser};
     }
 
     //친구 요청 수락
@@ -28,12 +26,10 @@ class FriendsService{
         }
 
         //친구 요청 수락하여 양방향 관계 설정
-        await FriendsRepository.updateFriendRequest(friendRequest.from_user_id, friendRequest.to_user_id, true);
-        await FriendsRepository.updateFriendRequest(friendRequest.to_user_id, friendRequest.from_user_id, true);
+        const createdReqeustFromUser = await FriendsRepository.updateFriendRequest(friendRequest.from_user_id, friendRequest.to_user_id, true);
+        const createdReqeustToUser = await FriendsRepository.updateFriendRequest(friendRequest.to_user_id, friendRequest.from_user_id, true);
         
-        return {
-            message: '친구 요청을 수락했습니다.'
-        }
+        return {createdReqeustFromUser, createdReqeustToUser};
     }
 
     //내가 친구 요청한 목록 조회

@@ -51,14 +51,6 @@ const {
   handleDeleteFriend,
 } = require("./controllers/friends.controller.js");
 const {
-  handleSendFriendRequest,
-  handleAcceptFriendRequest,
-  handleGetSentFriendRequests,
-  handleGetReceivedFriendRequests,
-  handleGetFriendsList,
-  handleDeleteFriend
-} = require("./controllers/friends.controller.js");
-const {
   handleListMainPost,
   handleSearchPosts,
   handleGetSearchRankings,
@@ -75,6 +67,12 @@ const {
   handleUpdatePlanet,
   handleGetOtherPlanet,
 } = require("./controllers/planet.controller.js");
+const {
+  getMyPage,
+  updateMyPage,
+  getStoragedPost,
+} = require("./controllers/mypage.controller.js");
+
 
 const options = {
   swaggerDefinition: {
@@ -106,6 +104,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.use((req, res, next) => {
+  // 인증이 필요 없는 라우트
+  if(['/email', '/register','/login','/find-id'].includes(req.path)) {
+    return next();
+  }
+  //나머지는 authenticateUser 인증 수행
+  authenticateUser(req, res, next);
+});
 
 app.get("/", (req, res) => {
   res.send("Welcome to the server!");
@@ -173,13 +179,10 @@ app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
 app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 수정(행성 이름 수정)
 app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 조회
 
-// 친구 관리
-app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
-app.patch("/friends/request/:requestId", handleAcceptFriendRequest); // 친구 요청 수락
-app.get("/friends/list/sent", handleGetSentFriendRequests); // 내가 친구 요청한 목록 조회
-app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게 친구 요청한 목록 조회
-app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
-app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
+// 마이페이지
+app.get("/mypage", getMyPage); // 유저 정보 조회
+app.patch("/mypage", updateMyPage); // 유저 정보 수정
+app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -1192,11 +1195,8 @@ app.listen(port, () => {
  *                   example: "서버 오류 발생"
  */
 
-<<<<<<< HEAD
-// 행성 설정 API
-=======
+
 // 행성 이름 초기 설정 API
->>>>>>> 9a1cb9d22f3bf33c455ae0ed1e792e4ff364bbef
 /**
  * @swagger
  * /prod/planet:
