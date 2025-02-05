@@ -45,6 +45,7 @@ const setStarsNameService = async (userId, name) => {
 
 //   return starsRanking;
 // };
+
 const getStarsRankingService = async () => {
   const cacheKey = "stars_ranking";
 
@@ -63,7 +64,8 @@ const getStarsRankingService = async () => {
   const rankings = await findTopStars();
 
   try {
-    await redisClient.set(cacheKey, 600, JSON.stringify(rankings));
+    // 600초 만료 설정 추가
+    await redisClient.set(cacheKey, JSON.stringify(rankings), { EX: 600 });
     console.log("✅ Redis 캐시에 저장 완료!");
   } catch (error) {
     console.error("🚨 Redis 캐싱 실패:", error);
@@ -71,6 +73,33 @@ const getStarsRankingService = async () => {
 
   return rankings;
 };
+
+// const getStarsRankingService = async () => {
+//   const cacheKey = "stars_ranking";
+
+//   try {
+//     // Redis에서 캐시된 데이터 확인
+//     const cachedData = await redisClient.get(cacheKey);
+//     if (cachedData) {
+//       console.log("✅ Redis 캐시 데이터 반환");
+//       return JSON.parse(cachedData);
+//     }
+//   } catch (error) {
+//     console.error("🚨 Redis 조회 오류:", error);
+//   }
+
+//   // Redis에 데이터가 없으면 DB에서 조회
+//   const rankings = await findTopStars();
+
+//   try {
+//     await redisClient.set(cacheKey, 600, JSON.stringify(rankings));
+//     console.log("✅ Redis 캐시에 저장 완료!");
+//   } catch (error) {
+//     console.error("🚨 Redis 캐싱 실패:", error);
+//   }
+
+//   return rankings;
+// };
 
 module.exports = {
   getFilteredStarRegionsService,
