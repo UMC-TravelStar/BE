@@ -85,8 +85,7 @@ const handleGetPost = async (req, res) => {
 
 const handleGetUPost = async (req, res) => {
     try {
-        const userId = req.userId;
-        const postsId = req.params;
+        const { postsId, userId } = req.params;
         const viewerId = req.userId;
 
         const post = await getPost(userId, viewerId, postsId);

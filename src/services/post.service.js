@@ -104,7 +104,7 @@ const getPost = async (userId, viewerId, postsId) => {
     }
     console.log(posts);
 
-    return 
+    return posts
 };
 
 const checkUserPost = async (userId, postsId) => {

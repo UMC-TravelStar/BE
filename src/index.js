@@ -139,8 +139,8 @@ app.get("/posts", handleListUserPost); // 유저의 일지 조회(전체)
 app.get("/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
 app.patch("/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/posts/:postsId", handleDeletePost); // 일지 삭제
-app.get("/posts/user/:userId", handleGetPost); // 일지 조회(전체)
-app.get("/posts/:postsId/user/:userId", handleGetUPost); // 일지 조회(1개)
+app.get("/posts/user/:userId", handleGetPost); // 다른 유저의 일지 조회(전체)
+app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일지 조회(1개)
 app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
@@ -1190,6 +1190,162 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "서버 오류 발생"
+ */
+
+// 다른 유저의 일지 조회(전체) API
+/**
+ * @swagger
+ * /prod/posts/user/{userId}:
+ *   get:
+ *     summary: 다른 유저의 일지 조회(전체)
+ *     description: 특정 유저가 작성한 모든 일지를 조회합니다. 페이징 처리 기능이 포함되어 있습니다.
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "조회할 사용자의 ID"
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: "페이지 번호 (기본값: 1)"
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: "페이지당 항목 수 (기본값: 10)"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "Bearer 인증 토큰"
+ *     responses:
+ *       200:
+ *         description: 일지 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "조회 성공"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       post_id:
+ *                         type: integer
+ *                         example: 16
+ *                       title:
+ *                         type: string
+ *                         example: "일지"
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-02-01T15:59:10.478Z"
+ *                       star_id:
+ *                         type: integer
+ *                         example: 4
+ *                       region:
+ *                         type: string
+ *                         example: "서울"
+ *       404:
+ *         description: 해당 게시글을 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+
+// 다른 유저의 일지 조회(1개) API
+/**
+ * @swagger
+ * /prod/posts/{postsId}/user/{userId}:
+ *   get:
+ *     summary: 다른 유저의 일지 조회(1개) 
+ *     description: 사용자가 작성한 일지(1개)를 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: postsId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "조회할 일지의 ID"
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "사용자의 ID"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "Bearer 인증 토큰"
+ *     responses:
+ *       200:
+ *         description: 일지 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "조회 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     post_id:
+ *                       type: integer
+ *                       example: 16
+ *                     title:
+ *                       type: string
+ *                       example: "일지"
+ *                     content:
+ *                       type: string
+ *                       example: "서울여행"
+ *                     music:
+ *                       type: string
+ *                       example: "흠"
+ *                     feeling:
+ *                       type: string
+ *                       example: "재밌었당"
+ *                     feel_color:
+ *                       type: string
+ *                       nullable: true
+ *                     views:
+ *                       type: integer
+ *                       example: 0
+ *                     storage:
+ *                       type: integer
+ *                       example: 1
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-02-01T15:59:10.478Z"
+ *                     updated_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-02-01T15:59:10.478Z"
+ *                     user_id:
+ *                       type: string
+ *                       example: "1"
+ *                     star_id:
+ *                       type: integer
+ *                       example: 4
+ *       404:
+ *         description: 해당 게시글을 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
  */
 
 // 행성 이름 초기 설정 API
