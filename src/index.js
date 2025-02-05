@@ -134,11 +134,11 @@ app.get("/planet/:user_id", getPlanetName);
 app.patch("/planet/:user_id", updatePlanetName);
 
 // 일지
-app.post("/users/:userId/posts", handleAddPost); // 일지 작성
-app.get("/users/:userId/posts", handleListUserPost); // 유저의 일지 조회(전체)
-app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
-app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
-app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
+app.post("/posts", handleAddPost); // 일지 작성
+app.get("/posts", handleListUserPost); // 유저의 일지 조회(전체)
+app.get("/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
+app.patch("/posts/:postsId", handleEditPost); // 일지 수정
+app.delete("/posts/:postsId", handleDeletePost); // 일지 삭제
 app.get("/posts/user/:userId", handleGetPost); // 일지 조회(전체)
 app.get("/posts/:postsId/user/:userId", handleGetUPost); // 일지 조회(1개)
 app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
