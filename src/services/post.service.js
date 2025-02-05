@@ -83,14 +83,13 @@ const getPostWithStatus = async (userId, viewerId, page, limit) => {
         posts = await getFrPost(skip, userId);
     } else {
         posts = await getPostList(skip, userId);
+        console.log(`getPostLists: `, posts);
     }
-    console.log(posts);
 
     if (posts.length === 0) {
         return []; // 빈 배열을 반환할 경우
     }
-    
-    return new PostResponseDTO(posts);
+    return posts.map(post => new PostResponseDTO(post));
 };
 
 const getPost = async (userId, viewerId, postsId) => {

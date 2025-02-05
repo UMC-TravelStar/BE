@@ -139,9 +139,9 @@ app.get("/users/:userId/posts", handleListUserPost); // 유저의 일지 조회(
 app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
 app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
-app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조회(전체)
-app.get("/posts/:postsId/user/:userId", authenticateUser, handleGetUPost); // 일지 조회(1개)
-app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
+app.get("/posts/user/:userId", handleGetPost); // 일지 조회(전체)
+app.get("/posts/:postsId/user/:userId", handleGetUPost); // 일지 조회(1개)
+app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
 app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가

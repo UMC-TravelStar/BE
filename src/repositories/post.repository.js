@@ -186,8 +186,8 @@ const getStarById = async (starId) => {
 const checkFriendship = async (userId, viewerId) => {
     console.log(typeof userId, userId); 
     console.log(typeof viewerId, viewerId);
-    console.log('prisma.Friend:', prisma.Friend);
-    return prisma.Friend.findFirst({
+    console.log('prisma.Friend:', prisma.friend);
+    return prisma.friend.findMany({
         where: {
             are_we_friend: true,
             AND: [
