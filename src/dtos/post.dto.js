@@ -13,14 +13,13 @@ class UserPostResponseDTO {
 
 class PostResponseDTO {
     constructor(post) {
+        this.post_id = post.post_id;
         this.title = post.title;
         this.content = post.content;
         this.music = post.music;
         this.created_at = post.created_at;
-        this.star = {
-            id: post.star.star_id,
-            region: post.star.region
-        };
+        this.star_id = post.star?.star_id;
+        this.region = post.star?.region;
     }
 }
 
