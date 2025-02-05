@@ -19,7 +19,7 @@ const handleAddPost = async (req, res) => {
     console.log("Request to add post received");
     console.log("Request body:", req.body);
 
-    const { userId } = req.params;
+    const userId = req.userId;
     const { region, ...restOfData } = req.body;
 
     try {
@@ -42,7 +42,7 @@ const handleAddPost = async (req, res) => {
 const handleListUserPost = async (req, res) => {
     
     try {
-        const userId = req.params.userId;
+        const userId = req.userId;
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
 
@@ -85,7 +85,7 @@ const handleGetPost = async (req, res) => {
 
 const handleGetUPost = async (req, res) => {
     try {
-        const { userId, postsId } = req.params;
+        const { postsId, userId } = req.params;
         const viewerId = req.userId;
 
         const post = await getPost(userId, viewerId, postsId);
@@ -106,7 +106,8 @@ const handleGetUserPost = async (req, res) => {
 
     try {
         console.log(req.params);
-        const { userId, postsId } = req.params;
+        const userId = req.userId;
+        const postsId = req.params.postsId;
         
         if (!userId || !postsId) {
             return res.status(400).json({ success: false, message: "일지 조회 실패 (userId or postsId 누락)" });
@@ -135,7 +136,8 @@ const handleEditPost = async (req, res) => {
     console.log("Request body:", req.body);
 
     try {
-        const { userId, postsId } = req.params;
+        const userId = req.userId;
+        const postsId = req.params.postsId;
         const editData = new EditPostDto(req.body);
 
         if (!userId || !postsId) {
@@ -166,7 +168,8 @@ const handleDeletePost = async (req, res) => {
     console.log("Request to delete user post");
 
     try {
-        const { userId, postsId } = req.params;
+        const userId = req.userId;
+        const postsId = req.params.postsId;
         
         if (!userId || !postsId) {
             return res.status(400).json({ success: false, message: "일지 삭제 실패 (userId or postsId 누락)" });

@@ -113,7 +113,7 @@ const getFrPost2 = async (userId, postsId) => {
     return prisma.post.findUnique({
         where: {
             user_id: userId,
-            post_id: postsId,
+            post_id: parseInt(postsId),
             storage: { in: [0, 1] }
         }
     })
@@ -186,8 +186,8 @@ const getStarById = async (starId) => {
 const checkFriendship = async (userId, viewerId) => {
     console.log(typeof userId, userId); 
     console.log(typeof viewerId, viewerId);
-    console.log('prisma.Friend:', prisma.Friend);
-    return prisma.Friend.findFirst({
+    console.log('prisma.Friend:', prisma.friend);
+    return prisma.friend.findMany({
         where: {
             are_we_friend: true,
             AND: [
