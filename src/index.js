@@ -745,17 +745,12 @@ app.listen(port, () => {
 // 일지 작성 API
 /**
  * @swagger
- * /prod/users/{userId}/posts:
+ * /prod/posts:
  *   post:
  *     summary: 일지 작성
  *     description: 로그인된 사용자가 일지를 작성합니다.
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -812,7 +807,7 @@ app.listen(port, () => {
  *                       description: 감정
  *                     storage:
  *                       type: integer
- *                       description: 저장 공간 여부
+ *                       description: 공개 여부
  *                     created_at:
  *                       type: string
  *                       description: 일지 생성 시간
@@ -821,7 +816,7 @@ app.listen(port, () => {
  *                       description: 일지 업데이트 시간
  *                     user_id:
  *                       type: string
- *                       description: 사용자 ID
+ *                       description: 사용자 ID (JWT에서 추출)
  *                     star_id:
  *                       type: integer
  *                       description: 별자리 ID
@@ -832,17 +827,13 @@ app.listen(port, () => {
 // 유저의 일지 조회(전체) API
 /**
  * @swagger
- * /prod/users/{userId}/posts:
+ * /prod/posts:
  *   get:
  *     summary: 유저의 일지 조회(전체)
  *     description: 로그인된 사용자의 일지를 조회합니다. 최신순으로 10개씩 반환합니다.
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
  *       - in: query
  *         name: page
  *         required: false
@@ -914,23 +905,19 @@ app.listen(port, () => {
 // 유저의 일지 조회(1개) API
 /**
  * @swagger
- * /prod/users/{userId}/posts/{postsId}:
+ * /prod/posts/{postsId}:
  *   get:
  *     summary: 유저의 일지 조회(1개)
- *     description: 사용자가 작성한 일지를 조회합니다.
+ *     description: 사용자가 작성한 일지를 조회합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
  *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
  *       - in: path
  *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
  *         description: 일지 ID
+ *     security:
+ *       - BearerAuth: []  # JWT 토큰 인증 추가
  *     responses:
  *       200:
  *         description: 일지 조회 성공
@@ -962,7 +949,7 @@ app.listen(port, () => {
  *                       description: 감정
  *                     storage:
  *                       type: integer
- *                       description: 저장 공간 여부
+ *                       description: 공개 여부
  *                     created_at:
  *                       type: string
  *                       format: date-time
@@ -977,28 +964,30 @@ app.listen(port, () => {
  *         description: 파라미터 누락 또는 잘못된 요청
  *       500:
  *         description: 서버 내부 오류
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 // 일지 수정 API
 /**
  * @swagger
- * /prod/users/{userId}/posts/{postsId}:
+ * /prod/posts/{postsId}:
  *   patch:
  *     summary: 일지 수정
- *     description: 사용자가 작성한 일지를 수정합니다.
+ *     description: 사용자가 작성한 일지를 수정합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
  *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
  *         description: "수정할 일지의 ID"
+ *     security:
+ *       - BearerAuth: []  # JWT 토큰 인증 추가
  *     requestBody:
  *       required: true
  *       content:
@@ -1085,28 +1074,30 @@ app.listen(port, () => {
  *         description: 일지를 찾을 수 없음
  *       500:
  *         description: 서버 내부 오류
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 // 일지 삭제 API
 /**
  * @swagger
- * /prod/users/{userId}/posts/{postsId}:
+ * /prod/posts/{postsId}:
  *   delete:
  *     summary: 일지 삭제
- *     description: 사용자가 작성한 일지를 삭제합니다.
+ *     description: 사용자가 작성한 일지를 삭제합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
  *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
  *         description: "삭제할 일지의 ID"
+ *     security:
+ *       - BearerAuth: []  # JWT 토큰 인증 추가
  *     responses:
  *       200:
  *         description: 일지 삭제 성공
@@ -1124,6 +1115,12 @@ app.listen(port, () => {
  *         description: 일지를 찾을 수 없음
  *       500:
  *         description: 서버 내부 오류
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 // 일지 화면 코멘트 작성 API
