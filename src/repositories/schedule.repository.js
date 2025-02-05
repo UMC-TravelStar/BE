@@ -6,7 +6,11 @@ class ScheduleRepository {
     async createDaySchedule(userId, date, title, content) {
         return await prisma.day_schedule.create({
             data: {
-                user_id: userId,
+                user: {
+                    connect: {
+                        user_id: userId, 
+                    },
+                },
                 date: date,
                 title: title,
                 content: content,
@@ -73,8 +77,8 @@ class ScheduleRepository {
             where: {
                 day_id: dayId,
                 date_time: {
-                    gte: new Date(date.setHours(0, 0, 0, 0)), // 시작 시간
-                    lt: new Date(date.setHours(23, 59, 59, 999)) // 종료 시간
+                    gte: new Date(date.setHours(0, 0, 0, 0)), 
+                    lt: new Date(date.setHours(23, 59, 59, 999)) 
                 }
             }
         });

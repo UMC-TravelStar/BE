@@ -5,27 +5,32 @@ const prisma = new PrismaClient();
 
 // 친구 관계 확인 함수
 const checkFriendship = async (currentUserId, userId) => {
-    const friendship = await prisma.friends.findFirst({
+    const friendship = await prisma.friend.findFirst({
         where: {
-            user_id: currentUserId,
-            user: {
-                user_id: userId
-            }
+            are_we_friend: true,
+            OR: [
+                {
+                    from_user_id: currentUserId,
+                    to_user_id: userId
+                },
+                {
+                    from_user_id: userId,
+                    to_user_id: currentUserId
+                }
+            ]
         }
     });
     return !!friendship; // 친구 관계가 있으면 true, 없으면 false
 };
 
 // 포스트 목록 조회
-const listUserPosts = async (userId, page, limit, currentUserId) => {
+const listUserPosts = async (currentUserId, page, limit) => {
     const skip = (page - 1) * limit;
     const totalPosts = await countUserPosts();
     const posts = await getUserPosts(skip, limit);
 
-    const filteredPosts = posts.filter(post => post.user.user_id !== userId);
-
-    const formattedPosts = await Promise.all(filteredPosts.map(async post => {
-        const isFriend = await checkFriendship(currentUserId, post.user.user_id);
+    const formattedPosts = await Promise.all(posts.map(async post => {
+        const isFriend = await checkFriendship(currentUserId, post.user_id); 
         return new PostResponseDTO(post, isFriend); 
     }));
 
@@ -74,7 +79,7 @@ const searchPosts = async (searchTerm, page, limit, currentUserId) => {
     });
 
     const formattedResults = await Promise.all(results.map(async post => {
-        const isFriend = await checkFriendship(currentUserId, post.user.user_id);
+        const isFriend = await checkFriendship(currentUserId, post.user_id);
         return new PostResponseDTO(post, isFriend); 
     }));
 
@@ -84,7 +89,7 @@ const searchPosts = async (searchTerm, page, limit, currentUserId) => {
 // 검색 기록 저장
 const recordSearch = async (searchTerm) => {
   const existingSearch = await prisma.search.findFirst({
-      where: { word: searchTerm } // word를 기준으로 검색
+      where: { word: searchTerm }
   });
 
   if (existingSearch) {
