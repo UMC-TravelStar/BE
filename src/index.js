@@ -58,6 +58,7 @@ const {
   getFilteredStarRegions,
   setStarsName,
   getStarsRanking,
+  voteForStar,
 } = require("./controllers/stars.controller.js");
 
 const {
@@ -130,16 +131,28 @@ app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면
 // 하루 일정 작성
 app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
 app.get("/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
-app.get("/users/:user_id/day-schedules/:date",handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
-app.patch("/users/:user_id/day-schedules/:day_id",handleUpdateDaySchedule); // Day Schedule 수정
-app.delete("/users/:user_id/day-schedules/:day_id",handleDeleteDaySchedule); // Day Schedule 삭제
+app.get(
+  "/users/:user_id/day-schedules/:date",
+  handleGetDaySchedulesByDateInUrl
+); // 날짜별 Day Schedule 조회
+app.patch("/users/:user_id/day-schedules/:day_id", handleUpdateDaySchedule); // Day Schedule 수정
+app.delete("/users/:user_id/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule 삭제
 
 // 일정 작성
-app.post("/users/:user_id/day-schedules/:day_id/schedules",handleAddSchedule); // Schedule 추가
-app.get("/users/:user_id/day-schedules/:day_id/schedules",handleGetSchedules); // Schedule 조회
-app.get("/users/:user_id/day-schedules/:day_id/schedules/:date",handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
-app.patch("/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",handleUpdateSchedule); // Schedule 수정
-app.delete("/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",handleDeleteSchedule); // Schedule 삭제
+app.post("/users/:user_id/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
+app.get("/users/:user_id/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
+app.get(
+  "/users/:user_id/day-schedules/:day_id/schedules/:date",
+  handleGetSchedulesByDateInUrl
+); // 날짜별 Schedule 조회
+app.patch(
+  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
+  handleUpdateSchedule
+); // Schedule 수정
+app.delete(
+  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
+  handleDeleteSchedule
+); // Schedule 삭제
 
 // 메인 페이지
 app.get("/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
@@ -157,6 +170,7 @@ app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
 app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
+app.post("/stars/vote", voteForStar); // 별자리 랭킹 조회
 
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
@@ -718,7 +732,6 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
-
 
 // 일지 작성 API
 /**
@@ -1796,7 +1809,6 @@ app.listen(port, () => {
  *                   example: "Error message details"
  */
 
-
 // 하루 일정 작성 API
 /**
  * @swagger
@@ -2133,7 +2145,7 @@ app.listen(port, () => {
  *       - in: path
  *         name: date
  *         required: true
-  *         schema:
+ *         schema:
  *           type: string
  *           format: date
  *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
@@ -2255,4 +2267,3 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
-

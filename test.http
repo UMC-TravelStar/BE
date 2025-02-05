@@ -13,7 +13,7 @@ Content-Type: application/json; charset=UTF-8
 }
 
 ###로그인15.165.117.176
-POST http://15.165.117.176:4000/login
+POST http://localhost:4000/login
 Content-Type: application/json; charset=UTF-8
 
 {
@@ -81,3 +81,13 @@ Content-Type: application/json
 ### 별자리 랭킹 조회
 GET http://localhost:4000/stars/ranking
 Content-Type: application/json
+
+### 투표
+POST http://localhost:4000/stars/vote
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg3NjMzNzcsImV4cCI6MTczODc5OTM3N30.bVNCgjfbdk5F0ktfuMaHxH0y3pySTnI4EHIMdTsxoAg
+Content-Type: application/json; charset=UTF-8
+
+{
+  "stars_id": 2,
+  "post_user_id": "1" 
+}
