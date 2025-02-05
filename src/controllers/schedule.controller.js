@@ -4,7 +4,8 @@ const ScheduleDto = require("../dtos/schedule.dto");
 
 const handleAddDaySchedule = async (req, res) => {
     const { date, title, content } = req.body;
-    const userId = req.params.user_id;
+    const userId = req.userId; 
+    console.log(userId)
 
     if (!date) {
         return res.status(400).json({ message: "날짜를 입력해주세요." });
@@ -20,7 +21,7 @@ const handleAddDaySchedule = async (req, res) => {
 };
 
 const handleGetDaySchedules = async (req, res) => {
-    const userId = req.params.user_id;
+    const userId = req.user_id; 
 
     try {
         const daySchedules = await ScheduleService.getDaySchedules(userId);
@@ -32,7 +33,7 @@ const handleGetDaySchedules = async (req, res) => {
 };
 
 const handleGetDaySchedulesByDateInUrl = async (req, res) => {
-    const userId = req.params.user_id;
+    const userId = req.user_id; 
     const { date } = req.params; // URL 파라미터에서 날짜를 가져옴
 
     try {
@@ -71,7 +72,7 @@ const handleDeleteDaySchedule = async (req, res) => {
 
 const handleAddSchedule = async (req, res) => {
     const { location, date_time } = req.body;
-    const userId = req.params.user_id;
+    const userId = req.user_id;
     const dayId = parseInt(req.params.day_id);
 
     if (!location || !date_time) {
@@ -112,7 +113,6 @@ const handleGetSchedulesByDateInUrl = async (req, res) => {
     }
 };
 
-
 const handleUpdateSchedule = async (req, res) => {
     const { location, date_time } = req.body;
     const scheduleId = parseInt(req.params.schedule_id);
@@ -138,15 +138,15 @@ const handleDeleteSchedule = async (req, res) => {
     }
 };
 
-
 module.exports = {
     handleAddDaySchedule,
     handleGetDaySchedules,
-    handleDeleteSchedule,handleGetDaySchedulesByDateInUrl,
+    handleGetDaySchedulesByDateInUrl,
     handleUpdateDaySchedule,
     handleDeleteDaySchedule,
     handleAddSchedule,
     handleGetSchedules,
     handleGetSchedulesByDateInUrl,
-    handleUpdateSchedule
+    handleUpdateSchedule,
+    handleDeleteSchedule,
 };

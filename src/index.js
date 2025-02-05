@@ -26,6 +26,7 @@ const {
   handleEditPost,
   handleDeletePost,
   handleGetPost,
+  handleGetUPost,
   handleAddComment,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
@@ -67,6 +68,12 @@ const {
   handleUpdatePlanet,
   handleGetOtherPlanet,
 } = require("./controllers/planet.controller.js");
+const {
+  getMyPage,
+  updateMyPage,
+  getStoragedPost,
+} = require("./controllers/mypage.controller.js");
+
 
 const options = {
   swaggerDefinition: {
@@ -98,6 +105,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하기 위해 존재함.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.use((req, res, next) => {
+  // 인증이 필요 없는 라우트
+  if(['/email', '/register','/login','/find-id'].includes(req.path)) {
+    return next();
+  }
+  //나머지는 authenticateUser 인증 수행
+  authenticateUser(req, res, next);
+});
 
 app.get("/", (req, res) => {
   res.send("Welcome to the server!");
@@ -120,44 +135,34 @@ app.get("/planet/:user_id", getPlanetName);
 app.patch("/planet/:user_id", updatePlanetName);
 
 // 일지
-app.post("/users/:userId/posts", handleAddPost); // 일지 작성
-app.get("/users/:userId/posts", handleListUserPost); // 유저의 일지 조회(전체)
-app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
-app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
-app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
-app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조회(전체)
-app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
+app.post("/posts", handleAddPost); // 일지 작성
+app.get("/posts", handleListUserPost); // 유저의 일지 조회(전체)
+app.get("/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
+app.patch("/posts/:postsId", handleEditPost); // 일지 수정
+app.delete("/posts/:postsId", handleDeletePost); // 일지 삭제
+app.get("/posts/user/:userId", handleGetPost); // 다른 유저의 일지 조회(전체)
+app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일지 조회(1개)
+app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
-app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
-app.get("/users/:user_id/day-schedules", handleGetDaySchedules); // Day Schedule 조회
-app.get(
-  "/users/:user_id/day-schedules/:date",
-  handleGetDaySchedulesByDateInUrl
-); // 날짜별 Day Schedule 조회
-app.patch("/users/:user_id/day-schedules/:day_id", handleUpdateDaySchedule); // Day Schedule 수정
-app.delete("/users/:user_id/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule 삭제
+app.post("/day-schedules", handleAddDaySchedule); // Day Schedule 추가
+app.get("/day-schedules", handleGetDaySchedules); // Day Schedule 조회
+app.get("/day-schedules/:date", handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
+app.patch("/day-schedules/:day_id", handleUpdateDaySchedule); // Day Schedule 수정
+app.delete("/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule 삭제
 
 // 일정 작성
-app.post("/users/:user_id/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
-app.get("/users/:user_id/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
-app.get(
-  "/users/:user_id/day-schedules/:day_id/schedules/:date",
-  handleGetSchedulesByDateInUrl
-); // 날짜별 Schedule 조회
-app.patch(
-  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleUpdateSchedule
-); // Schedule 수정
-app.delete(
-  "/users/:user_id/day-schedules/:day_id/schedules/:schedule_id",
-  handleDeleteSchedule
-); // Schedule 삭제
+app.post("/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
+app.get("/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
+app.get("/day-schedules/:day_id/schedules/:date", handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
+app.patch("/day-schedules/:day_id/schedules/:schedule_id", handleUpdateSchedule); // Schedule 수정
+app.delete("/day-schedules/:day_id/schedules/:schedule_id", handleDeleteSchedule); // Schedule 삭제
+
 
 // 메인 페이지
-app.get("/users/:user_id/home", handleListMainPost); // 메인페이지의 일지조회
-app.get("/users/:user_id/home/search", handleSearchPosts); // 메인 페이지에서 검색
-app.get("/users/:user_id/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
+app.get("/home", authenticateUser, handleListMainPost); // 메인페이지의 일지조회
+app.get("/home/search", authenticateUser, handleSearchPosts); // 메인 페이지에서 검색
+app.get("/home/search/rankings", authenticateUser, handleGetSearchRankings); // 검색 순위 조회
 
 // 친구 관리
 app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
@@ -177,9 +182,15 @@ app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
 app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 수정(행성 이름 수정)
 app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 조회
 
+// 마이페이지
+app.get("/mypage", getMyPage); // 유저 정보 조회
+app.patch("/mypage", updateMyPage); // 유저 정보 수정
+app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
+
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
+
 
 // 로그인 API
 /**
@@ -736,17 +747,12 @@ app.listen(port, () => {
 // 일지 작성 API
 /**
  * @swagger
- * /prod/users/{userId}/posts:
+ * /prod/posts:
  *   post:
  *     summary: 일지 작성
  *     description: 로그인된 사용자가 일지를 작성합니다.
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -803,7 +809,7 @@ app.listen(port, () => {
  *                       description: 감정
  *                     storage:
  *                       type: integer
- *                       description: 저장 공간 여부
+ *                       description: 공개 여부
  *                     created_at:
  *                       type: string
  *                       description: 일지 생성 시간
@@ -812,7 +818,7 @@ app.listen(port, () => {
  *                       description: 일지 업데이트 시간
  *                     user_id:
  *                       type: string
- *                       description: 사용자 ID
+ *                       description: 사용자 ID (JWT에서 추출)
  *                     star_id:
  *                       type: integer
  *                       description: 별자리 ID
@@ -823,17 +829,13 @@ app.listen(port, () => {
 // 유저의 일지 조회(전체) API
 /**
  * @swagger
- * /prod/users/{userId}/posts:
+ * /prod/posts:
  *   get:
  *     summary: 유저의 일지 조회(전체)
  *     description: 로그인된 사용자의 일지를 조회합니다. 최신순으로 10개씩 반환합니다.
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
  *       - in: query
  *         name: page
  *         required: false
@@ -905,23 +907,19 @@ app.listen(port, () => {
 // 유저의 일지 조회(1개) API
 /**
  * @swagger
- * /prod/users/{userId}/posts/{postsId}:
+ * /prod/posts/{postsId}:
  *   get:
  *     summary: 유저의 일지 조회(1개)
- *     description: 사용자가 작성한 일지를 조회합니다.
+ *     description: 사용자가 작성한 일지를 조회합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
  *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "사용자 ID (로그인된 사용자)"
  *       - in: path
  *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
  *         description: 일지 ID
+ *     security:
+ *       - BearerAuth: []  # JWT 토큰 인증 추가
  *     responses:
  *       200:
  *         description: 일지 조회 성공
@@ -953,7 +951,7 @@ app.listen(port, () => {
  *                       description: 감정
  *                     storage:
  *                       type: integer
- *                       description: 저장 공간 여부
+ *                       description: 공개 여부
  *                     created_at:
  *                       type: string
  *                       format: date-time
@@ -968,28 +966,30 @@ app.listen(port, () => {
  *         description: 파라미터 누락 또는 잘못된 요청
  *       500:
  *         description: 서버 내부 오류
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 // 일지 수정 API
 /**
  * @swagger
- * /prod/users/{userId}/posts/{postsId}:
+ * /prod/posts/{postsId}:
  *   patch:
  *     summary: 일지 수정
- *     description: 사용자가 작성한 일지를 수정합니다.
+ *     description: 사용자가 작성한 일지를 수정합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
  *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
  *         description: "수정할 일지의 ID"
+ *     security:
+ *       - BearerAuth: []  # JWT 토큰 인증 추가
  *     requestBody:
  *       required: true
  *       content:
@@ -1076,28 +1076,30 @@ app.listen(port, () => {
  *         description: 일지를 찾을 수 없음
  *       500:
  *         description: 서버 내부 오류
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 // 일지 삭제 API
 /**
  * @swagger
- * /prod/users/{userId}/posts/{postsId}:
+ * /prod/posts/{postsId}:
  *   delete:
  *     summary: 일지 삭제
- *     description: 사용자가 작성한 일지를 삭제합니다.
+ *     description: 사용자가 작성한 일지를 삭제합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
  *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: postsId
  *         required: true
  *         schema:
  *           type: integer
  *         description: "삭제할 일지의 ID"
+ *     security:
+ *       - BearerAuth: []  # JWT 토큰 인증 추가
  *     responses:
  *       200:
  *         description: 일지 삭제 성공
@@ -1115,6 +1117,12 @@ app.listen(port, () => {
  *         description: 일지를 찾을 수 없음
  *       500:
  *         description: 서버 내부 오류
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 // 일지 화면 코멘트 작성 API
@@ -1184,6 +1192,162 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "서버 오류 발생"
+ */
+
+// 다른 유저의 일지 조회(전체) API
+/**
+ * @swagger
+ * /prod/posts/user/{userId}:
+ *   get:
+ *     summary: 다른 유저의 일지 조회(전체)
+ *     description: 특정 유저가 작성한 모든 일지를 조회합니다. 페이징 처리 기능이 포함되어 있습니다.
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "조회할 사용자의 ID"
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: "페이지 번호 (기본값: 1)"
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: "페이지당 항목 수 (기본값: 10)"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "Bearer 인증 토큰"
+ *     responses:
+ *       200:
+ *         description: 일지 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "조회 성공"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       post_id:
+ *                         type: integer
+ *                         example: 16
+ *                       title:
+ *                         type: string
+ *                         example: "일지"
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-02-01T15:59:10.478Z"
+ *                       star_id:
+ *                         type: integer
+ *                         example: 4
+ *                       region:
+ *                         type: string
+ *                         example: "서울"
+ *       404:
+ *         description: 해당 게시글을 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+
+// 다른 유저의 일지 조회(1개) API
+/**
+ * @swagger
+ * /prod/posts/{postsId}/user/{userId}:
+ *   get:
+ *     summary: 다른 유저의 일지 조회(1개) 
+ *     description: 사용자가 작성한 일지(1개)를 조회합니다.
+ *     parameters:
+ *       - in: path
+ *         name: postsId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "조회할 일지의 ID"
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "사용자의 ID"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "Bearer 인증 토큰"
+ *     responses:
+ *       200:
+ *         description: 일지 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "조회 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     post_id:
+ *                       type: integer
+ *                       example: 16
+ *                     title:
+ *                       type: string
+ *                       example: "일지"
+ *                     content:
+ *                       type: string
+ *                       example: "서울여행"
+ *                     music:
+ *                       type: string
+ *                       example: "흠"
+ *                     feeling:
+ *                       type: string
+ *                       example: "재밌었당"
+ *                     feel_color:
+ *                       type: string
+ *                       nullable: true
+ *                     views:
+ *                       type: integer
+ *                       example: 0
+ *                     storage:
+ *                       type: integer
+ *                       example: 1
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-02-01T15:59:10.478Z"
+ *                     updated_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-02-01T15:59:10.478Z"
+ *                     user_id:
+ *                       type: string
+ *                       example: "1"
+ *                     star_id:
+ *                       type: integer
+ *                       example: 4
+ *       404:
+ *         description: 해당 게시글을 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
  */
 
 // 행성 이름 초기 설정 API

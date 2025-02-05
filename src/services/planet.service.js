@@ -10,14 +10,7 @@ class PlanetService{
         }
 
         const planet = await PlanetRepository.createPlanet(userId, planetName); 
-        return {
-            message: '행성 생성 완료',
-            planet: {
-                userId: planet.user_id,
-                planetId: planet.planet_id,
-                planetName: planet.name,
-            }
-        }
+        return planet;
 
     };
 
@@ -28,14 +21,7 @@ class PlanetService{
             throw new Error('행성이 존재하지 않습니다.');
         }
 
-        return {
-            message: '행성 조회 성공',
-            planet: {
-                userId: planet.user_id,
-                planetId: planet.planet_id,
-                planetName: planet.name,
-            }
-        }
+        return planet;
     };
 
     //행성 이름 변경
@@ -46,13 +32,7 @@ class PlanetService{
         }
 
         const updatedPlanet = await PlanetRepository.updatePlanet(userId, planetName);
-        return {
-            message: '행성 이름 변경 완료',
-            planet: {
-                userId: updatedPlanet.user_id,
-                planetName: updatedPlanet.name,
-            }
-        }
+        return planet;
     };
 };
 

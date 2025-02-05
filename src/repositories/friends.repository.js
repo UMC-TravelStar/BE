@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 class FriendsRepository{
     //친구 요청 존재 여부 확인
     async findFriendRequest(fromUserId, toUserId){
-        return prisma.Friend.findFirst({
+        return await prisma.Friend.findFirst({
             where:{
                 from_user_id: fromUserId,
                 to_user_id: toUserId
@@ -14,7 +14,7 @@ class FriendsRepository{
 
     //친구 요청 생성
     async createFriendRequest(fromUserId, toUserId, areWeFriend){
-        return prisma.Friend.create({
+        return await prisma.Friend.create({
             data:{
                 from_user_id: fromUserId,
                 to_user_id: toUserId,
@@ -25,14 +25,14 @@ class FriendsRepository{
 
     // 특정 요청 찾기
     async findFriendRequestById(requestId){
-        return prisma.Friend.findUnique({
+        return await prisma.Friend.findUnique({
             where: { id: parseInt(requestId) }
         });
     }
 
     // 친구 요청 업데이트(수락 처리)
     async updateFriendRequest(fromUserId, toUserId, areWeFriend){
-        return prisma.Friend.updateMany({
+        return await prisma.Friend.updateMany({
             where: {
                 from_user_id: fromUserId,
                 to_user_id: toUserId
@@ -45,7 +45,7 @@ class FriendsRepository{
 
     // 내가 보낸 친구 요청 조회(아직 수락되지 않은 요청)
     async findSentFriendRequests(userId){
-        return prisma.Friend.findMany({
+        return await prisma.Friend.findMany({
             where: {from_user_id: userId, are_we_friend: false},
             select:{
                 request_id: true,
@@ -63,7 +63,7 @@ class FriendsRepository{
 
     // 내게 온 친구 요청 조회(아직 수락하지 않은 요청)
     async findReceivedFriendRequests(userId){
-        return prisma.Friend.findMany({
+        return await prisma.Friend.findMany({
             where: {to_user_id: userId, are_we_friend: false},
             select:{
                 request_id: true,
@@ -81,7 +81,7 @@ class FriendsRepository{
 
     // 서로 친구인 목록 조회
     async findFriends(userId){
-        return prisma.Friend.findMany({
+        return await prisma.Friend.findMany({
             where: {
                 are_we_friend: true,
                 OR: [
@@ -116,7 +116,7 @@ class FriendsRepository{
 
     // 친구 삭제
     async deleteFriend(fromUserId, toUserId){
-        return prisma.Friend.updateMany({
+        return await prisma.Friend.updateMany({
             where:{
                 OR: [
                     {from_user_id: fromUserId, to_user_id: toUserId},

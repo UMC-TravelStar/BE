@@ -4,6 +4,7 @@ const {
     listUserPosts,
     getUserPost, 
     getPostWithStatus,
+    getPost,
     checkUserPost,
     editPost,
     deleteUserPost,
@@ -18,7 +19,7 @@ const handleAddPost = async (req, res) => {
     console.log("Request to add post received");
     console.log("Request body:", req.body);
 
-    const { userId } = req.params;
+    const userId = req.userId;
     const { region, ...restOfData } = req.body;
 
     try {
@@ -41,7 +42,7 @@ const handleAddPost = async (req, res) => {
 const handleListUserPost = async (req, res) => {
     
     try {
-        const userId = req.params.userId;
+        const userId = req.userId;
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
 
@@ -82,12 +83,31 @@ const handleGetPost = async (req, res) => {
     }
 };
 
+const handleGetUPost = async (req, res) => {
+    try {
+        const { postsId, userId } = req.params;
+        const viewerId = req.userId;
+
+        const post = await getPost(userId, viewerId, postsId);
+
+        if (!post) {
+            return res.status(404).json({ message: "해당 게시글을 찾을 수 없습니다." });
+        }
+
+        return res.status(200).json({ message: "조회 성공", data: post });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "서버 오류" });
+    }
+};
+
 const handleGetUserPost = async (req, res) => {
     console.log("Request to get user post");
 
     try {
         console.log(req.params);
-        const { userId, postsId } = req.params;
+        const userId = req.userId;
+        const postsId = req.params.postsId;
         
         if (!userId || !postsId) {
             return res.status(400).json({ success: false, message: "일지 조회 실패 (userId or postsId 누락)" });
@@ -116,7 +136,8 @@ const handleEditPost = async (req, res) => {
     console.log("Request body:", req.body);
 
     try {
-        const { userId, postsId } = req.params;
+        const userId = req.userId;
+        const postsId = req.params.postsId;
         const editData = new EditPostDto(req.body);
 
         if (!userId || !postsId) {
@@ -147,7 +168,8 @@ const handleDeletePost = async (req, res) => {
     console.log("Request to delete user post");
 
     try {
-        const { userId, postsId } = req.params;
+        const userId = req.userId;
+        const postsId = req.params.postsId;
         
         if (!userId || !postsId) {
             return res.status(400).json({ success: false, message: "일지 삭제 실패 (userId or postsId 누락)" });
@@ -187,6 +209,7 @@ module.exports = {
     handleListUserPost,
     handleGetUserPost,
     handleGetPost,
+    handleGetUPost,
     handleEditPost,
     handleDeletePost,
     handleAddComment,

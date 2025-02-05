@@ -8,27 +8,30 @@ datasource db {
 }
 
 model user {
-  user_id                          String         @id
-  nickname                         String
-  password                         String
-  name                             String?
-  birth                            DateTime?
-  phonenum                         String?
-  email                            String?
-  created_at                       DateTime       @default(now())
-  updated_at                       DateTime       @updatedAt
-  planet_name                      String?
-  comment                          String?
-  day_schedules                    day_schedule[]
-  friend_friend_from_user_idTouser friend[]       @relation("friend_from_user_idTouser")
-  friend_friend_to_user_idTouser   friend[]       @relation("friend_to_user_idTouser")
-  planets                          planet[]
-  posts                            post[]
-  votes       votes[]  // votes와의 관계 설정
-  stars                            stars?
-  subscrition                      subscrition?
-  u_bgimage                        user_bgimage?
-  u_image                          user_image?
+  user_id       String     @id
+  nickname      String 
+  password      String 
+  name          String?
+  birth         DateTime?
+  phonenum      String?
+  email         String?
+  planet_name   String?
+  comment       String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  posts         post[]
+  day_schedules day_schedule[]
+  planets       planet[]
+  votes         votes[] 
+
+  stars         stars?
+  subscrition   subscrition?
+  u_image       user_image?
+  u_bgimage     user_bgimage?
+
+  from_friends  friend[] @relation("FromUser")
+  to_friends    friend[] @relation("ToUser")
 }
 
 model post {
@@ -115,13 +118,25 @@ model schedule {
 }
 
 model subscrition {
-  sub_id     Int       @id @default(autoincrement())
-  deadline   DateTime?
-  method     Int?
-  user_id    String    @unique
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  user       user      @relation(fields: [user_id], references: [user_id])
+  sub_id         Int      @id @default(autoincrement())
+  deadline       DateTime?
+  method         Int?
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+
+  user_id        String   @unique
+  user           user     @relation(fields: [user_id], references: [user_id])
+}
+
+model friend {
+  request_id    Int     @id @default(autoincrement())
+  from_user_id  String
+  to_user_id    String
+  are_we_friend Boolean @default(false)
+  created_at    DateTime  @default(now())
+
+  from_user     user   @relation("FromUser", fields: [from_user_id], references: [user_id])
+  to_user       user   @relation("ToUser", fields: [to_user_id], references: [user_id])
 }
 
 model user_image {
