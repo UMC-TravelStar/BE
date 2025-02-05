@@ -74,7 +74,6 @@ const {
   getStoragedPost,
 } = require("./controllers/mypage.controller.js");
 
-
 const options = {
   swaggerDefinition: {
     openapi: "3.0.0",
@@ -107,7 +106,16 @@ app.use(express.urlencoded({ extended: true })); // 폼 데이터를 파싱하�
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.use((req, res, next) => {
   // 인증이 필요 없는 라우트
-  if(['/email', '/register','/login','/find-id'].includes(req.path)) {
+  if (
+    [
+      "/email",
+      "/register",
+      "/login",
+      "/find-id",
+      "check-id",
+      "reset-pw",
+    ].includes(req.path)
+  ) {
     return next();
   }
   //나머지는 authenticateUser 인증 수행
@@ -154,10 +162,18 @@ app.delete("/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule �
 // 일정 작성
 app.post("/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
 app.get("/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
-app.get("/day-schedules/:day_id/schedules/:date", handleGetSchedulesByDateInUrl); // 날짜별 Schedule 조회
-app.patch("/day-schedules/:day_id/schedules/:schedule_id", handleUpdateSchedule); // Schedule 수정
-app.delete("/day-schedules/:day_id/schedules/:schedule_id", handleDeleteSchedule); // Schedule 삭제
-
+app.get(
+  "/day-schedules/:day_id/schedules/:date",
+  handleGetSchedulesByDateInUrl
+); // 날짜별 Schedule 조회
+app.patch(
+  "/day-schedules/:day_id/schedules/:schedule_id",
+  handleUpdateSchedule
+); // Schedule 수정
+app.delete(
+  "/day-schedules/:day_id/schedules/:schedule_id",
+  handleDeleteSchedule
+); // Schedule 삭제
 
 // 메인 페이지
 app.get("/home", authenticateUser, handleListMainPost); // 메인페이지의 일지조회
@@ -190,7 +206,6 @@ app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
-
 
 // 로그인 API
 /**
@@ -1271,7 +1286,7 @@ app.listen(port, () => {
  * @swagger
  * /prod/posts/{postsId}/user/{userId}:
  *   get:
- *     summary: 다른 유저의 일지 조회(1개) 
+ *     summary: 다른 유저의 일지 조회(1개)
  *     description: 사용자가 작성한 일지(1개)를 조회합니다.
  *     parameters:
  *       - in: path
