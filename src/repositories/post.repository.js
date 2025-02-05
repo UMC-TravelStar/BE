@@ -113,7 +113,7 @@ const getFrPost2 = async (userId, postsId) => {
     return prisma.post.findUnique({
         where: {
             user_id: userId,
-            post_id: postsId,
+            post_id: parseInt(postsId),
             storage: { in: [0, 1] }
         }
     })
