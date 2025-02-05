@@ -1,3 +1,4 @@
+const redisClient = require("../config/redisClient");
 const {
   findStarsByUserId,
   findFilteredStarRegions,
@@ -34,15 +35,41 @@ const setStarsNameService = async (userId, name) => {
   return updatedStars;
 };
 
-const getStarsRankingService = async () => {
-  // 상위 10개의 별자리 조회
-  const starsRanking = await findTopStars();
+// const getStarsRankingService = async () => {
+//   // 상위 10개의 별자리 조회
+//   const starsRanking = await findTopStars();
 
-  if (!starsRanking || starsRanking.length === 0) {
-    throw new Error("별자리 랭킹 데이터를 찾을 수 없습니다.");
+//   if (!starsRanking || starsRanking.length === 0) {
+//     throw new Error("별자리 랭킹 데이터를 찾을 수 없습니다.");
+//   }
+
+//   return starsRanking;
+// };
+const getStarsRankingService = async () => {
+  const cacheKey = "stars_ranking";
+
+  try {
+    // Redis에서 캐시된 데이터 확인
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      console.log("✅ Redis 캐시 데이터 반환");
+      return JSON.parse(cachedData);
+    }
+  } catch (error) {
+    console.error("🚨 Redis 조회 오류:", error);
   }
 
-  return starsRanking;
+  // Redis에 데이터가 없으면 DB에서 조회
+  const rankings = await findTopStars();
+
+  try {
+    await redisClient.set(cacheKey, 600, JSON.stringify(rankings));
+    console.log("✅ Redis 캐시에 저장 완료!");
+  } catch (error) {
+    console.error("🚨 Redis 캐싱 실패:", error);
+  }
+
+  return rankings;
 };
 
 module.exports = {
