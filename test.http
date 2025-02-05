@@ -20,6 +20,7 @@ Content-Type: application/json; charset=UTF-8
   "id": "1234",
   "pw": "1234"
 }
+
 ###이메일 인증코드 발송
 POST http://localhost:4000/email
 Content-Type: application/json; charset=UTF-8
@@ -80,3 +81,13 @@ Content-Type: application/json
 ### 별자리 랭킹 조회
 GET http://localhost:4000/stars/ranking
 Content-Type: application/json
+
+### 투표
+POST http://localhost:4000/stars/vote
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg3NjMzNzcsImV4cCI6MTczODc5OTM3N30.bVNCgjfbdk5F0ktfuMaHxH0y3pySTnI4EHIMdTsxoAg
+Content-Type: application/json; charset=UTF-8
+
+{
+  "stars_id": 2,
+  "post_user_id": "1" 
+}

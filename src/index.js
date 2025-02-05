@@ -59,6 +59,7 @@ const {
   getFilteredStarRegions,
   setStarsName,
   getStarsRanking,
+  voteForStar,
 } = require("./controllers/stars.controller.js");
 
 const {
@@ -174,6 +175,7 @@ app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
 app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
+app.post("/stars/vote", voteForStar); // 별자리 랭킹 조회
 
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
@@ -741,7 +743,6 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
-
 
 // 일지 작성 API
 /**
@@ -1972,7 +1973,6 @@ app.listen(port, () => {
  *                   example: "Error message details"
  */
 
-
 // 하루 일정 작성 API
 /**
  * @swagger
@@ -2309,7 +2309,7 @@ app.listen(port, () => {
  *       - in: path
  *         name: date
  *         required: true
-  *         schema:
+ *         schema:
  *           type: string
  *           format: date
  *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
@@ -2431,4 +2431,3 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
-

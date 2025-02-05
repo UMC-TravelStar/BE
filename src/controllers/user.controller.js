@@ -149,15 +149,41 @@ const handleUserLogin = async (req, res) => {
     });
   }
 
-  // JWT 생성 (실제로는 DB에서 사용자 인증 필요)
-  const token = jwt.sign({ id }, secretKey, {
-    expiresIn: "10h",
-  });
+  try {
+    // 데이터베이스에서 사용자 찾기
+    const user = await prisma.user.findUnique({
+      where: { user_id: id },
+    });
 
-  res.status(200).json({
-    message: "로그인 성공!",
-    token, // 프론트엔드에서 저장할 수 있도록 응답으로 보냄
-  });
+    if (!user) {
+      return res.status(404).json({
+        message: "해당 아이디를 가진 사용자가 없습니다.",
+      });
+    }
+
+    // 비밀번호 확인 (평문 비교)
+    if (pw !== user.password) {
+      return res.status(401).json({
+        message: "비밀번호가 일치하지 않습니다.",
+      });
+    }
+
+    // JWT 토큰 생성
+    const token = jwt.sign({ id: user.user_id }, secretKey, {
+      expiresIn: "10h",
+    });
+
+    res.status(200).json({
+      message: "로그인 성공!",
+      token, // 프론트엔드에서 저장할 수 있도록 응답으로 보냄
+    });
+  } catch (error) {
+    console.error("로그인 처리 중 오류:", error);
+    res.status(500).json({
+      message: "서버 오류가 발생했습니다.",
+      error: error.message,
+    });
+  }
 };
 
 // 로그아웃 처리
