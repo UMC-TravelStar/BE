@@ -2447,4 +2447,45 @@ app.listen(port, () => {
  *                   example: "일정 삭제 성공"
  *       500:
  *         description: 서버 내부 오류
+ * 
+/**
+ * @swagger
+ * /mypage:
+ *   get:
+ *     summary: "유저 정보 조회"
+ *     description: "현재 로그인된 사용자의 정보를 조회합니다."
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "유저 정보 조회 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user_id:
+ *                   type: string
+ *                   example: "12345"
+ *                 nickname:
+ *                   type: string
+ *                   example: "닉네임"
+ *                 name:
+ *                   type: string
+ *                   example: "이름"
+ *                 birth:
+ *                   type: string
+ *                   example: "1990-01-01"
+ *                 phonenum:
+ *                   type: string
+ *                   example: "010-0000-0000"
+ *                 email:
+ *                   type: string
+ *                   example: "user@domain.com"
+ *       401:
+ *         description: "인증 실패"
+ *       404:
+ *         description: "유저 정보를 찾을 수 없음"
+ *      500:
+ *        description: 서버 내부 오류
  */
