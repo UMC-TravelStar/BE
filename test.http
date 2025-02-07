@@ -13,13 +13,14 @@ Content-Type: application/json; charset=UTF-8
 }
 
 ###로그인15.165.117.176
-POST http://localhost:4000/login
+POST http://15.165.117.176:4000/login
 Content-Type: application/json; charset=UTF-8
 
 {
   "id": "1234",
   "pw": "1234"
 }
+
 ###이메일 인증코드 발송
 POST http://localhost:4000/email
 Content-Type: application/json; charset=UTF-8
@@ -45,7 +46,7 @@ Content-Type: application/json; charset=UTF-8
 }
 
 ###비밀번호 찾기
-POST http://15.165.117.176:4000/reset-pw
+POST http://localhost:4000/reset-pw
 Content-Type: application/json; charset=UTF-8
 
 {
@@ -70,7 +71,7 @@ Content-Type: application/json
 
 ### 별자리 이름 설정 변경 및 여행한 별들 추가
 PATCH http://localhost:4000/stars/name
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg0MTQwNDcsImV4cCI6MTczODQ1MDA0N30.d5NcLUEUHqWguLq6g6Pi0V6ji_7MnHu9698-S1r17tc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg3NjYwOTAsImV4cCI6MTczODgwMjA5MH0.z23L9I1urVBFIM8zBSo5YLzLQLcwhir1NKMhFwXujds
 Content-Type: application/json
 
 {
@@ -80,3 +81,13 @@ Content-Type: application/json
 ### 별자리 랭킹 조회
 GET http://localhost:4000/stars/ranking
 Content-Type: application/json
+
+### 투표
+POST http://localhost:4000/stars/vote
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg3NjYwOTAsImV4cCI6MTczODgwMjA5MH0.z23L9I1urVBFIM8zBSo5YLzLQLcwhir1NKMhFwXujds
+Content-Type: application/json; charset=UTF-8
+
+{
+  "stars_id": 2,
+  "post_user_id": "1" 
+}
