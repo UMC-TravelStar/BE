@@ -46,5 +46,17 @@ class MyPageRepository {
             }
         })
     };
+
+    // 보관 글 상태 수정(보관->전체공개)
+    async updateStoragePost(postId){
+        return await prisma.post.update({
+            where: {post_id: postId},
+            data: {storage: 0},
+            select: {
+                post_id: true,
+                updated_at: true,
+            }
+        })
+    }
 };
 module.exports = new MyPageRepository();

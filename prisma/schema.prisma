@@ -30,8 +30,8 @@ model user {
   u_image       user_image?
   u_bgimage     user_bgimage?
 
-  from_friends  friend[] @relation("FromUser")
-  to_friends    friend[] @relation("ToUser")
+  from_friends friend[] @relation("FromUser")
+  to_friends   friend[] @relation("ToUser")
 }
 
 model post {
