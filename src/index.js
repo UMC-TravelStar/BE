@@ -70,6 +70,7 @@ const {
   getMyPage,
   updateMyPage,
   getStoragedPost,
+  updateStoragePost
 } = require("./controllers/mypage.controller.js");
 
 
@@ -138,8 +139,8 @@ app.get("/users/:userId/posts", handleListUserPost); // 유저의 일지 조회(
 app.get("/users/:userId/posts/:postsId", handleGetUserPost); // 유저의 일지 조회(1개)
 app.patch("/users/:userId/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/users/:userId/posts/:postsId", handleDeletePost); // 일지 삭제
-app.get("/posts/user/:userId", authenticateUser, handleGetPost); // 일지 조회(전체)
-app.post("/posts/comment", authenticateUser, handleAddComment); // 일지 화면 코멘트 작성
+app.get("/posts/user/:userId",  handleGetPost); // 일지 조회(전체)
+app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
 
 // 하루 일정 작성
 app.post("/users/:user_id/day-schedules", handleAddDaySchedule); // Day Schedule 추가
@@ -181,6 +182,7 @@ app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 �
 app.get("/mypage", getMyPage); // 유저 정보 조회
 app.patch("/mypage", updateMyPage); // 유저 정보 수정
 app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
+app.patch("/mypage/storaged-posts/:postId", updateStoragePost); // 보관 글 상태 수정(보관->전체공개)
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
