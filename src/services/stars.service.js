@@ -65,6 +65,7 @@ const getStarsRankingService = async () => {
 
   return rankings;
 };
+
 const voteForStarService = async (tokenUserId, starsId, postUserId) => {
   // 자신이 작성한 게시글인지 확인
   if (tokenUserId === postUserId) {
