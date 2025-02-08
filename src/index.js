@@ -208,7 +208,7 @@ app.patch("/mypage/storaged-posts/:postId", updateStoragePost); // 보관 글 �
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
-
+// 유저 정보 조회
 // 로그인 API
 /**
  * @swagger
@@ -564,20 +564,14 @@ app.listen(port, () => {
  *                   example: "Internal Server Error"
  */
 
-// 메인 페이지 일지 조회 API
+//메인 페이지 일지 조회 API
 /**
  * @swagger
- * /prod/users/{user_id}/home:
+ * /prod/home:
  *   get:
  *     summary: 메인 페이지의 일지 조회
  *     description: 사용자의 일지를 조회합니다.
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: query
  *         name: page
  *         required: false
@@ -592,6 +586,8 @@ app.listen(port, () => {
  *           type: integer
  *           example: 10
  *         description: "한 페이지에 표시할 일지 수 (기본값: 10)"
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     responses:
  *       200:
  *         description: 포스트 조회 성공
@@ -646,17 +642,11 @@ app.listen(port, () => {
 // 메인 페이지 검색 API
 /**
  * @swagger
- * /prod/users/{user_id}/home/search:
+ * /prod/home/search:
  *   get:
  *     summary: 메인 페이지에서 검색
  *     description: 특정 키워드를 사용하여 포스트를 검색합니다.
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: query
  *         name: term
  *         required: true
@@ -677,6 +667,8 @@ app.listen(port, () => {
  *           type: integer
  *           example: 10
  *         description: "한 페이지에 표시할 포스트 수 (기본값: 10)"
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     responses:
  *       200:
  *         description: 검색 결과
@@ -726,17 +718,12 @@ app.listen(port, () => {
 // 검색 순위 조회 API
 /**
  * @swagger
- * /prod/users/{user_id}/home/search/rankings:
+ * /prod/home/search/rankings:
  *   get:
  *     summary: 검색 순위 조회
  *     description: 사용자의 검색 순위를 조회합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     responses:
  *       200:
  *         description: 검색 순위 조회 성공
@@ -760,6 +747,7 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
+
 
 // 일지 작성 API
 /**
@@ -1990,20 +1978,15 @@ app.listen(port, () => {
  *                   example: "Error message details"
  */
 
-// 하루 일정 작성 API
+// 하루 일정 추가 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules:
+ * /prod/day-schedules:
  *   post:
  *     summary: 하루 일정 추가
  *     description: 사용자의 하루 일정을 추가합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     requestBody:
  *       required: true
  *       content:
@@ -2013,30 +1996,39 @@ app.listen(port, () => {
  *             properties:
  *               date:
  *                 type: string
- *                 format: date-time
+ *                 format: date
+ *                 description: "일정 날짜"
  *               title:
  *                 type: string
+ *                 description: "일정 제목"
  *               content:
  *                 type: string
+ *                 description: "일정 내용"
  *     responses:
  *       201:
- *         description: 하루 일정 추가 성공
+ *         description: 일정 추가 성공
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 day_id:
- *                   type: integer
- *                 date:
+ *                 message:
  *                   type: string
- *                   format: date-time
- *                 title:
- *                   type: string
- *                 content:
- *                   type: string
+ *                   example: "일정 추가 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     day_id:
+ *                       type: integer
+ *                     date:
+ *                       type: string
+ *                       format: date
+ *                     title:
+ *                       type: string
+ *                     content:
+ *                       type: string
  *       400:
- *         description: 날짜가 누락됨
+ *         description: 날짜가 필요합니다.
  *       500:
  *         description: 서버 내부 오류
  */
@@ -2044,20 +2036,15 @@ app.listen(port, () => {
 // 하루 일정 조회 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules:
+ * /prod/day-schedules:
  *   get:
  *     summary: 하루 일정 조회
- *     description: 사용자의 하루 일정을 조회합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
+ *     description: 사용자의 모든 하루 일정을 조회합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     responses:
  *       200:
- *         description: 하루 일정 조회 성공
+ *         description: 일정 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -2069,7 +2056,7 @@ app.listen(port, () => {
  *                     type: integer
  *                   date:
  *                     type: string
- *                     format: date-time
+ *                     format: date
  *                   title:
  *                     type: string
  *                   content:
@@ -2081,27 +2068,23 @@ app.listen(port, () => {
 // 날짜별 하루 일정 조회 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{date}:
+ * /prod/day-schedules/{date}:
  *   get:
  *     summary: 날짜별 하루 일정 조회
  *     description: 특정 날짜의 하루 일정을 조회합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: date
  *         required: true
  *         schema:
  *           type: string
  *           format: date
- *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
+ *         description: "조회할 날짜"
  *     responses:
  *       200:
- *         description: 날짜별 하루 일정 조회 성공
+ *         description: 일정 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -2113,7 +2096,7 @@ app.listen(port, () => {
  *                     type: integer
  *                   date:
  *                     type: string
- *                     format: date-time
+ *                     format: date
  *                   title:
  *                     type: string
  *                   content:
@@ -2125,17 +2108,13 @@ app.listen(port, () => {
 // 하루 일정 수정 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}:
+ * /prod/day-schedules/{day_id}:
  *   patch:
  *     summary: 하루 일정 수정
- *     description: 사용자의 하루 일정을 수정합니다.
+ *     description: 특정 하루 일정을 수정합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
@@ -2151,25 +2130,23 @@ app.listen(port, () => {
  *             properties:
  *               title:
  *                 type: string
+ *                 description: "일정 제목"
  *               content:
  *                 type: string
+ *                 description: "일정 내용"
  *     responses:
  *       200:
- *         description: 하루 일정 수정 성공
+ *         description: 일정 수정 성공
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 day_id:
- *                   type: integer
- *                 date:
+ *                 message:
  *                   type: string
- *                   format: date-time
- *                 title:
- *                   type: string
- *                 content:
- *                   type: string
+ *                   example: "일정 수정 성공"
+ *       404:
+ *         description: 해당 일정이 존재하지 않습니다.
  *       500:
  *         description: 서버 내부 오류
  */
@@ -2177,17 +2154,13 @@ app.listen(port, () => {
 // 하루 일정 삭제 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}:
+ * /prod/day-schedules/{day_id}:
  *   delete:
  *     summary: 하루 일정 삭제
- *     description: 사용자의 하루 일정을 삭제합니다.
+ *     description: 특정 하루 일정을 삭제합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
@@ -2196,7 +2169,7 @@ app.listen(port, () => {
  *         description: "삭제할 하루 일정 ID"
  *     responses:
  *       200:
- *         description: 하루 일정 삭제 성공
+ *         description: 일정 삭제 성공
  *         content:
  *           application/json:
  *             schema:
@@ -2205,30 +2178,29 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "일정 삭제 성공"
+ *       404:
+ *         description: 해당 일정이 존재하지 않습니다.
  *       500:
  *         description: 서버 내부 오류
  */
 
+
 // 일정 추가 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules:
+ * /prod/day-schedules/{day_id}/schedules:
  *   post:
  *     summary: 일정 추가
- *     description: 사용자의 하루 일정에 일정을 추가합니다.
+ *     description: 특정 하루 일정에 일정을 추가합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "추가할 일정을 포함할 하루 일정 ID"
  *     requestBody:
  *       required: true
  *       content:
@@ -2238,9 +2210,11 @@ app.listen(port, () => {
  *             properties:
  *               location:
  *                 type: string
+ *                 description: "일정 위치"
  *               date_time:
  *                 type: string
  *                 format: date-time
+ *                 description: "일정 날짜 및 시간"
  *     responses:
  *       201:
  *         description: 일정 추가 성공
@@ -2249,15 +2223,21 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
- *                 schedule_id:
- *                   type: integer
- *                 location:
+ *                 message:
  *                   type: string
- *                 date_time:
- *                   type: string
- *                   format: date-time
+ *                   example: "일정 추가 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     schedule_id:
+ *                       type: integer
+ *                     location:
+ *                       type: string
+ *                     date_time:
+ *                       type: string
+ *                       format: date-time
  *       400:
- *         description: 위치 또는 날짜가 누락됨
+ *         description: 위치와 날짜/시간이 필요합니다.
  *       500:
  *         description: 서버 내부 오류
  */
@@ -2265,23 +2245,19 @@ app.listen(port, () => {
 // 일정 조회 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules:
+ * /prod/day-schedules/{day_id}/schedules:
  *   get:
  *     summary: 일정 조회
- *     description: 사용자의 하루 일정에 등록된 일정을 조회합니다.
+ *     description: 특정 하루 일정에 포함된 일정을 조회합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "조회할 하루 일정 ID"
  *     responses:
  *       200:
  *         description: 일정 조회 성공
@@ -2306,33 +2282,29 @@ app.listen(port, () => {
 // 날짜별 일정 조회 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules/{date}:
+ * /prod/day-schedules/{day_id}/schedules/{date}:
  *   get:
  *     summary: 날짜별 일정 조회
  *     description: 특정 날짜의 일정을 조회합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "조회할 하루 일정 ID"
  *       - in: path
  *         name: date
  *         required: true
  *         schema:
  *           type: string
  *           format: date
- *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
+ *         description: "조회할 날짜"
  *     responses:
  *       200:
- *         description: 날짜별 일정 조회 성공
+ *         description: 일정 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -2354,23 +2326,19 @@ app.listen(port, () => {
 // 일정 수정 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules/{schedule_id}:
+ * /prod/day-schedules/{day_id}/schedules/{schedule_id}:
  *   patch:
  *     summary: 일정 수정
- *     description: 사용자의 특정 일정을 수정합니다.
+ *     description: 특정 일정을 수정합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "수정할 일정이 포함된 하루 일정 ID"
  *       - in: path
  *         name: schedule_id
  *         required: true
@@ -2386,9 +2354,11 @@ app.listen(port, () => {
  *             properties:
  *               location:
  *                 type: string
+ *                 description: "일정 위치"
  *               date_time:
  *                 type: string
  *                 format: date-time
+ *                 description: "일정 날짜 및 시간"
  *     responses:
  *       200:
  *         description: 일정 수정 성공
@@ -2397,13 +2367,11 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
- *                 schedule_id:
- *                   type: integer
- *                 location:
+ *                 message:
  *                   type: string
- *                 date_time:
- *                   type: string
- *                   format: date-time
+ *                   example: "일정 수정 성공"
+ *       404:
+ *         description: 해당 일정이 존재하지 않습니다.
  *       500:
  *         description: 서버 내부 오류
  */
@@ -2411,23 +2379,19 @@ app.listen(port, () => {
 // 일정 삭제 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules/{schedule_id}:
+ * /prod/day-schedules/{day_id}/schedules/{schedule_id}:
  *   delete:
  *     summary: 일정 삭제
- *     description: 사용자의 특정 일정을 삭제합니다.
+ *     description: 특정 일정을 삭제합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "삭제할 일정이 포함된 하루 일정 ID"
  *       - in: path
  *         name: schedule_id
  *         required: true
@@ -2445,9 +2409,12 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "일정 삭제 성공"
+ *       404:
+ *         description: 해당 일정이 존재하지 않습니다.
  *       500:
  *         description: 서버 내부 오류
- * 
+ */
+
 /**
  * @swagger
  * /mypage:
