@@ -191,7 +191,7 @@ app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
 app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
-app.post("/stars/vote", voteForStar); // 별자리 랭킹 조회
+app.post("/stars/vote", voteForStar); // 별자리 투표하기
 
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
@@ -1986,6 +1986,81 @@ app.listen(port, () => {
  *                 error:
  *                   type: string
  *                   example: "Error message details"
+ */
+
+/**
+ * @swagger
+ * /prod/stars/vote:
+ *   post:
+ *     summary: 별자리에 투표
+ *     description: 사용자가 특정 별자리에 투표합니다. 동일한 별자리에 중복 투표할 수 없으며, 자신의 별자리에 투표할 수 없습니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               starsId:
+ *                 type: integer
+ *                 example: 1
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer 토큰을 포함한 인증 정보
+ *     responses:
+ *       200:
+ *         description: 투표 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "투표 성공"
+ *                 updatedStar:
+ *                   type: object
+ *                   properties:
+ *                     stars_id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     vote_num:
+ *                       type: integer
+ *       400:
+ *         description: 잘못된 요청 (자신의 별자리에 투표 시도 또는 중복 투표)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "자신의 별자리에 투표할 수 없습니다."
+ *       401:
+ *         description: 인증 실패
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "인증이 필요합니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
  */
 
 // 하루 일정 작성 API
