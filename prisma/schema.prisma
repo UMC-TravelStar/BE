@@ -23,6 +23,7 @@ model user {
   posts         post[]
   day_schedules day_schedule[]
   planets       planet[]
+  votes         votes[] 
 
   stars         stars?
   subscrition   subscrition?
@@ -34,84 +35,86 @@ model user {
 }
 
 model post {
-  post_id     Int      @id @default(autoincrement())
+  post_id     Int          @id @default(autoincrement())
   title       String?
   content     String?
   music       String?
   feeling     String?
   feel_color  String?
-  views       Int      @default(0)
+  views       Int          @default(0)
   storage     Int?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  user_id     String
+  star_id     Int
+  star        star         @relation(fields: [star_id], references: [star_id])
+  user        user         @relation(fields: [user_id], references: [user_id])
   post_images post_image[]
 
-  user_id     String      
-  user        user     @relation(fields: [user_id], references: [user_id])
-
-  star_id     Int      
-  star        star     @relation(fields: [star_id], references: [star_id])
+  @@index([star_id], map: "post_star_id_fkey")
+  @@index([user_id], map: "post_user_id_fkey")
 }
 
 model post_image {
-  p_image_id    Int        @id @default(autoincrement())
-  file_name     String?
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
+  p_image_id Int      @id @default(autoincrement())
+  file_name  String?
+  post_id    Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  post       post     @relation(fields: [post_id], references: [post_id])
 
-  post_id       Int      
-  post          post     @relation(fields: [post_id], references: [post_id])
+  @@index([post_id], map: "post_image_post_id_fkey")
 }
 
-model stars { 
-  stars_id      Int      @id @default(autoincrement())
-  name          String?
-  views         Int      @default(0)
-  vote_num      Int?
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
-
-  stars         star[]
-
-  user_id       String   @unique
-  user          user     @relation(fields: [user_id], references: [user_id])
+model stars {
+  stars_id   Int      @id @default(autoincrement())
+  name       String?
+  views      Int      @default(0)
+  vote_num   Int?
+  created_at DateTime @default(now())
+  user_id    String   @unique
+  updated_at DateTime @updatedAt
+  stars      star[]
+  votes      votes[]  
+  user       user     @relation(fields: [user_id], references: [user_id])
 }
 
 model star {
-  star_id       Int      @id @default(autoincrement())
-  region        String?
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
+  star_id    Int      @id @default(autoincrement())
+  region     String?
+  stars_id   Int?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  posts      post[]
+  stars      stars?   @relation(fields: [stars_id], references: [stars_id])
 
-  posts         post[]
-
-  stars_id      Int?      
-  stars         stars?   @relation(fields: [stars_id], references: [stars_id])
+  @@index([stars_id], map: "star_stars_id_fkey")
 }
 
 model day_schedule {
-  day_id        Int      @id @default(autoincrement())
-  date          DateTime?
-  title         String?
-  content       String?
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
+  day_id     Int        @id @default(autoincrement())
+  date       DateTime?
+  title      String?
+  content    String?
+  user_id    String
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  user       user       @relation(fields: [user_id], references: [user_id])
+  schedules  schedule[]
 
-  schedules     schedule[]
-  user_id       String    
-  user          user     @relation(fields: [user_id], references: [user_id])
+  @@index([user_id], map: "day_schedule_user_id_fkey")
 }
 
 model schedule {
-  schedule_id       Int           @id @default(autoincrement())
-  location          String?
-  date_time         DateTime
-  created_at        DateTime   @default(now())
-  updated_at        DateTime   @updatedAt
+  schedule_id   Int          @id @default(autoincrement())
+  location      String?
+  date_time     DateTime
+  day_id        Int
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  day_schedules day_schedule @relation(fields: [day_id], references: [day_id])
 
-  day_id            Int      
-  day_schedules     day_schedule  @relation(fields: [day_id], references: [day_id])
+  @@index([day_id], map: "schedule_day_id_fkey")
 }
 
 model subscrition {
@@ -137,37 +140,48 @@ model friend {
 }
 
 model user_image {
-  u_image_id    Int      @id @default(autoincrement())
-  file_name     String?
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
-
-  user_id       String   @unique
-  user          user     @relation(fields: [user_id], references: [user_id])
+  u_image_id Int      @id @default(autoincrement())
+  file_name  String?
+  user_id    String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       user     @relation(fields: [user_id], references: [user_id])
 }
 
 model user_bgimage {
-  bg_image_id   Int      @id @default(autoincrement())
-  file_name     String?
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
-
-  user_id       String   @unique
-  user          user     @relation(fields: [user_id], references: [user_id])
+  bg_image_id Int      @id @default(autoincrement())
+  file_name   String?
+  user_id     String   @unique
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  user        user     @relation(fields: [user_id], references: [user_id])
 }
 
 model search {
-  search_id     Int      @id @default(autoincrement())
-  word          String?
-  number        Int      @default(0)
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
+  search_id  Int      @id @default(autoincrement())
+  word       String?
+  number     Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model planet {
-  planet_id     Int     @id @default(autoincrement())
-  user_id       String
-  name          String
+  planet_id Int    @id @default(autoincrement())
+  user_id   String
+  name      String
+  user      user   @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-  user          user    @relation(fields: [user_id], references:[user_id], onDelete: Cascade)
+  @@index([user_id], map: "planet_user_id_fkey")
+}
+
+model votes {
+  vote_id   Int      @id @default(autoincrement())
+  user_id   String
+  stars_id  Int
+  created_at DateTime @default(now())
+
+  user   user   @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  stars  stars  @relation(fields: [stars_id], references: [stars_id], onDelete: Cascade)
+
+  @@unique([user_id, stars_id]) // 사용자와 별자리 조합으로 중복 방지
 }
