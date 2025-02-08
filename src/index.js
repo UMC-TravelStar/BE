@@ -112,8 +112,8 @@ app.use((req, res, next) => {
       "/register",
       "/login",
       "/find-id",
-      "check-id",
-      "reset-pw",
+      "/check-id",
+      "/reset-pw",
     ].includes(req.path)
   ) {
     return next();
