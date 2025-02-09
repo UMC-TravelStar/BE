@@ -72,6 +72,7 @@ const {
   getMyPage,
   updateMyPage,
   getStoragedPost,
+  updateStoragePost
 } = require("./controllers/mypage.controller.js");
 
 const options = {
@@ -112,8 +113,8 @@ app.use((req, res, next) => {
       "/register",
       "/login",
       "/find-id",
-      "check-id",
-      "reset-pw",
+      "/check-id",
+      "/reset-pw",
     ].includes(req.path)
   ) {
     return next();
@@ -191,7 +192,7 @@ app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
 app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
-app.post("/stars/vote", voteForStar); // 별자리 랭킹 조회
+app.post("/stars/vote", voteForStar); // 별자리 투표하기
 
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
@@ -202,11 +203,12 @@ app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 �
 app.get("/mypage", getMyPage); // 유저 정보 조회
 app.patch("/mypage", updateMyPage); // 유저 정보 수정
 app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
+app.patch("/mypage/storaged-posts/:postId", updateStoragePost); // 보관 글 상태 수정(보관->전체공개)
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
 });
-
+// 유저 정보 조회
 // 로그인 API
 /**
  * @swagger
@@ -562,20 +564,14 @@ app.listen(port, () => {
  *                   example: "Internal Server Error"
  */
 
-// 메인 페이지 일지 조회 API
+//메인 페이지 일지 조회 API
 /**
  * @swagger
- * /prod/users/{user_id}/home:
+ * /prod/home:
  *   get:
  *     summary: 메인 페이지의 일지 조회
  *     description: 사용자의 일지를 조회합니다.
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: query
  *         name: page
  *         required: false
@@ -590,6 +586,8 @@ app.listen(port, () => {
  *           type: integer
  *           example: 10
  *         description: "한 페이지에 표시할 일지 수 (기본값: 10)"
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     responses:
  *       200:
  *         description: 포스트 조회 성공
@@ -644,17 +642,11 @@ app.listen(port, () => {
 // 메인 페이지 검색 API
 /**
  * @swagger
- * /prod/users/{user_id}/home/search:
+ * /prod/home/search:
  *   get:
  *     summary: 메인 페이지에서 검색
  *     description: 특정 키워드를 사용하여 포스트를 검색합니다.
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: query
  *         name: term
  *         required: true
@@ -675,6 +667,8 @@ app.listen(port, () => {
  *           type: integer
  *           example: 10
  *         description: "한 페이지에 표시할 포스트 수 (기본값: 10)"
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     responses:
  *       200:
  *         description: 검색 결과
@@ -724,17 +718,12 @@ app.listen(port, () => {
 // 검색 순위 조회 API
 /**
  * @swagger
- * /prod/users/{user_id}/home/search/rankings:
+ * /prod/home/search/rankings:
  *   get:
  *     summary: 검색 순위 조회
  *     description: 사용자의 검색 순위를 조회합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     responses:
  *       200:
  *         description: 검색 순위 조회 성공
@@ -758,6 +747,7 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
+
 
 // 일지 작성 API
 /**
@@ -1988,20 +1978,90 @@ app.listen(port, () => {
  *                   example: "Error message details"
  */
 
-// 하루 일정 작성 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules:
+ * /prod/stars/vote:
  *   post:
- *     summary: 하루 일정 추가
- *     description: 사용자의 하루 일정을 추가합니다.
+ *     summary: 별자리에 투표
+ *     description: 사용자가 특정 별자리에 투표합니다. 동일한 별자리에 중복 투표할 수 없으며, 자신의 별자리에 투표할 수 없습니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               starsId:
+ *                 type: integer
+ *                 example: 1
  *     parameters:
- *       - in: path
- *         name: user_id
+ *       - in: header
+ *         name: Authorization
  *         required: true
  *         schema:
  *           type: string
- *         description: "로그인된 사용자 ID"
+ *         description: Bearer 토큰을 포함한 인증 정보
+ *     responses:
+ *       200:
+ *         description: 투표 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "투표 성공"
+ *                 updatedStar:
+ *                   type: object
+ *                   properties:
+ *                     stars_id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     vote_num:
+ *                       type: integer
+ *       400:
+ *         description: 잘못된 요청 (자신의 별자리에 투표 시도 또는 중복 투표)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "자신의 별자리에 투표할 수 없습니다."
+ *       401:
+ *         description: 인증 실패
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "인증이 필요합니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ */
+
+// 하루 일정 작성 API
+/**
+ * @swagger
+ * /prod/day-schedules:
+ *   post:
+ *     summary: 하루 일정 추가
+ *     description: 사용자의 하루 일정을 추가합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     requestBody:
  *       required: true
  *       content:
@@ -2011,30 +2071,39 @@ app.listen(port, () => {
  *             properties:
  *               date:
  *                 type: string
- *                 format: date-time
+ *                 format: date
+ *                 description: "일정 날짜"
  *               title:
  *                 type: string
+ *                 description: "일정 제목"
  *               content:
  *                 type: string
+ *                 description: "일정 내용"
  *     responses:
  *       201:
- *         description: 하루 일정 추가 성공
+ *         description: 일정 추가 성공
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 day_id:
- *                   type: integer
- *                 date:
+ *                 message:
  *                   type: string
- *                   format: date-time
- *                 title:
- *                   type: string
- *                 content:
- *                   type: string
+ *                   example: "일정 추가 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     day_id:
+ *                       type: integer
+ *                     date:
+ *                       type: string
+ *                       format: date
+ *                     title:
+ *                       type: string
+ *                     content:
+ *                       type: string
  *       400:
- *         description: 날짜가 누락됨
+ *         description: 날짜가 필요합니다.
  *       500:
  *         description: 서버 내부 오류
  */
@@ -2042,20 +2111,15 @@ app.listen(port, () => {
 // 하루 일정 조회 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules:
+ * /prod/day-schedules:
  *   get:
  *     summary: 하루 일정 조회
- *     description: 사용자의 하루 일정을 조회합니다.
- *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
+ *     description: 사용자의 모든 하루 일정을 조회합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     responses:
  *       200:
- *         description: 하루 일정 조회 성공
+ *         description: 일정 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -2067,7 +2131,7 @@ app.listen(port, () => {
  *                     type: integer
  *                   date:
  *                     type: string
- *                     format: date-time
+ *                     format: date
  *                   title:
  *                     type: string
  *                   content:
@@ -2079,27 +2143,23 @@ app.listen(port, () => {
 // 날짜별 하루 일정 조회 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{date}:
+ * /prod/day-schedules/{date}:
  *   get:
  *     summary: 날짜별 하루 일정 조회
  *     description: 특정 날짜의 하루 일정을 조회합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: date
  *         required: true
  *         schema:
  *           type: string
  *           format: date
- *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
+ *         description: "조회할 날짜"
  *     responses:
  *       200:
- *         description: 날짜별 하루 일정 조회 성공
+ *         description: 일정 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -2111,7 +2171,7 @@ app.listen(port, () => {
  *                     type: integer
  *                   date:
  *                     type: string
- *                     format: date-time
+ *                     format: date
  *                   title:
  *                     type: string
  *                   content:
@@ -2123,17 +2183,13 @@ app.listen(port, () => {
 // 하루 일정 수정 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}:
+ * /prod/day-schedules/{day_id}:
  *   patch:
  *     summary: 하루 일정 수정
- *     description: 사용자의 하루 일정을 수정합니다.
+ *     description: 특정 하루 일정을 수정합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
@@ -2149,25 +2205,23 @@ app.listen(port, () => {
  *             properties:
  *               title:
  *                 type: string
+ *                 description: "일정 제목"
  *               content:
  *                 type: string
+ *                 description: "일정 내용"
  *     responses:
  *       200:
- *         description: 하루 일정 수정 성공
+ *         description: 일정 수정 성공
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 day_id:
- *                   type: integer
- *                 date:
+ *                 message:
  *                   type: string
- *                   format: date-time
- *                 title:
- *                   type: string
- *                 content:
- *                   type: string
+ *                   example: "일정 수정 성공"
+ *       404:
+ *         description: 해당 일정이 존재하지 않습니다.
  *       500:
  *         description: 서버 내부 오류
  */
@@ -2175,17 +2229,13 @@ app.listen(port, () => {
 // 하루 일정 삭제 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}:
+ * /prod/day-schedules/{day_id}:
  *   delete:
  *     summary: 하루 일정 삭제
- *     description: 사용자의 하루 일정을 삭제합니다.
+ *     description: 특정 하루 일정을 삭제합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
@@ -2194,7 +2244,7 @@ app.listen(port, () => {
  *         description: "삭제할 하루 일정 ID"
  *     responses:
  *       200:
- *         description: 하루 일정 삭제 성공
+ *         description: 일정 삭제 성공
  *         content:
  *           application/json:
  *             schema:
@@ -2203,30 +2253,29 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "일정 삭제 성공"
+ *       404:
+ *         description: 해당 일정이 존재하지 않습니다.
  *       500:
  *         description: 서버 내부 오류
  */
 
+
 // 일정 추가 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules:
+ * /prod/day-schedules/{day_id}/schedules:
  *   post:
  *     summary: 일정 추가
- *     description: 사용자의 하루 일정에 일정을 추가합니다.
+ *     description: 특정 하루 일정에 일정을 추가합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "추가할 일정을 포함할 하루 일정 ID"
  *     requestBody:
  *       required: true
  *       content:
@@ -2236,9 +2285,11 @@ app.listen(port, () => {
  *             properties:
  *               location:
  *                 type: string
+ *                 description: "일정 위치"
  *               date_time:
  *                 type: string
  *                 format: date-time
+ *                 description: "일정 날짜 및 시간"
  *     responses:
  *       201:
  *         description: 일정 추가 성공
@@ -2247,15 +2298,21 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
- *                 schedule_id:
- *                   type: integer
- *                 location:
+ *                 message:
  *                   type: string
- *                 date_time:
- *                   type: string
- *                   format: date-time
+ *                   example: "일정 추가 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     schedule_id:
+ *                       type: integer
+ *                     location:
+ *                       type: string
+ *                     date_time:
+ *                       type: string
+ *                       format: date-time
  *       400:
- *         description: 위치 또는 날짜가 누락됨
+ *         description: 위치와 날짜/시간이 필요합니다.
  *       500:
  *         description: 서버 내부 오류
  */
@@ -2263,23 +2320,19 @@ app.listen(port, () => {
 // 일정 조회 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules:
+ * /prod/day-schedules/{day_id}/schedules:
  *   get:
  *     summary: 일정 조회
- *     description: 사용자의 하루 일정에 등록된 일정을 조회합니다.
+ *     description: 특정 하루 일정에 포함된 일정을 조회합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "조회할 하루 일정 ID"
  *     responses:
  *       200:
  *         description: 일정 조회 성공
@@ -2304,33 +2357,29 @@ app.listen(port, () => {
 // 날짜별 일정 조회 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules/{date}:
+ * /prod/day-schedules/{day_id}/schedules/{date}:
  *   get:
  *     summary: 날짜별 일정 조회
  *     description: 특정 날짜의 일정을 조회합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "조회할 하루 일정 ID"
  *       - in: path
  *         name: date
  *         required: true
  *         schema:
  *           type: string
  *           format: date
- *         description: "조회할 날짜 (형식: YYYY-MM-DD)"
+ *         description: "조회할 날짜"
  *     responses:
  *       200:
- *         description: 날짜별 일정 조회 성공
+ *         description: 일정 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -2352,23 +2401,19 @@ app.listen(port, () => {
 // 일정 수정 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules/{schedule_id}:
+ * /prod/day-schedules/{day_id}/schedules/{schedule_id}:
  *   patch:
  *     summary: 일정 수정
- *     description: 사용자의 특정 일정을 수정합니다.
+ *     description: 특정 일정을 수정합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "수정할 일정이 포함된 하루 일정 ID"
  *       - in: path
  *         name: schedule_id
  *         required: true
@@ -2384,9 +2429,11 @@ app.listen(port, () => {
  *             properties:
  *               location:
  *                 type: string
+ *                 description: "일정 위치"
  *               date_time:
  *                 type: string
  *                 format: date-time
+ *                 description: "일정 날짜 및 시간"
  *     responses:
  *       200:
  *         description: 일정 수정 성공
@@ -2395,13 +2442,11 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
- *                 schedule_id:
- *                   type: integer
- *                 location:
+ *                 message:
  *                   type: string
- *                 date_time:
- *                   type: string
- *                   format: date-time
+ *                   example: "일정 수정 성공"
+ *       404:
+ *         description: 해당 일정이 존재하지 않습니다.
  *       500:
  *         description: 서버 내부 오류
  */
@@ -2409,23 +2454,19 @@ app.listen(port, () => {
 // 일정 삭제 API
 /**
  * @swagger
- * /users/{user_id}/day-schedules/{day_id}/schedules/{schedule_id}:
+ * /prod/day-schedules/{day_id}/schedules/{schedule_id}:
  *   delete:
  *     summary: 일정 삭제
- *     description: 사용자의 특정 일정을 삭제합니다.
+ *     description: 특정 일정을 삭제합니다.
+ *     security:
+ *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: user_id
- *         required: true
- *         schema:
- *           type: string
- *         description: "로그인된 사용자 ID"
  *       - in: path
  *         name: day_id
  *         required: true
  *         schema:
  *           type: integer
- *         description: "하루 일정 ID"
+ *         description: "삭제할 일정이 포함된 하루 일정 ID"
  *       - in: path
  *         name: schedule_id
  *         required: true
@@ -2443,6 +2484,522 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "일정 삭제 성공"
+ *       404:
+ *         description: 해당 일정이 존재하지 않습니다.
  *       500:
  *         description: 서버 내부 오류
  */
+
+ 
+// 마이페이지 - 유저 정보 조회
+/**
+ * @swagger
+ * /mypage:
+ *   get:
+ *     summary: "유저 정보 조회"
+ *     description: "현재 로그인된 사용자의 정보를 조회합니다."
+ *     tags:
+ *       - mypage
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "유저 정보 조회 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "유저 정보 조회 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user_id:
+ *                       type: string
+ *                       example: "12345"
+ *                     nickname:
+ *                       type: string
+ *                       example: "닉네임"
+ *                     name:
+ *                       type: string
+ *                       example: "이름"
+ *                     birth:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "1990-01-01"
+ *                     phonenum:
+ *                       type: string
+ *                       example: "010-0000-0000"
+ *                     email:
+ *                       type: string
+ *                       example: "user@domain.com"
+ *       401:
+ *         description: "인증 실패"
+ *       404:
+ *         description: "유저 정보를 찾을 수 없음"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 마이페이지 - 유저 정보 수정
+/**
+ * @swagger
+ * /mypage:
+ *   patch:
+ *     summary: "유저 정보 수정"
+ *     description: "현재 로그인된 사용자의 정보를 수정합니다."
+ *     tags:
+ *       - mypage
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       description: "수정할 유저 정보 데이터"
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nickname
+ *               - name
+ *               - birth
+ *               - phonenum
+ *               - email
+ *             properties:
+ *               nickname:
+ *                 type: string
+ *                 example: "닉네임"
+ *               name:
+ *                 type: string
+ *                 example: "이름"
+ *               birth:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "생년월일"
+ *               phonenum:
+ *                 type: string
+ *                 example: "010-0000-0000"
+ *               email:
+ *                 type: string
+ *                 example: "user@domain.com"
+ *     responses:
+ *       200:
+ *         description: "유저 정보 수정 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "유저 정보가 성공적으로 업데이트되었습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user_id:
+ *                       type: string
+ *                       example: "12345"
+ *                     nickname:
+ *                       type: string
+ *                       example: "닉네임"
+ *                     name:
+ *                       type: string
+ *                       example: "이름"
+ *                     birth:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "1990-01-01"
+ *                     phonenum:
+ *                       type: string
+ *                       example: "010-0000-0000"
+ *                     email:
+ *                       type: string
+ *                       example: "user@domain.com"
+ *       400:
+ *         description: "잘못된 요청"
+ *       401:
+ *         description: "인증 실패"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 마이페이지 - 보관 글 목록 조회
+/**
+ * @swagger
+ * /mypage/storaged-posts:
+ *   get:
+ *     summary: "보관 글 목록 조회"
+ *     description: "현재 로그인된 사용자가 보관한 글 목록을 조회합니다."
+ *     tags:
+ *       - mypage
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "보관 글 목록 조회 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "보관 글 목록 조회 성공"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       post_id:
+ *                         type: integer
+ *                         example: 1
+ *                       title:
+ *                         type: string
+ *                         example: "게시글 제목"
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-01T00:00:00.000Z"
+ *                       updated_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-01T00:00:00.000Z"
+ *       401:
+ *         description: "인증 실패"
+ *       404:
+ *         description: "보관 글이 없음"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 마이페이지 - 보관 글 상태 수정
+/**
+ * @swagger
+ * /mypage/storaged-posts/{postId}:
+ *   patch:
+ *     summary: "보관 글 상태 수정"
+ *     description: "보관된 글의 상태를 전체 공개로 변경합니다."
+ *     tags:
+ *       - mypage
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "상태를 수정할 보관 글의 ID"
+ *     responses:
+ *       200:
+ *         description: "보관 글 상태 수정 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "보관 글 상태 수정 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     post_id:
+ *                       type: integer
+ *                       example: 1
+ *                     updated_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-01-01T00:00:00.000Z"
+ *       400:
+ *         description: "잘못된 요청"
+ *       401:
+ *         description: "인증 실패"
+ *       404:
+ *         description: "보관 글을 찾을 수 없음"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 친구 요청
+/**
+ * @swagger
+ * /friends/request/{toUserId}:
+ *   post:
+ *     summary: "친구 요청"
+ *     description: "현재 로그인된 사용자가 toUserId에 해당하는 사용자에게 친구 요청을 보냅니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: toUserId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "친구 요청을 보낼 대상 사용자 ID"
+ *     responses:
+ *       200:
+ *         description: "친구 요청 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "친구 요청 완료"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     createdRequestFromUser:
+ *                       type: object
+ *                       description: "요청을 보낸 사용자의 요청 생성 결과"
+ *                     createdRequestToUser:
+ *                       type: object
+ *                       description: "요청을 받는 사용자의 요청 생성 결과"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 친구 요청 수락
+/**
+ * @swagger
+ * /friends/request/{requestId}:
+ *   patch:
+ *     summary: "친구 요청 수락"
+ *     description: "친구 요청 ID에 해당하는 친구 요청을 수락하여 양방향 친구 관계를 설정합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: requestId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "수락할 친구 요청의 ID"
+ *     responses:
+ *       200:
+ *         description: "친구 요청 수락 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "친구 요청 수락 완료"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     createdRequestFromUser:
+ *                       type: object
+ *                       description: "요청을 보낸 사용자의 업데이트 결과"
+ *                     createdRequestToUser:
+ *                       type: object
+ *                       description: "요청을 받은 사용자의 업데이트 결과"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 내가 친구 요청한 목록 조회
+/**
+ * @swagger
+ * /friends/list/sent:
+ *   get:
+ *     summary: "내가 친구 요청한 목록 조회"
+ *     description: "현재 로그인된 사용자가 보낸(아직 수락되지 않은) 친구 요청 목록을 조회합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "내가 친구 요청한 목록 조회 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "내가 친구 요청한 목록 조회 완료"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       requestId:
+ *                         type: integer
+ *                         example: 101
+ *                       toUserNickname:
+ *                         type: string
+ *                         example: "친구닉네임"
+ *                       toUserImage:
+ *                         type: string
+ *                         example: "profile.jpg"
+ *                       requestedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-01T12:00:00.000Z"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 나에게 친구 요청한 목록 조회
+/**
+ * @swagger
+ * /friends/list/received:
+ *   get:
+ *     summary: "나에게 친구 요청한 목록 조회"
+ *     description: "현재 로그인된 사용자에게 온(아직 수락하지 않은) 친구 요청 목록을 조회합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "나에게 친구 요청한 목록 조회 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "나에게 친구 요청한 목록 조회 완료"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       requestId:
+ *                         type: integer
+ *                         example: 102
+ *                       fromUserNickname:
+ *                         type: string
+ *                         example: "요청보낸닉네임"
+ *                       fromUserImage:
+ *                         type: string
+ *                         example: "profile2.jpg"
+ *                       requestedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-02T15:30:00.000Z"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 서로 친구인 목록 조회
+/**
+ * @swagger
+ * /friends/list:
+ *   get:
+ *     summary: "서로 친구인 목록 조회"
+ *     description: "현재 로그인된 사용자의 친구 목록(서로 친구 관계인 목록)을 조회합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "서로 친구인 목록 조회 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "서로 친구인 목록 조회 완료"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       requestId:
+ *                         type: integer
+ *                         example: 103
+ *                       friendNickname:
+ *                         type: string
+ *                         example: "친구닉네임"
+ *                       friendImage:
+ *                         type: string
+ *                         example: "friend_profile.jpg"
+ *                       requestedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-03T10:00:00.000Z"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 친구 삭제
+/**
+ * @swagger
+ * /friends/request/{friendId}:
+ *   delete:
+ *     summary: "친구 삭제"
+ *     description: "현재 로그인된 사용자가 friendId에 해당하는 친구와의 친구 관계를 해제합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: friendId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "삭제할 친구의 사용자 ID"
+ *     responses:
+ *       200:
+ *         description: "친구 삭제 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "친구 삭제 완료"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+

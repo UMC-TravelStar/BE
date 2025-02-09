@@ -31,5 +31,15 @@ class MyPageService {
 
         return posts;
     };
+
+    // 보관 글 상태 수정(보관->전체공개)
+    async updateStoragePost(postId){
+        const post = await MyPageRepository.updateStoragePost(postId);
+        if(!post){
+            throw new Error('보관 글 상태 수정에 실패했습니다.');
+        }
+
+        return post;
+    };
 };
 module.exports = new MyPageService();

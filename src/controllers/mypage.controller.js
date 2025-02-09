@@ -46,11 +46,25 @@ const getStoragedPost = async (req, res) => {
     }
 };
 
-// 보관 취소
+// 보관 글 상태 수정(보관->전체공개)
+const updateStoragePost = async (req, res) => {
+    try{
+        const postId = req.params.postId;
+        const post = await MyPageService.updateStoragePost(postId);
+        res.status(200).json({
+            resultType: 'success',
+            message: '보관 글 상태 수정 성공',
+            data: post
+        });
+    } catch(error) {
+        res.status(500).json({message: error.message});
+    }
+};
 
 
 module.exports = { 
     getMyPage,
     updateMyPage,
-    getStoragedPost
+    getStoragedPost,
+    updateStoragePost
 };
