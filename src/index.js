@@ -2490,9 +2490,8 @@ app.listen(port, () => {
  *         description: 서버 내부 오류
  */
 
-/**
  
-// 마이페이지
+// 마이페이지 - 유저 정보 조회
 /**
  * @swagger
  * /mypage:
@@ -2514,38 +2513,41 @@ app.listen(port, () => {
  *                 resultType:
  *                   type: string
  *                   example: "success"
- *               message:
- *                  type: string
- *                  example: "유저 정보 조회 성공"
- *               data:
- *                  type: object
- *                  properties:
-    *                 user_id:
-    *                   type: string
-    *                   example: "12345"
-    *                 nickname:
-    *                   type: string
-    *                   example: "닉네임"
-    *                 name:
-    *                   type: string
-    *                   example: "이름"
-    *                 birth:
-    *                   type: string
-    *                   format: date-time
-    *                   example: "1990-01-01"
-    *                 phonenum:
-    *                   type: string
-    *                   example: "010-0000-0000"
-    *                 email:
-    *                   type: string
-    *                   example: "user@domain.com"
+ *                 message:
+ *                   type: string
+ *                   example: "유저 정보 조회 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user_id:
+ *                       type: string
+ *                       example: "12345"
+ *                     nickname:
+ *                       type: string
+ *                       example: "닉네임"
+ *                     name:
+ *                       type: string
+ *                       example: "이름"
+ *                     birth:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "1990-01-01"
+ *                     phonenum:
+ *                       type: string
+ *                       example: "010-0000-0000"
+ *                     email:
+ *                       type: string
+ *                       example: "user@domain.com"
  *       401:
  *         description: "인증 실패"
  *       404:
  *         description: "유저 정보를 찾을 수 없음"
- *      500:
- *        description: 서버 내부 오류
- * 
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 마이페이지 - 유저 정보 수정
+/**
  * @swagger
  * /mypage:
  *   patch:
@@ -2593,44 +2595,44 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
- *                resultType:
- *                 type: string
- *                 example: "success"
- *               message:
- *                 type: string
- *                 example: "유저 정보가 성공적으로 업데이트되었습니다."
- *               data:
- *                type: object
- *                properties:
- *                 user_id:
- *                  type: string
- *                  example: "12345"
- *                 nickname:
- *                  type: string
- *                  example: "닉네임"
- *                 name:
- *                  type: string
- *                  example: "이름"
- *                 birth:
- *                  type: string
- *                  format: date-time
- *                  example: "1990-01-01"
- *                 phonenum:
- *                  type: string
- *                  example: "010-0000-0000"
- *                email:
- *                  type: string
- *                  example: "user@domain.com"
- 
- *                 
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "유저 정보가 성공적으로 업데이트되었습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user_id:
+ *                       type: string
+ *                       example: "12345"
+ *                     nickname:
+ *                       type: string
+ *                       example: "닉네임"
+ *                     name:
+ *                       type: string
+ *                       example: "이름"
+ *                     birth:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "1990-01-01"
+ *                     phonenum:
+ *                       type: string
+ *                       example: "010-0000-0000"
+ *                     email:
+ *                       type: string
+ *                       example: "user@domain.com"
  *       400:
  *         description: "잘못된 요청"
  *       401:
  *         description: "인증 실패"
  *       500:
  *         description: "서버 내부 오류"
- * 
- * 
+ */
+
+// 마이페이지 - 보관 글 목록 조회
+/**
  * @swagger
  * /mypage/storaged-posts:
  *   get:
@@ -2649,38 +2651,40 @@ app.listen(port, () => {
  *               type: object
  *               properties:
  *                 resultType:
- *                  type: string
- *                  example: "success"
+ *                   type: string
+ *                   example: "success"
  *                 message:
- *                  type: string
- *                  example: "보관 글 목록 조회 성공"
- *                data:
- *                 type: array
- *                 items:
- *                  type: object
- *                  properties:
-*                       post_id:
-*                         type: integer
-*                         example: 1
-*                       title:
-*                         type: string
-*                         example: "게시글 제목"
-*                       created_at:
-*                         type: string
-                          format: date-time
-*                         example: "2025-01-01T00:00:00.000Z"
-*                       updated_at:
-*                         type: string
-                          format: date-time
-*                         example: "2025-01-01T00:00:00.000Z"
-
+ *                   type: string
+ *                   example: "보관 글 목록 조회 성공"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       post_id:
+ *                         type: integer
+ *                         example: 1
+ *                       title:
+ *                         type: string
+ *                         example: "게시글 제목"
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-01T00:00:00.000Z"
+ *                       updated_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-01T00:00:00.000Z"
  *       401:
  *         description: "인증 실패"
  *       404:
  *         description: "보관 글이 없음"
  *       500:
- *         description: 서버 내부 오류
- * 
+ *         description: "서버 내부 오류"
+ */
+
+// 마이페이지 - 보관 글 상태 수정
+/**
  * @swagger
  * /mypage/storaged-posts/{postId}:
  *   patch:
@@ -2705,7 +2709,7 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
- *                resultType:
+ *                 resultType:
  *                   type: string
  *                   example: "success"
  *                 message:
@@ -2729,9 +2733,9 @@ app.listen(port, () => {
  *         description: "보관 글을 찾을 수 없음"
  *       500:
  *         description: "서버 내부 오류"
- **/
+ */
 
-// 친구 관리 api
+// 친구 요청
 /**
  * @swagger
  * /friends/request/{toUserId}:
@@ -2769,12 +2773,15 @@ app.listen(port, () => {
  *                     createdRequestFromUser:
  *                       type: object
  *                       description: "요청을 보낸 사용자의 요청 생성 결과"
- *                     ceratedReqeustToUser:
+ *                     createdRequestToUser:
  *                       type: object
  *                       description: "요청을 받는 사용자의 요청 생성 결과"
  *       500:
  *         description: "서버 내부 오류"
- * 
+ */
+
+// 친구 요청 수락
+/**
  * @swagger
  * /friends/request/{requestId}:
  *   patch:
@@ -2808,16 +2815,19 @@ app.listen(port, () => {
  *                 data:
  *                   type: object
  *                   properties:
- *                     createdReqeustFromUser:
+ *                     createdRequestFromUser:
  *                       type: object
  *                       description: "요청을 보낸 사용자의 업데이트 결과"
- *                     createdReqeustToUser:
+ *                     createdRequestToUser:
  *                       type: object
  *                       description: "요청을 받은 사용자의 업데이트 결과"
  *       500:
  *         description: "서버 내부 오류"
- * 
- *  @swagger
+ */
+
+// 내가 친구 요청한 목록 조회
+/**
+ * @swagger
  * /friends/list/sent:
  *   get:
  *     summary: "내가 친구 요청한 목록 조회"
@@ -2860,7 +2870,10 @@ app.listen(port, () => {
  *                         example: "2025-01-01T12:00:00.000Z"
  *       500:
  *         description: "서버 내부 오류"
- * 
+ */
+
+// 나에게 친구 요청한 목록 조회
+/**
  * @swagger
  * /friends/list/received:
  *   get:
@@ -2904,7 +2917,11 @@ app.listen(port, () => {
  *                         example: "2025-01-02T15:30:00.000Z"
  *       500:
  *         description: "서버 내부 오류"
- * 
+ */
+
+// 서로 친구인 목록 조회
+/**
+ * @swagger
  * /friends/list:
  *   get:
  *     summary: "서로 친구인 목록 조회"
@@ -2947,7 +2964,10 @@ app.listen(port, () => {
  *                         example: "2025-01-03T10:00:00.000Z"
  *       500:
  *         description: "서버 내부 오류"
- * 
+ */
+
+// 친구 삭제
+/**
  * @swagger
  * /friends/request/{friendId}:
  *   delete:
@@ -2980,5 +3000,6 @@ app.listen(port, () => {
  *                   example: "친구 삭제 완료"
  *       500:
  *         description: "서버 내부 오류"
- * 
- **/
+ */
+
+
