@@ -140,8 +140,8 @@ app.post("/reset-pw", handleresetPassword);
 
 //행성
 app.post("/planet", setPlanetName);
-app.get("/planet/:user_id", getPlanetName);
-app.patch("/planet/:user_id", updatePlanetName);
+app.get("/planet", getPlanetName);
+app.patch("/planet", updatePlanetName);
 
 // 일지
 app.post("/posts", handleAddPost); // 일지 작성
