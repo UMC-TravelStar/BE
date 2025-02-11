@@ -17,12 +17,15 @@ const {
     deleteStar,
     getAllUserPosts,
     createComment,
+    findPostImages,
+    deleteImageDB,
 } = require("../repositories/post.repository.js");
 const { 
     UserPostResponseDTO,
     formatPostResponse,
     PostResponseDTO
 } = require("../dtos/post.dto.js");
+const { deleteImage } = require("../middlewares/deleteImage.js");
 
 const checkOrCreateStar = async (userId, region) => {
     console.log("Checking or creating star for userId:", userId, "region:", region);
@@ -159,6 +162,25 @@ const registerComment = async (userId, comment) => {
     return commentData;
 };
 
+// ✅ 특정 게시글의 모든 이미지 삭제 함수
+const deletePostImages = async (posts_id) => {
+    // 🔹 1. posts_id에 해당하는 이미지들 조회
+    const postImages = await findPostImages(posts_id);
+
+    if (postImages.length === 0) {
+        return { message: "해당 게시글에 등록된 이미지가 없습니다." };
+    }
+
+    // 🔹 2. S3에서 이미지 삭제 (posts 폴더)
+    const imageUrls = postImages.map(img => img.imageUrl);
+    await deleteImage("posts", imageUrls);
+
+    // 🔹 3. DB에서 이미지 데이터 삭제
+    await deleteImageDB(posts_id);
+
+    return { message: "해당 게시글의 모든 이미지 삭제 완료" };
+};
+
 module.exports = {
     checkOrCreateStar,
     registerPost,
@@ -170,4 +192,5 @@ module.exports = {
     editPost,
     deleteUserPost,
     registerComment,
+    deletePostImages,
 };

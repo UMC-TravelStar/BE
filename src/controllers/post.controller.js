@@ -10,6 +10,7 @@ const {
     editPost,
     deleteUserPost,
     registerComment,
+    deletePostImages,
 } = require("../services/post.service.js");
 const { 
     EditPostDto 
@@ -229,6 +230,16 @@ const uploadPostImages = (req, res) => {
   });
 };
 
+const deletePostImagesController = async (req, res) => {
+    try {
+        const posts_id = parseInt(req.params.posts_id);
+        const result = await deletePostImages(posts_id);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     handleAddPost,
     handleListUserPost,
@@ -239,4 +250,5 @@ module.exports = {
     handleDeletePost,
     handleAddComment,
     uploadPostImages,
+    deletePostImagesController
 };

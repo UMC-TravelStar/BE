@@ -10,7 +10,7 @@ const s3 = new S3Client({
       accessKeyId: process.env.AWS_S3_ACCESS_KEY,
       secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
     },
-  });
+});
 
 // 확장자 검사 목록
 const allowedExtensions = [".png", ".jpg", ".jpeg", ".bmp", ".gif"];
