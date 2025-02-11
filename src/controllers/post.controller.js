@@ -1,4 +1,5 @@
 const { 
+    findStars,
     checkOrCreateStar, 
     registerPost,
     listUserPosts,
@@ -13,6 +14,11 @@ const {
 const { 
     EditPostDto 
 } = require("../dtos/post.dto.js");
+const {
+    registerPostImages
+} = require("../repositories/post.repository.js")
+const imageUploader = require("../middlewares/imageUploader.js");
+const postImageUploader = imageUploader("posts");
 const { StatusCodes } = require("http-status-codes");
 
 const handleAddPost = async (req, res) => {
@@ -23,7 +29,7 @@ const handleAddPost = async (req, res) => {
     const { region, ...restOfData } = req.body;
 
     try {
-        // userId에 해당하는 별이 존재하는지 확인
+        // userId에 해당하는 별자리의 별이 존재하는지 확인
         const starId = await checkOrCreateStar(userId, region);
         console.log("Star ID:", starId);
 
@@ -204,6 +210,25 @@ const handleAddComment = async (req, res) => {
     }
 };
 
+const uploadPostImages = (req, res) => {
+  postImageUploader.array("images")(req, res, (err) => {
+    if (err) {
+      return res.status(500).json({ message: "파일 업로드 중 오류 발생", error: err.message });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "파일 업로드 실패" });
+    }
+
+    const fileUrls = req.files.map(file => file.location);
+
+    const posts_id = parseInt(req.params.posts_id);
+    const images = registerPostImages(posts_id, fileUrls);
+    console.log(`images url db에 저장`, images);
+    return res.status(200).json({ message: "파일 업로드 성공", fileUrls });
+  });
+};
+
 module.exports = {
     handleAddPost,
     handleListUserPost,
@@ -213,4 +238,5 @@ module.exports = {
     handleEditPost,
     handleDeletePost,
     handleAddComment,
+    uploadPostImages,
 };
