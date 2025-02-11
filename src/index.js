@@ -760,6 +760,8 @@ app.listen(port, () => {
  *   post:
  *     summary: 일지 작성
  *     description: 로그인된 사용자가 일지를 작성합니다.
+ *     tags:
+ *       - "Post"
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -842,6 +844,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 유저의 일지 조회(전체)
  *     description: 로그인된 사용자의 일지를 조회합니다. 최신순으로 10개씩 반환합니다.
+ *     tags:
+ *       - "Post"
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -920,6 +924,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 유저의 일지 조회(1개)
  *     description: 사용자가 작성한 일지를 조회합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -990,6 +996,8 @@ app.listen(port, () => {
  *   patch:
  *     summary: 일지 수정
  *     description: 사용자가 작성한 일지를 수정합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -1100,6 +1108,8 @@ app.listen(port, () => {
  *   delete:
  *     summary: 일지 삭제
  *     description: 사용자가 작성한 일지를 삭제합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -1142,7 +1152,7 @@ app.listen(port, () => {
  *     summary: "일지 화면 코멘트 작성"
  *     description: "사용자가 특정 게시글에 코멘트를 작성하는 API"
  *     tags:
- *       - "Comments"
+ *       - "Post"
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -1210,6 +1220,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 다른 유저의 일지 조회(전체)
  *     description: 특정 유저가 작성한 모든 일지를 조회합니다. 페이징 처리 기능이 포함되어 있습니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: userId
@@ -1282,6 +1294,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 다른 유저의 일지 조회(1개)
  *     description: 사용자가 작성한 일지(1개)를 조회합니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -1357,6 +1371,125 @@ app.listen(port, () => {
  *         description: 해당 게시글을 찾을 수 없음
  *       500:
  *         description: 서버 오류
+ */
+
+// 일지 이미지 업로드 API
+/**
+ * @swagger
+ * /prod/posts/{posts_id}/image:
+ *   post:
+ *     summary: "게시글 이미지 업로드"
+ *     description: "S3에 이미지를 업로드하고, DB에 저장합니다."
+ *     tags:
+ *       - "Post"
+ *     parameters:
+ *       - name: posts_id
+ *         in: path
+ *         required: true
+ *         description: "이미지를 업로드할 게시글 ID"
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: "업로드할 이미지 파일들"
+ *     responses:
+ *       200:
+ *         description: "업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrls:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["https://s3-bucket-url.com/posts/image1.jpg"]
+ *       400:
+ *         description: "파일이 없거나 업로드 실패"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 실패"
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 일지 이미지 삭제 API
+/**
+ * @swagger
+ * /prod/posts/{posts_id}/image:
+ *   delete:
+ *     summary: "특정 일지의 모든 이미지 삭제"
+ *     description: "S3 및 DB에서 특정 게시글의 모든 이미지를 삭제합니다."
+ *     tags:
+ *       - "Post"
+ *     parameters:
+ *       - name: posts_id
+ *         in: path
+ *         required: true
+ *         description: "삭제할 게시글 ID"
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: "삭제 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "해당 게시글의 모든 이미지 삭제 완료"
+ *       404:
+ *         description: "이미지가 존재하지 않음"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "해당 게시글에 등록된 이미지가 없습니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 내부 오류"
  */
 
 // 행성 이름 초기 설정 API
