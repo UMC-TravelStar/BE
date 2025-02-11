@@ -2,10 +2,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 require("dotenv").config();
 
-const findStarByRegion = async (region) => {
+const findStarByRegion = async (region, starsId) => {
     const existingStar = await prisma.star.findFirst({
         where: {
             region: region,
+            stars_id: starsId
         },
     });
 
@@ -23,11 +24,14 @@ const findStarsByUserId = async (userId) => {
     return stars; 
 };
 
-const createStar = async (region) => {
+const createStar = async (region, starsId) => {
     try {
         const star = await prisma.star.create({
             data: {
                 region: region,
+                stars: {
+                    connect: { stars_id: starsId }, // starsId와 연결
+                },
             }});
         return star; // star 객체를 반환
     } catch (error) {

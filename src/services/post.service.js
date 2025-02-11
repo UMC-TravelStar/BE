@@ -1,5 +1,6 @@
 const { 
     findStarByRegion, 
+    findStarsByUserId,
     checkFriendship,
     createStar, 
     savePost, 
@@ -26,13 +27,17 @@ const {
 const checkOrCreateStar = async (userId, region) => {
     console.log("Checking or creating star for userId:", userId, "region:", region);
 
+    // 별자리 아이디 찾기
+    const stars = await findStarsByUserId(userId);
+    console.log("Stars ID for user:", stars.stars_id);
+
     // 별자리에서 해당 region에 맞는 별을 찾는다
-    let star = await findStarByRegion(region);
+    let star = await findStarByRegion(region, stars.stars_id);
     console.log("Found star:", star);
 
     if (!star) {
         // 별이 없다면 새로 생성
-        star = await createStar(region);
+        star = await createStar(region, stars.stars_id);
         console.log("Created Star ID:", star.star_id);
     }
 
