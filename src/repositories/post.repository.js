@@ -327,6 +327,22 @@ const registerPostImages = async (posts_id, fileUrls) => {
     });
 };
 
+const findPostImages = async (posts_id) => {
+    return prisma.post_image.findMany({
+        where: {
+            post_id: posts_id
+        }
+    });
+};
+
+const deleteImageDB = async (posts_id) => {
+    return prisma.post_image.deleteMany({
+        where: {
+            post_id: posts_id
+        }
+    });
+};
+
 module.exports = {
     findStarByRegion,
     findStarsByUserId,
@@ -346,5 +362,7 @@ module.exports = {
     deleteStar,
     getAllUserPosts,
     createComment,
-    registerPostImages
+    registerPostImages,
+    findPostImages,
+    deleteImageDB
 };

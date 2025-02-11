@@ -29,6 +29,7 @@ const {
   handleGetUPost,
   handleAddComment,
   uploadPostImages,
+  deletePostImagesController,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
 const {
@@ -154,6 +155,7 @@ app.get("/posts/user/:userId", handleGetPost); // 다른 유저의 일지 조회
 app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일지 조회(1개)
 app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
 app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
+app.delete("/posts/:posts_id/image", deletePostImagesController) // 일지 첨부파일 삭제
 
 // 하루 일정 작성
 app.post("/day-schedules", handleAddDaySchedule); // Day Schedule 추가
