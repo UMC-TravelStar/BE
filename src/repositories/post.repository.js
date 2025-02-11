@@ -314,6 +314,15 @@ const createComment = async (userId, commentData) => {
     });
 };
 
+const registerPostImages = async (posts_id, fileUrls) => {
+    return prisma.post_image.createMany({
+        data: fileUrls.map(url => ({
+            post_id: posts_id,
+            imageUrl: url,
+        })),
+    });
+};
+
 module.exports = {
     findStarByRegion,
     findStarsByUserId,
@@ -333,4 +342,5 @@ module.exports = {
     deleteStar,
     getAllUserPosts,
     createComment,
+    registerPostImages
 };

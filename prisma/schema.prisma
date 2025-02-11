@@ -57,7 +57,7 @@ model post {
 
 model post_image {
   p_image_id Int      @id @default(autoincrement())
-  file_name  String?
+  imageUrl   String?
   post_id    Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
