@@ -11,6 +11,7 @@ const {
     deleteUserPost,
     registerComment,
     deletePostImages,
+    analyzeFeeling, //write from moni
 } = require("../services/post.service.js");
 const { 
     EditPostDto 
@@ -240,6 +241,33 @@ const deletePostImagesController = async (req, res) => {
     }
 };
 
+// write from moni
+const analyzeFeeling = async (req, res) => {
+    const {postId} = req.params;
+    const {review} = req.body;
+
+    if(!review) {
+        return res.status(400).json({
+            message: "감상평을 입력해주세요."
+        })
+    }
+
+    try{
+        const result = await postService.analyzeFeeling(postId, review);
+        res.status(200).json({
+            resultType: 'success',
+            message: '감정분석 완료',
+            data: result
+        })
+    } catch (error) {
+        const statusCode = error.statusCode || 500;
+        res.status(statusCode).json({
+          resultType: 'error',
+          message: error.message
+        })
+    }
+}
+
 module.exports = {
     handleAddPost,
     handleListUserPost,
@@ -250,5 +278,6 @@ module.exports = {
     handleDeletePost,
     handleAddComment,
     uploadPostImages,
-    deletePostImagesController
+    deletePostImagesController,
+    analyzeFeeling, //write from moni
 };

@@ -29,6 +29,7 @@ const {
   handleAddComment,
   uploadPostImages,
   deletePostImagesController,
+  analyzeFeeling,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
 const {
@@ -150,7 +151,7 @@ app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일
 app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
 app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
 app.delete("/posts/:posts_id/image", deletePostImagesController) // 일지 첨부파일 삭제
-
+app.post("/posts/:postId/feeling", analyzeFeeling); // 감정분석
 
 // 캘린더 일정
 app.post("/schedule", authenticateUser, handleAddSchedule); // 일정 추가
