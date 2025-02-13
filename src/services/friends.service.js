@@ -7,7 +7,9 @@ class FriendsService{
         //이미 요청이 있는 지 확인
         const existingRequest = await FriendsRepository.findFriendRequest(fromUserId, toUserId);
         if(existingRequest){
-            throw new Error('이미 친구 요청을 보냈습니다.');
+            const error = new Error('이미 친구 요청을 보냈습니다.');
+            error.statusCode = 409;
+            throw error;
         }
 
         //양방향 관계 생성
@@ -22,7 +24,9 @@ class FriendsService{
         //요청이 존재하는지 확인
         const friendRequest = await FriendsRepository.findFriendRequestById(requestId);
         if(!friendRequest){
-            throw new Error('친구 요청이 존재하지 않습니다.');
+            const error = new Error('친구 요청이 존재하지 않습니다.');
+            error.statusCode = 404;
+            throw error;
         }
 
         //친구 요청 수락하여 양방향 관계 설정
@@ -88,7 +92,9 @@ class FriendsService{
             (!existingAtoB || !existingAtoB.are_we_friend) ||
             (!existingBtoA || !existingBtoA.are_we_friend)
         ) {
-            throw new Error('친구 관계가 존재하지 않습니다.');
+            const error = new Error('친구 관계가 존재하지 않습니다.');
+            error.statusCode = 404;
+            throw error;
         }
 
         // 양방향 레코드를 are_we_friend = false로 업데이트
