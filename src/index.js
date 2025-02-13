@@ -17,7 +17,6 @@ const {
   updatePlanetName,
   getPlanetName,
 } = require("./controllers/user.controller.js");
-const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
 const {
   handleAddPost,
@@ -28,20 +27,17 @@ const {
   handleGetPost,
   handleGetUPost,
   handleAddComment,
+  uploadPostImages,
+  deletePostImagesController,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
 const {
-  handleAddDaySchedule,
-  handleGetDaySchedules,
-  handleGetDaySchedulesByDateInUrl,
-  handleUpdateDaySchedule,
-  handleDeleteDaySchedule,
   handleAddSchedule,
   handleGetSchedules,
-  handleGetSchedulesByDateInUrl,
+  handleGetScheduleById,
   handleUpdateSchedule,
   handleDeleteSchedule,
-} = require("./controllers/schedule.controller.js");
+} = require("./controllers/schedule.controller");
 const {
   handleSendFriendRequest,
   handleAcceptFriendRequest,
@@ -152,29 +148,17 @@ app.delete("/posts/:postsId", handleDeletePost); // 일지 삭제
 app.get("/posts/user/:userId", handleGetPost); // 다른 유저의 일지 조회(전체)
 app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일지 조회(1개)
 app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
+app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
+app.delete("/posts/:posts_id/image", deletePostImagesController) // 일지 첨부파일 삭제
 
-// 하루 일정 작성
-app.post("/day-schedules", handleAddDaySchedule); // Day Schedule 추가
-app.get("/day-schedules", handleGetDaySchedules); // Day Schedule 조회
-app.get("/day-schedules/:date", handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
-app.patch("/day-schedules/:day_id", handleUpdateDaySchedule); // Day Schedule 수정
-app.delete("/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule 삭제
 
-// 일정 작성
-app.post("/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
-app.get("/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
-app.get(
-  "/day-schedules/:day_id/schedules/:date",
-  handleGetSchedulesByDateInUrl
-); // 날짜별 Schedule 조회
-app.patch(
-  "/day-schedules/:day_id/schedules/:schedule_id",
-  handleUpdateSchedule
-); // Schedule 수정
-app.delete(
-  "/day-schedules/:day_id/schedules/:schedule_id",
-  handleDeleteSchedule
-); // Schedule 삭제
+// 캘린더 일정
+app.post("/schedule", authenticateUser, handleAddSchedule); // 일정 추가
+app.get("/schedule", authenticateUser, handleGetSchedules); // 전체 일정 조회
+app.get("/schedule/:date", authenticateUser, handleGetSchedules); // 날짜별 일정 조회
+app.get("/schedule/:date/:schedule_id", authenticateUser, handleGetScheduleById); // 날짜별 ID로 특정 일정 조회
+app.patch("/schedule/:date/:schedule_id", authenticateUser, handleUpdateSchedule); // 일정 수정
+app.delete("/schedule/:date/:schedule_id", authenticateUser, handleDeleteSchedule); // 일정 삭제
 
 // 메인 페이지
 app.get("/home", authenticateUser, handleListMainPost); // 메인페이지의 일지조회
@@ -564,13 +548,13 @@ app.listen(port, () => {
  *                   example: "Internal Server Error"
  */
 
-//메인 페이지 일지 조회 API
+// 메인 페이지 일지 조회 API
 /**
  * @swagger
  * /prod/home:
  *   get:
  *     summary: 메인 페이지의 일지 조회
- *     description: 사용자의 일지를 조회합니다.
+ *     description: 사용자의 일지를 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: query
  *         name: page
@@ -586,8 +570,13 @@ app.listen(port, () => {
  *           type: integer
  *           example: 10
  *         description: "한 페이지에 표시할 일지 수 (기본값: 10)"
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer your_jwt_token_here"
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 포스트 조회 성공
@@ -645,7 +634,7 @@ app.listen(port, () => {
  * /prod/home/search:
  *   get:
  *     summary: 메인 페이지에서 검색
- *     description: 특정 키워드를 사용하여 포스트를 검색합니다.
+ *     description: 특정 키워드를 사용하여 포스트를 검색합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: query
  *         name: term
@@ -667,8 +656,13 @@ app.listen(port, () => {
  *           type: integer
  *           example: 10
  *         description: "한 페이지에 표시할 포스트 수 (기본값: 10)"
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer your_jwt_token_here"
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 검색 결과
@@ -721,9 +715,15 @@ app.listen(port, () => {
  * /prod/home/search/rankings:
  *   get:
  *     summary: 검색 순위 조회
- *     description: 사용자의 검색 순위를 조회합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 사용자의 검색 순위를 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer your_jwt_token_here"
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 검색 순위 조회 성공
@@ -756,6 +756,8 @@ app.listen(port, () => {
  *   post:
  *     summary: 일지 작성
  *     description: 로그인된 사용자가 일지를 작성합니다.
+ *     tags:
+ *       - "Post"
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -838,6 +840,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 유저의 일지 조회(전체)
  *     description: 로그인된 사용자의 일지를 조회합니다. 최신순으로 10개씩 반환합니다.
+ *     tags:
+ *       - "Post"
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -916,6 +920,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 유저의 일지 조회(1개)
  *     description: 사용자가 작성한 일지를 조회합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -986,6 +992,8 @@ app.listen(port, () => {
  *   patch:
  *     summary: 일지 수정
  *     description: 사용자가 작성한 일지를 수정합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -1096,6 +1104,8 @@ app.listen(port, () => {
  *   delete:
  *     summary: 일지 삭제
  *     description: 사용자가 작성한 일지를 삭제합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -1138,7 +1148,7 @@ app.listen(port, () => {
  *     summary: "일지 화면 코멘트 작성"
  *     description: "사용자가 특정 게시글에 코멘트를 작성하는 API"
  *     tags:
- *       - "Comments"
+ *       - "Post"
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -1206,6 +1216,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 다른 유저의 일지 조회(전체)
  *     description: 특정 유저가 작성한 모든 일지를 조회합니다. 페이징 처리 기능이 포함되어 있습니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: userId
@@ -1278,6 +1290,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 다른 유저의 일지 조회(1개)
  *     description: 사용자가 작성한 일지(1개)를 조회합니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -1353,6 +1367,125 @@ app.listen(port, () => {
  *         description: 해당 게시글을 찾을 수 없음
  *       500:
  *         description: 서버 오류
+ */
+
+// 일지 이미지 업로드 API
+/**
+ * @swagger
+ * /prod/posts/{posts_id}/image:
+ *   post:
+ *     summary: "게시글 이미지 업로드"
+ *     description: "S3에 이미지를 업로드하고, DB에 저장합니다."
+ *     tags:
+ *       - "Post"
+ *     parameters:
+ *       - name: posts_id
+ *         in: path
+ *         required: true
+ *         description: "이미지를 업로드할 게시글 ID"
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: "업로드할 이미지 파일들"
+ *     responses:
+ *       200:
+ *         description: "업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrls:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["https://s3-bucket-url.com/posts/image1.jpg"]
+ *       400:
+ *         description: "파일이 없거나 업로드 실패"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 실패"
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 일지 이미지 삭제 API
+/**
+ * @swagger
+ * /prod/posts/{posts_id}/image:
+ *   delete:
+ *     summary: "특정 일지의 모든 이미지 삭제"
+ *     description: "S3 및 DB에서 특정 게시글의 모든 이미지를 삭제합니다."
+ *     tags:
+ *       - "Post"
+ *     parameters:
+ *       - name: posts_id
+ *         in: path
+ *         required: true
+ *         description: "삭제할 게시글 ID"
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: "삭제 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "해당 게시글의 모든 이미지 삭제 완료"
+ *       404:
+ *         description: "이미지가 존재하지 않음"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "해당 게시글에 등록된 이미지가 없습니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 내부 오류"
  */
 
 // 행성 이름 초기 설정 API
@@ -2059,9 +2192,7 @@ app.listen(port, () => {
  * /prod/day-schedules:
  *   post:
  *     summary: 하루 일정 추가
- *     description: 사용자의 하루 일정을 추가합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 사용자의 하루 일정을 추가합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     requestBody:
  *       required: true
  *       content:
@@ -2079,6 +2210,14 @@ app.listen(port, () => {
  *               content:
  *                 type: string
  *                 description: "일정 내용"
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     responses:
  *       201:
  *         description: 일정 추가 성공
@@ -2106,7 +2245,32 @@ app.listen(port, () => {
  *         description: 날짜가 필요합니다.
  *       500:
  *         description: 서버 내부 오류
+ *     x-code-samples:
+ *       - lang: curl
+ *         source: |
+ *           curl -X POST http://localhost:4000/prod/day-schedules \
+ *           -H "Content-Type: application/json" \
+ *           -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+ *           -d '{
+ *               "date": "2025-01-30T10:00:00Z",
+ *               "title": "회의",
+ *               "content": "팀 미팅"
+ *           }'
+ *     curl:
+ *       - |
+ *         curl -X POST http://localhost:4000/prod/day-schedules \
+ *         -H "Content-Type: application/json" \
+ *         -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+ *         -d '{
+ *             "date": "2025-01-30T10:00:00Z",
+ *             "title": "회의",
+ *             "content": "팀 미팅"
+ *         }'
  */
+
+
+
+
 
 // 하루 일정 조회 API
 /**
@@ -2114,9 +2278,15 @@ app.listen(port, () => {
  * /prod/day-schedules:
  *   get:
  *     summary: 하루 일정 조회
- *     description: 사용자의 모든 하루 일정을 조회합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 사용자의 모든 하루 일정을 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 일정 조회 성공
@@ -2146,9 +2316,7 @@ app.listen(port, () => {
  * /prod/day-schedules/{date}:
  *   get:
  *     summary: 날짜별 하루 일정 조회
- *     description: 특정 날짜의 하루 일정을 조회합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 특정 날짜의 하루 일정을 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: path
  *         name: date
@@ -2157,6 +2325,13 @@ app.listen(port, () => {
  *           type: string
  *           format: date
  *         description: "조회할 날짜"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 일정 조회 성공
@@ -2186,9 +2361,7 @@ app.listen(port, () => {
  * /prod/day-schedules/{day_id}:
  *   patch:
  *     summary: 하루 일정 수정
- *     description: 특정 하루 일정을 수정합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 특정 하루 일정을 수정합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: path
  *         name: day_id
@@ -2196,6 +2369,13 @@ app.listen(port, () => {
  *         schema:
  *           type: integer
  *         description: "수정할 하루 일정 ID"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     requestBody:
  *       required: true
  *       content:
@@ -2232,9 +2412,7 @@ app.listen(port, () => {
  * /prod/day-schedules/{day_id}:
  *   delete:
  *     summary: 하루 일정 삭제
- *     description: 특정 하루 일정을 삭제합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 특정 하루 일정을 삭제합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: path
  *         name: day_id
@@ -2242,6 +2420,13 @@ app.listen(port, () => {
  *         schema:
  *           type: integer
  *         description: "삭제할 하루 일정 ID"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 일정 삭제 성공
@@ -2258,6 +2443,8 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
+
+
 
 
 // 일정 추가 API
