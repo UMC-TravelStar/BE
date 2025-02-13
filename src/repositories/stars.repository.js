@@ -45,6 +45,7 @@ const findTopStars = async () => {
     take: 10,
     select: {
       stars_id: true,
+      user_id: true,
       name: true,
       vote_num: true,
       views: true,
