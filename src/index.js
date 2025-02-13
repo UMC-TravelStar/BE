@@ -182,7 +182,7 @@ app.post("/stars/vote", voteForStar); // 별자리 투표하기
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
 app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 수정(행성 이름 수정)
-app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 조회
+app.get("/planets/:planetId", handleGetOtherPlanet); // 다른 유저의 행성 조회
 
 // 마이페이지
 app.get("/mypage", getMyPage); // 유저 정보 조회
