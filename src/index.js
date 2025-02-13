@@ -17,7 +17,6 @@ const {
   updatePlanetName,
   getPlanetName,
 } = require("./controllers/user.controller.js");
-const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
 const {
   handleAddPost,
@@ -33,17 +32,12 @@ const {
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
 const {
-  handleAddDaySchedule,
-  handleGetDaySchedules,
-  handleGetDaySchedulesByDateInUrl,
-  handleUpdateDaySchedule,
-  handleDeleteDaySchedule,
   handleAddSchedule,
   handleGetSchedules,
-  handleGetSchedulesByDateInUrl,
+  handleGetScheduleById,
   handleUpdateSchedule,
   handleDeleteSchedule,
-} = require("./controllers/schedule.controller.js");
+} = require("./controllers/schedule.controller");
 const {
   handleSendFriendRequest,
   handleAcceptFriendRequest,
@@ -157,28 +151,14 @@ app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
 app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
 app.delete("/posts/:posts_id/image", deletePostImagesController) // 일지 첨부파일 삭제
 
-// 하루 일정 작성
-app.post("/day-schedules", handleAddDaySchedule); // Day Schedule 추가
-app.get("/day-schedules", handleGetDaySchedules); // Day Schedule 조회
-app.get("/day-schedules/:date", handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
-app.patch("/day-schedules/:day_id", handleUpdateDaySchedule); // Day Schedule 수정
-app.delete("/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule 삭제
 
-// 일정 작성
-app.post("/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
-app.get("/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
-app.get(
-  "/day-schedules/:day_id/schedules/:date",
-  handleGetSchedulesByDateInUrl
-); // 날짜별 Schedule 조회
-app.patch(
-  "/day-schedules/:day_id/schedules/:schedule_id",
-  handleUpdateSchedule
-); // Schedule 수정
-app.delete(
-  "/day-schedules/:day_id/schedules/:schedule_id",
-  handleDeleteSchedule
-); // Schedule 삭제
+// 캘린더 일정
+app.post("/schedule", authenticateUser, handleAddSchedule); // 일정 추가
+app.get("/schedule", authenticateUser, handleGetSchedules); // 전체 일정 조회
+app.get("/schedule/:date", authenticateUser, handleGetSchedules); // 날짜별 일정 조회
+app.get("/schedule/:date/:schedule_id", authenticateUser, handleGetScheduleById); // 날짜별 ID로 특정 일정 조회
+app.patch("/schedule/:date/:schedule_id", authenticateUser, handleUpdateSchedule); // 일정 수정
+app.delete("/schedule/:date/:schedule_id", authenticateUser, handleDeleteSchedule); // 일정 삭제
 
 // 메인 페이지
 app.get("/home", authenticateUser, handleListMainPost); // 메인페이지의 일지조회

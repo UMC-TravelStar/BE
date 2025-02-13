@@ -21,7 +21,7 @@ model user {
   updated_at    DateTime   @updatedAt
 
   posts         post[]
-  day_schedules day_schedule[]
+  schedules     schedule[] 
   planets       planet[]
   votes         votes[] 
 
@@ -91,30 +91,16 @@ model star {
   @@index([stars_id], map: "star_stars_id_fkey")
 }
 
-model day_schedule {
-  day_id     Int        @id @default(autoincrement())
-  date       DateTime?
-  title      String?
-  content    String?
-  user_id    String
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  user       user       @relation(fields: [user_id], references: [user_id])
-  schedules  schedule[]
-
-  @@index([user_id], map: "day_schedule_user_id_fkey")
-}
-
 model schedule {
   schedule_id   Int          @id @default(autoincrement())
   location      String?
   date_time     DateTime
-  day_id        Int
-  created_at    DateTime     @default(now())
-  updated_at    DateTime     @updatedAt
-  day_schedules day_schedule @relation(fields: [day_id], references: [day_id])
+  user_id       String       
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  user          user          @relation(fields: [user_id], references: [user_id]) 
 
-  @@index([day_id], map: "schedule_day_id_fkey")
+  @@index([user_id], map: "schedule_user_id_fkey") 
 }
 
 model subscrition {
