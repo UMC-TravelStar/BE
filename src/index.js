@@ -5,6 +5,7 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
+
 const {
   handleEmailCertification,
   handleUserSignUp,
@@ -16,6 +17,7 @@ const {
   setPlanetName,
   updatePlanetName,
   getPlanetName,
+  handleDeleteUser,
 } = require("./controllers/user.controller.js");
 const server_ip = process.env.IP;
 const {
@@ -53,9 +55,10 @@ const {
 } = require("./controllers/mainpage.controller.js");
 const {
   getFilteredStarRegions,
-  setStarsName,
   getStarsRanking,
   voteForStar,
+  upload,
+  setStarsNameWithImage,
 } = require("./controllers/stars.controller.js");
 
 const {
@@ -68,7 +71,7 @@ const {
   getMyPage,
   updateMyPage,
   getStoragedPost,
-  updateStoragePost
+  updateStoragePost,
 } = require("./controllers/mypage.controller.js");
 
 const options = {
@@ -133,6 +136,7 @@ app.post("/login", handleUserLogin);
 app.post("/logout", handleUserLogout);
 app.post("/find-id", handleFindUserIdByEmail);
 app.post("/reset-pw", handleresetPassword);
+app.delete("/user", authenticateUser, handleDeleteUser);
 
 //행성
 app.post("/planet", setPlanetName);
@@ -149,16 +153,27 @@ app.get("/posts/user/:userId", handleGetPost); // 다른 유저의 일지 조회
 app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일지 조회(1개)
 app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
 app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
-app.delete("/posts/:posts_id/image", deletePostImagesController) // 일지 첨부파일 삭제
-
+app.delete("/posts/:posts_id/image", deletePostImagesController); // 일지 첨부파일 삭제
 
 // 캘린더 일정
 app.post("/schedule", authenticateUser, handleAddSchedule); // 일정 추가
 app.get("/schedule", authenticateUser, handleGetSchedules); // 전체 일정 조회
 app.get("/schedule/:date", authenticateUser, handleGetSchedules); // 날짜별 일정 조회
-app.get("/schedule/:date/:schedule_id", authenticateUser, handleGetScheduleById); // 날짜별 ID로 특정 일정 조회
-app.patch("/schedule/:date/:schedule_id", authenticateUser, handleUpdateSchedule); // 일정 수정
-app.delete("/schedule/:date/:schedule_id", authenticateUser, handleDeleteSchedule); // 일정 삭제
+app.get(
+  "/schedule/:date/:schedule_id",
+  authenticateUser,
+  handleGetScheduleById
+); // 날짜별 ID로 특정 일정 조회
+app.patch(
+  "/schedule/:date/:schedule_id",
+  authenticateUser,
+  handleUpdateSchedule
+); // 일정 수정
+app.delete(
+  "/schedule/:date/:schedule_id",
+  authenticateUser,
+  handleDeleteSchedule
+); // 일정 삭제
 
 // 메인 페이지
 app.get("/home", authenticateUser, handleListMainPost); // 메인페이지의 일지조회
@@ -174,7 +189,7 @@ app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조�
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 
 app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
-app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
+app.patch("/stars/name", upload.single("image"), setStarsNameWithImage); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
 app.post("/stars/vote", voteForStar); // 별자리 투표하기
 
@@ -747,7 +762,6 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
-
 
 // 일지 작성 API
 /**
@@ -2268,10 +2282,6 @@ app.listen(port, () => {
  *         }'
  */
 
-
-
-
-
 // 하루 일정 조회 API
 /**
  * @swagger
@@ -2443,9 +2453,6 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
-
-
-
 
 // 일정 추가 API
 /**
@@ -2677,7 +2684,6 @@ app.listen(port, () => {
  *         description: 서버 내부 오류
  */
 
- 
 // 마이페이지 - 유저 정보 조회
 /**
  * @swagger
@@ -3188,5 +3194,3 @@ app.listen(port, () => {
  *       500:
  *         description: "서버 내부 오류"
  */
-
-

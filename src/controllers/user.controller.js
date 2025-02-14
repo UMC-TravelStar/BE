@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const nodemailer = require("nodemailer");
+const StatusCodes = require("http-status-codes");
 require("dotenv").config();
 
 // 1. 이메일 인증
@@ -395,6 +396,51 @@ const getPlanetName = async (req, res) => {
   }
 };
 
+// 회원 탈퇴 핸들러
+const handleDeleteUser = async (req, res) => {
+  try {
+    const userId = req.userId; // JWT 미들웨어에서 저장한 userId 사용
+    console.log("회원 탈퇴 요청:", userId);
+
+    // 🔹 회원 존재 여부 확인
+    const user = await prisma.user.findUnique({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "사용자를 찾을 수 없습니다." });
+    }
+
+    // 🔹 FK 제약 조건 해결 (연관 데이터 삭제)
+    await prisma.post.deleteMany({ where: { user_id: userId } });
+    await prisma.friend.deleteMany({
+      where: {
+        OR: [{ from_user_id: userId }, { to_user_id: userId }],
+      },
+    });
+    await prisma.votes.deleteMany({ where: { user_id: userId } });
+    await prisma.stars.deleteMany({ where: { user_id: userId } });
+    await prisma.subscrition.deleteMany({ where: { user_id: userId } });
+    await prisma.user_image.deleteMany({ where: { user_id: userId } });
+    await prisma.user_bgimage.deleteMany({ where: { user_id: userId } });
+    await prisma.planet.deleteMany({ where: { user_id: userId } });
+
+    // 🔹 사용자 삭제 (FK 문제 해결 후 삭제 가능)
+    await prisma.user.delete({
+      where: { user_id: userId },
+    });
+
+    res.status(StatusCodes.OK).json({ message: "회원 탈퇴 성공" });
+  } catch (error) {
+    console.error("회원 탈퇴 오류:", error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "서버 오류가 발생했습니다.", error: error.message });
+  }
+};
+
 module.exports = {
   handleEmailCertification,
   handleUserSignUp,
@@ -406,4 +452,5 @@ module.exports = {
   setPlanetName,
   updatePlanetName,
   getPlanetName,
+  handleDeleteUser,
 };

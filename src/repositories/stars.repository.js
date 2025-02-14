@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+require("dotenv").config();
 
 // 사용자 ID로 별자리 조회
 const findStarsByUserId = async (userId) => {
@@ -38,6 +39,8 @@ const updateStarsNameByUserId = async (userId, name) => {
 
 // 상위 10개의 별자리 조회
 const findTopStars = async () => {
+  const AWS_REGION = process.env.AWS_REGION || "ap-northeast-2";
+  const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
   const result = await prisma.stars.findMany({
     orderBy: {
       vote_num: "desc",
@@ -52,8 +55,14 @@ const findTopStars = async () => {
       created_at: true,
     },
   });
-  console.log("findTopStars result:", result); // 쿼리 결과 출력
-  return result;
+
+  const starsWithImages = result.map((star) => ({
+    ...star,
+    imageUrl: `https://${BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/stars/${star.user_id}.png`,
+  }));
+
+  console.log("findTopStars starsWithImages:", starsWithImages); // 쿼리 결과 출력
+  return starsWithImages;
 };
 
 module.exports = {
