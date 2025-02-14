@@ -67,7 +67,7 @@ Content-Type: application/json; charset=UTF-8
 
 ### 별자리 조회(아이디 기반)
 GET http://15.165.117.176:4000/stars/1234/regions
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3MzkxMDY1MjUsImV4cCI6MTczOTE0MjUyNX0.zWnCtvyc_z4UhQ0AqdHts5IXQrFf-ONzvnMadaqWMHM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3Mzk1MjI3NDksImV4cCI6MTczOTU1ODc0OX0.9UcvMVWiUvu7RtPi419rJZfo9lLybIe-vQCg6Kmd_xw
 Content-Type: application/json
 
 ### 별자리 이름 설정 변경 및 여행한 별들 추가
@@ -80,8 +80,8 @@ Content-Type: application/json
 }
 
 ### 별자리 랭킹 조회
-GET http://15.165.117.176:4000/stars/ranking
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3Mzk0NDI0MDEsImV4cCI6MTczOTQ3ODQwMX0.XLiKVJHPpyPeZKmu0_MrvSbnpFWHz4b4i8yfOQGjnws
+GET http://localhost:4000/stars/ranking
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1IiwiaWF0IjoxNzM5NTIwNTc5LCJleHAiOjE3Mzk1NTY1Nzl9.jUEoje5A_YqA6pXLK4pHfB-YdcjSxQRvMUZ7jEcrZqo
 Content-Type: application/json
 
 ### 투표
@@ -93,3 +93,8 @@ Content-Type: application/json; charset=UTF-8
   "stars_id": 5,
   "post_user_id": "1" 
 }
+
+### 회원 탈퇴 요청
+DELETE http://localhost:4000/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1IiwiaWF0IjoxNzM5NTIwNTc5LCJleHAiOjE3Mzk1NTY1Nzl9.jUEoje5A_YqA6pXLK4pHfB-YdcjSxQRvMUZ7jEcrZqo
+Content-Type: application/json
