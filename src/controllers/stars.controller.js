@@ -60,7 +60,7 @@ const setStarsNameWithImage = async (req, res) => {
 
     // 이미지 업로드 처리
     if (req.file) {
-      const fileName = `stars/${userId}.jpg`; // 파일명을 유저 ID 기반으로 설정
+      const fileName = `stars/${userId}.png`; // 파일명을 유저 ID 기반으로 설정
       const uploadParams = {
         Bucket: BUCKET_NAME,
         Key: fileName,
@@ -76,7 +76,7 @@ const setStarsNameWithImage = async (req, res) => {
     const updatedStars = await setStarsNameService(userId, name);
 
     // S3 URL을 생성해서 반환
-    const fileUrl = `https://${BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/stars/${userId}.jpg`;
+    const fileUrl = `https://${BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/stars/${userId}.png`;
 
     res.status(StatusCodes.OK).json({
       message: "별자리 이름 및 이미지 설정 성공",
