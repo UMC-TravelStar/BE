@@ -17,8 +17,8 @@ POST http://15.165.117.176:4000/login
 Content-Type: application/json; charset=UTF-8
 
 {
-  "id": "rrrr",
-  "pw": "rrrrr"
+  "id": "1",
+  "pw": "1234"
 }
 
 ###이메일 인증코드 발송
@@ -80,8 +80,8 @@ Content-Type: application/json
 }
 
 ### 별자리 랭킹 조회
-GET http://localhost:4000/stars/ranking
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1IiwiaWF0IjoxNzM5NTIwNTc5LCJleHAiOjE3Mzk1NTY1Nzl9.jUEoje5A_YqA6pXLK4pHfB-YdcjSxQRvMUZ7jEcrZqo
+GET http://15.165.117.176:4000/stars/ranking
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3Mzk1NTgwMTMsImV4cCI6MTczOTU5NDAxM30.i52d10WTymqPtQa3CzOcIZPmKfHmfSbhFZb93_tr3bY
 Content-Type: application/json
 
 ### 투표

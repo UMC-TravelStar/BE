@@ -262,7 +262,7 @@ const uploadBackImages = (req, res) => {
         }
 
         if (!req.file) {
-            return res.status(404).json({ message: "파일이 없습니다" });
+            return res.status(400).json({ message: "파일이 없어요.." });
         }
 
         const fileUrl = req.file.location
