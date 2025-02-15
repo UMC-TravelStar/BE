@@ -318,6 +318,17 @@ const createComment = async (userId, commentData) => {
     });
 };
 
+const getComment = async (userId) => {
+    return prisma.user.findUnique({
+        where: {
+            user_id: userId,
+        },
+        select: {
+            comment: true
+        }
+    });
+};
+
 const registerPostImages = async (posts_id, fileUrls) => {
     return prisma.post_image.createMany({
         data: fileUrls.map(url => ({
@@ -343,6 +354,37 @@ const deleteImageDB = async (posts_id) => {
     });
 };
 
+const checkBackImage = async (userId) => {
+    return prisma.user_bgimage.findUnique({
+        where: {
+            user_id: userId
+        },
+        select: {
+            file_name: true
+        }
+    });
+};
+
+const createBack = async (userId, file) => {
+    return prisma.user_bgimage.create({
+        data: {
+            user_id: userId,
+            file_name: file,
+        }
+    });
+};
+
+const updateBack = async (userId, file) => {
+    return prisma.user_bgimage.update({
+        where: {
+            user_id: userId
+        },
+        data: {
+            file_name: file
+        }
+    });
+};
+
 module.exports = {
     findStarByRegion,
     findStarsByUserId,
@@ -362,7 +404,11 @@ module.exports = {
     deleteStar,
     getAllUserPosts,
     createComment,
+    getComment,
     registerPostImages,
     findPostImages,
-    deleteImageDB
+    deleteImageDB,
+    checkBackImage,
+    createBack,
+    updateBack,
 };

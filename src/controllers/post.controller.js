@@ -11,15 +11,18 @@ const {
     deleteUserPost,
     registerComment,
     deletePostImages,
+    registerBackImage,
 } = require("../services/post.service.js");
 const { 
     EditPostDto 
 } = require("../dtos/post.dto.js");
 const {
-    registerPostImages
+    registerPostImages,
+    getComment
 } = require("../repositories/post.repository.js")
 const imageUploader = require("../middlewares/imageUploader.js");
 const postImageUploader = imageUploader("posts");
+const backImageUploader = imageUploader("backImages");
 const { StatusCodes } = require("http-status-codes");
 
 const handleAddPost = async (req, res) => {
@@ -211,23 +214,63 @@ const handleAddComment = async (req, res) => {
     }
 };
 
+const handleGetComment = async (req, res) => {
+    try {
+        const userId = req.userId;
+        
+        const comment = await getComment(userId);
+
+        if (!comment) {
+            return res.status(400).json({ message: "코멘트가 없습니다!" });
+        }
+
+        res.status(200).json({
+            message: "코멘트 조회 성공",
+            data: comment,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const uploadPostImages = (req, res) => {
-  postImageUploader.array("images")(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ message: "파일 업로드 중 오류 발생", error: err.message });
-    }
+    postImageUploader.array("images")(req, res, (err) => {
+        if (err) {
+        return res.status(500).json({ message: "파일 업로드 중 오류 발생", error: err.message });
+        }
 
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "파일 업로드 실패" });
-    }
+        if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: "파일 업로드 실패" });
+        }
 
-    const fileUrls = req.files.map(file => file.location);
+        const fileUrls = req.files.map(file => file.location);
 
-    const posts_id = parseInt(req.params.posts_id);
-    const images = registerPostImages(posts_id, fileUrls);
-    console.log(`images url db에 저장`, images);
-    return res.status(200).json({ message: "파일 업로드 성공", fileUrls });
-  });
+        const posts_id = parseInt(req.params.posts_id);
+        const images = registerPostImages(posts_id, fileUrls);
+        console.log(`images url db에 저장`, images);
+
+        return res.status(200).json({ message: "파일 업로드 성공", fileUrls });
+    });
+};
+
+const uploadBackImages = (req, res) => {
+    const userId = req.userId;
+
+    backImageUploader.single("images")(req, res, (err) => {
+        if (err) {
+            return res.status(400).json({ message: "파일 업로드 중 오류 발생", error: err.message });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ message: "파일이 없어요.." });
+        }
+
+        const fileUrl = req.file.location
+        const image = registerBackImage(userId, fileUrl);
+        console.log(`image url db에 저장`, image);
+
+        return res.status(200).json({ message: "파일 업로드 성공", fileUrl });
+    });
 };
 
 const deletePostImagesController = async (req, res) => {
@@ -249,6 +292,8 @@ module.exports = {
     handleEditPost,
     handleDeletePost,
     handleAddComment,
+    handleGetComment,
     uploadPostImages,
-    deletePostImagesController
+    deletePostImagesController,
+    uploadBackImages
 };
