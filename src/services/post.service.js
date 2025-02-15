@@ -19,6 +19,9 @@ const {
     createComment,
     findPostImages,
     deleteImageDB,
+    checkBackImage,
+    createBack,
+    updateBack,
 } = require("../repositories/post.repository.js");
 const { 
     UserPostResponseDTO,
@@ -116,7 +119,7 @@ const getPost = async (userId, viewerId, postsId) => {
 };
 
 const checkUserPost = async (userId, postsId) => {
-    return getPostById(userId, postsId);
+    return getPostById2(userId, postsId);
 };
 
 const editPost = async (post, editData) => {
@@ -181,6 +184,25 @@ const deletePostImages = async (posts_id) => {
     return { message: "해당 게시글의 모든 이미지 삭제 완료" };
 };
 
+const registerBackImage = async (userId, file) => {
+    // 1. 원래 배경화면이 있는지 확인
+    const checkBack = await checkBackImage(userId);
+    console.log(`checkBack: `, checkBack);
+
+    // 2. 배경화면이 없다면 생성 / 있다면 데이터 바꾸기
+    let image;
+
+    if (!checkBack) {
+        image = await createBack(userId, file);
+    }
+    else {
+        image = await updateBack(userId, file);
+        await deleteImage("backImages", [checkBack]);
+    }
+
+    return image.file_name;
+};
+
 module.exports = {
     checkOrCreateStar,
     registerPost,
@@ -193,4 +215,5 @@ module.exports = {
     deleteUserPost,
     registerComment,
     deletePostImages,
+    registerBackImage,
 };

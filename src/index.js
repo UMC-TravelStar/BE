@@ -29,8 +29,10 @@ const {
   handleGetPost,
   handleGetUPost,
   handleAddComment,
+  handleGetComment,
   uploadPostImages,
   deletePostImagesController,
+  uploadBackImages,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
 const {
@@ -151,9 +153,11 @@ app.patch("/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/posts/:postsId", handleDeletePost); // 일지 삭제
 app.get("/posts/user/:userId", handleGetPost); // 다른 유저의 일지 조회(전체)
 app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일지 조회(1개)
-app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
+app.post("/comment", handleAddComment); // 일지 화면 코멘트 작성
+app.get("/comment", handleGetComment); // 일지 화면 코멘트 조회
 app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
 app.delete("/posts/:posts_id/image", deletePostImagesController); // 일지 첨부파일 삭제
+app.patch("/background", uploadBackImages); // 일지 작성 화면 배경화면 생성/수정
 
 // 캘린더 일정
 app.post("/schedule", authenticateUser, handleAddSchedule); // 일정 추가
@@ -1157,7 +1161,7 @@ app.listen(port, () => {
 // 일지 화면 코멘트 작성 API
 /**
  * @swagger
- * /prod/posts/comment:
+ * /prod/comment:
  *   post:
  *     summary: "일지 화면 코멘트 작성"
  *     description: "사용자가 특정 게시글에 코멘트를 작성하는 API"
@@ -1221,6 +1225,56 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "서버 오류 발생"
+ */
+
+// 일지 화면 코멘트 조회 API
+/**
+ * @swagger
+ * /prod/comment:
+ *   get:
+ *     summary: "일지 화면 코멘트 조회"
+ *     description: "사용자의 코멘트를 조회합니다."
+ *     tags:
+ *       - "Post"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "코멘트 조회 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "코멘트 조회 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     comment:
+ *                       type: string
+ *                       example: "지호의 여행일지"
+ *       400:
+ *         description: "코멘트가 없습니다!"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "코멘트가 없습니다!"
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
  */
 
 // 다른 유저의 일지 조회(전체) API
