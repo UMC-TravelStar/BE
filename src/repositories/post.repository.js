@@ -68,6 +68,7 @@ const getAllUserPosts = async (skip, userId) => {
         select: {
             post_id: true,
             title: true,
+            feel_color: true,
             created_at: true,
             star: {
                 select: {
