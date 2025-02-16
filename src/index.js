@@ -59,6 +59,8 @@ const {
   voteForStar,
   upload,
   setStarsNameWithImage,
+  checkIfUserVoted,
+  checkStarRanking,
 } = require("./controllers/stars.controller.js");
 
 const {
@@ -192,6 +194,8 @@ app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 
 app.patch("/stars/name", upload.single("image"), setStarsNameWithImage); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
 app.post("/stars/vote", voteForStar); // 별자리 투표하기
+app.get("/stars/vote/check/:stars_id", checkIfUserVoted); //별자리 투표 신청 조회
+app.get("/stars/ranking/check", checkStarRanking); //별자리 랭킹 신청 여부 조회
 
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
