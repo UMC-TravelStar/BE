@@ -1,4 +1,6 @@
 const MyPageService = require('../services/mypage.service');
+const imageUploader = require("../middlewares/imageUploader.js");
+const profileImageUploader = imageUploader("profile-image");
 
 // 유저 정보 조회
 const getMyPage = async (req, res) => {
@@ -61,10 +63,30 @@ const updateStoragePost = async (req, res) => {
     }
 };
 
+// 프로필 사진 등록/수정 
+const uploadUserImage = async (req, res) => {
+    const userId = req.userId;
+
+    profileImageUploader.single("images")(req, res, (err) => {
+        if (err) {
+            return res.status(500).json({ message: "파일 업로드 중 오류 발생", error: err.message });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ message: "파일이 없어요.." });
+        }
+
+        const fileUrl = req.file.location;
+        MyPageService.registerProfileImage(userId, fileUrl);
+        
+        return res.status(200).json({ message: "파일 업로드 성공", fileUrl });
+    })
+};
 
 module.exports = { 
     getMyPage,
     updateMyPage,
     getStoragedPost,
-    updateStoragePost
+    updateStoragePost,
+    uploadUserImage,
 };

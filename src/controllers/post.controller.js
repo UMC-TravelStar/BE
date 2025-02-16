@@ -266,7 +266,7 @@ const uploadBackImages = (req, res) => {
             return res.status(400).json({ message: "파일이 없어요.." });
         }
 
-        const fileUrl = req.file.location
+        const fileUrl = req.file.location;
         const image = registerBackImage(userId, fileUrl);
         console.log(`image url db에 저장`, image);
 

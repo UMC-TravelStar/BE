@@ -75,6 +75,7 @@ const {
   updateMyPage,
   getStoragedPost,
   updateStoragePost,
+  uploadUserImage,
 } = require("./controllers/mypage.controller.js");
 
 const options = {
@@ -209,6 +210,7 @@ app.get("/mypage", getMyPage); // 유저 정보 조회
 app.patch("/mypage", updateMyPage); // 유저 정보 수정
 app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
 app.patch("/mypage/storaged-posts/:postId", updateStoragePost); // 보관 글 상태 수정(보관->전체공개)
+app.patch("/profile-image", uploadUserImage); // 프로필 사진 등록/수정
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -3355,4 +3357,63 @@ app.listen(port, () => {
  *                   example: "친구 삭제 완료"
  *       500:
  *         description: "서버 내부 오류"
+ */
+
+// 프로필 사진 등록/수정
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   patch:
+ *     summary: "프로필 사진 등록/수정"
+ *     description: "사용자가 프로필 사진을 업로드하면 S3에 저장하고 URL을 반환합니다."
+ *     tags:
+ *       - "mypage"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: string
+ *                 format: binary
+ *                 description: "업로드할 프로필 이미지 파일"
+ *     responses:
+ *       200:
+ *         description: "파일 업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrl:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/profile-image/example.png"
+ *       400:
+ *         description: "파일이 없을 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일이 없어요.."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
  */

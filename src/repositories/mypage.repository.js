@@ -58,5 +58,36 @@ class MyPageRepository {
             }
         })
     }
+
+    // 프로필 이미지 등록/수정 - 원래 이미지가 있는지 확인
+    async checkProfileImage(userId) {
+        return prisma.user_image.findUnique({
+            where: {
+                user_id: userId
+            }
+        })
+    };
+
+    // 프로필 이미지 등록/수정 - db에 데이터 생성
+    async createImage(userId, fileUrl) {
+        return prisma.user_image.create({
+            data: {
+                user_id: userId,
+                file_name: fileUrl,
+            }
+        });
+    };
+
+    // 프로필 이미지 등록/수정 - db에 데이터 수정
+    async updateImage(userId, fileUrl) {
+        return prisma.user_image.update({
+            where: {
+                user_id: userId
+            },
+            data: {
+                file_name: fileUrl
+            }
+        });
+    };
 };
 module.exports = new MyPageRepository();
