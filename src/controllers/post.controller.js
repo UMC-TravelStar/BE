@@ -18,7 +18,8 @@ const {
 } = require("../dtos/post.dto.js");
 const {
     registerPostImages,
-    getComment
+    getComment,
+    getImage
 } = require("../repositories/post.repository.js")
 const imageUploader = require("../middlewares/imageUploader.js");
 const postImageUploader = imageUploader("posts");
@@ -277,9 +278,31 @@ const deletePostImagesController = async (req, res) => {
     try {
         const posts_id = parseInt(req.params.posts_id);
         const result = await deletePostImages(posts_id);
-        res.json(result);
+
+        if (result.message === "해당 게시글에 등록된 이미지가 없습니다.") {
+            return res.status(404).json(result); // 404: 이미지가 없음
+        }
+
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: "서버 오류", error: error.message });
+    }
+};
+
+const getBackImages = async (req, res) => {
+    try {
+        const user_id = req.userId;
+        const image = await getImage(user_id);
+
+        if (!image) {
+            return res.status(400).json({ message: "등록된 배경사진이 없습니다.", error: error.message });
+        }
+
+        return res.status(200).json({
+            data: image.file_name
+        });
+    } catch (error) {
+        res.status(500).json({ message: "서버 오류", error: error.message });
     }
 };
 
@@ -295,5 +318,6 @@ module.exports = {
     handleGetComment,
     uploadPostImages,
     deletePostImagesController,
-    uploadBackImages
+    uploadBackImages,
+    getBackImages
 };

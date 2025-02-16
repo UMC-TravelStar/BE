@@ -33,6 +33,7 @@ const {
   uploadPostImages,
   deletePostImagesController,
   uploadBackImages,
+  getBackImages,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
 const {
@@ -158,6 +159,7 @@ app.get("/comment", handleGetComment); // 일지 화면 코멘트 조회
 app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
 app.delete("/posts/:posts_id/image", deletePostImagesController); // 일지 첨부파일 삭제
 app.patch("/background", uploadBackImages); // 일지 작성 화면 배경화면 생성/수정
+app.get("/background", getBackImages); // 일지 작성 화면 배경화면 조회
 
 // 캘린더 일정
 app.post("/schedule", authenticateUser, handleAddSchedule); // 일정 추가
@@ -1610,6 +1612,53 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 일지 작성 화면 배경화면 조회 API
+/**
+ * @swagger
+ * /prod/background:
+ *   get:
+ *     summary: "일지 작성 화면 배경화면 조회"
+ *     description: "사용자의 배경 이미지를 조회합니다."
+ *     tags:
+ *       - "Post"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "배경 이미지 조회 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/backImages/449e7993f538d398b89ee19e3452caf7_1.png"
+ *       400:
+ *         description: "등록된 배경 이미지가 없음"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 배경사진이 없습니다."
+ *       500:
+ *         description: "서버 오류 발생"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
  *                 error:
  *                   type: string
  *                   example: "Error message"

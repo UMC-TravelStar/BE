@@ -386,6 +386,17 @@ const updateBack = async (userId, file) => {
     });
 };
 
+const getImage = async (user_id) => {
+    return prisma.user_bgimage.findUnique({
+        where: {
+            user_id: user_id
+        },
+        select: {
+            file_name: true
+        }
+    });
+};
+
 module.exports = {
     findStarByRegion,
     findStarsByUserId,
@@ -412,4 +423,5 @@ module.exports = {
     checkBackImage,
     createBack,
     updateBack,
+    getImage,
 };
