@@ -13,7 +13,7 @@
     "@aws-sdk/client-s3": "^3.744.0",
     "@aws-sdk/lib-storage": "^3.744.0",
     "@aws-sdk/s3-request-presigner": "^3.744.0",
-    "@prisma/client": "^6.3.0",
+    "@prisma/client": "^6.3.1",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.9",
     "cookie-parser": "^1.4.7",
@@ -35,6 +35,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.9",
-    "prisma": "^6.2.1"
+    "prisma": "^6.3.1"
   }
 }

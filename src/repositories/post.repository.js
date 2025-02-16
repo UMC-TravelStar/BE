@@ -51,7 +51,8 @@ const savePost = async (userId, starId, postData) => {
             title: postData.title,
             content: postData.content,
             music: postData.music,
-            feeling: postData.feeling,
+            feel_color: postData.feel_color,
+            // feeling: postData.feeling,
             storage: postData.storage,
             user: {
                 connect: { user_id: userId },  // user와 연결 (user_id를 통해)
@@ -421,23 +422,23 @@ const getImage = async (user_id) => {
     });
 };
 
-const updateFeeling = async (postId, feelingType, feelingComment) => {
-    try{
-        const updatedPost = await prisma.post.update({
-            where: {post_id: Number(postId)},
-            data: {
-                feeling_type: feelingType,
-                feeling_comment: feelingComment
-            }
-        });
-        return updatedPost;
-    } catch(error){
-        throw {
-            statusCode : 500,
-            message: 'Repository update error: ' + error.message
-        }
-    }
-}
+// const updateFeeling = async (postId, feelingType, feelingComment) => {
+//     try{
+//         const updatedPost = await prisma.post.update({
+//             where: {post_id: Number(postId)},
+//             data: {
+//                 feeling_type: feelingType,
+//                 feeling_comment: feelingComment
+//             }
+//         });
+//         return updatedPost;
+//     } catch(error){
+//         throw {
+//             statusCode : 500,
+//             message: 'Repository update error: ' + error.message
+//         }
+//     }
+// }
 
 module.exports = {
     findStarByRegion,
@@ -466,5 +467,4 @@ module.exports = {
     createBack,
     updateBack,
     getImage,
-    updateFeeling,
 };

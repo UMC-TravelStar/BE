@@ -24,7 +24,6 @@ const {
     checkBackImage,
     createBack,
     updateBack,
-    updateFeeling,
 } = require("../repositories/post.repository.js");
 const { 
     UserPostResponseDTO,
@@ -213,13 +212,13 @@ const registerBackImage = async (userId, file) => {
 };
 
 // 감정 분석
-const analyzeFeeling = async (postId, review) => {
+const analyzeFeeling = async (review) => {
     const prompt = `
     사용자가 남긴 감상평:
     "${review}"
 
     아래 5가지 감정 분류 중 해당하는 감정을 선택하고,
-    해당 감정의 번호(feelingType)와 간단한 감정 분석(feelingComment)을 아래와 같이 JSON 형식으로 반환해줘.
+    해당 감정의 번호(feel_color)와 간단한 감정 분석(feeling)을 아래와 같이 JSON 형식으로 반환해줘.
 
     1: 화남, 분노
     2: 슬픔, 우울
@@ -229,8 +228,8 @@ const analyzeFeeling = async (postId, review) => {
 
     예시 출력: 
     {
-        "feelingType": 3,
-        "feelingComment": "당신의 여행은 행복한 상태군요."
+        "feel_color": 3,
+        "feeling": "당신의 여행은 행복한 상태군요."
     }
     `;
 
@@ -269,14 +268,14 @@ const analyzeFeeling = async (postId, review) => {
     }
 
     // post 테이블에 덮어쓰기(업데이트)
-    try{
-        await updateFeeling(postId, result.feelingType, result.feelingComment);
-    } catch (error) {
-        throw {
-            statusCode: error.statusCode || 500,
-            message: error.message || 'DB 업데이트 오류'
-        }
-    }
+    // try{
+    //     await updateFeeling(postId, result.feelingType, result.feelingComment);
+    // } catch (error) {
+    //     throw {
+    //         statusCode: error.statusCode || 500,
+    //         message: error.message || 'DB 업데이트 오류'
+    //     }
+    // }
 
     return result;
 }
