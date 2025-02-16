@@ -5,6 +5,7 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
+
 const {
   handleEmailCertification,
   handleUserSignUp,
@@ -16,6 +17,7 @@ const {
   setPlanetName,
   updatePlanetName,
   getPlanetName,
+  handleDeleteUser,
 } = require("./controllers/user.controller.js");
 const server_ip = process.env.IP;
 const {
@@ -27,8 +29,11 @@ const {
   handleGetPost,
   handleGetUPost,
   handleAddComment,
+  handleGetComment,
   uploadPostImages,
   deletePostImagesController,
+  uploadBackImages,
+  getBackImages,
   analyzeFeeling,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
@@ -54,9 +59,12 @@ const {
 } = require("./controllers/mainpage.controller.js");
 const {
   getFilteredStarRegions,
-  setStarsName,
   getStarsRanking,
   voteForStar,
+  upload,
+  setStarsNameWithImage,
+  checkIfUserVoted,
+  checkStarRanking,
 } = require("./controllers/stars.controller.js");
 
 const {
@@ -69,7 +77,10 @@ const {
   getMyPage,
   updateMyPage,
   getStoragedPost,
-  updateStoragePost
+  updateStoragePost,
+  uploadUserImage,
+  deleteUserImage,
+  getUserImage,
 } = require("./controllers/mypage.controller.js");
 
 const options = {
@@ -134,6 +145,7 @@ app.post("/login", handleUserLogin);
 app.post("/logout", handleUserLogout);
 app.post("/find-id", handleFindUserIdByEmail);
 app.post("/reset-pw", handleresetPassword);
+app.delete("/user", authenticateUser, handleDeleteUser);
 
 //행성
 app.post("/planet", setPlanetName);
@@ -148,23 +160,25 @@ app.patch("/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/posts/:postsId", handleDeletePost); // 일지 삭제
 app.get("/posts/user/:userId", handleGetPost); // 다른 유저의 일지 조회(전체)
 app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일지 조회(1개)
-app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
+app.post("/comment", handleAddComment); // 일지 화면 코멘트 작성
+app.get("/comment", handleGetComment); // 일지 화면 코멘트 조회
 app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
-app.delete("/posts/:posts_id/image", deletePostImagesController) // 일지 첨부파일 삭제
-app.post("/posts/:postId/feeling", analyzeFeeling); // 감정분석
+app.delete("/posts/:posts_id/image", deletePostImagesController); // 일지 첨부파일 삭제
+app.patch("/background", uploadBackImages); // 일지 작성 화면 배경화면 생성/수정
+app.get("/background", getBackImages); // 일지 작성 화면 배경화면 조회app.post("/posts/:postId/feeling", analyzeFeeling); // 감정분석
 
 // 캘린더 일정
-app.post("/schedule", authenticateUser, handleAddSchedule); // 일정 추가
-app.get("/schedule", authenticateUser, handleGetSchedules); // 전체 일정 조회
-app.get("/schedule/:date", authenticateUser, handleGetSchedules); // 날짜별 일정 조회
-app.get("/schedule/:date/:schedule_id", authenticateUser, handleGetScheduleById); // 날짜별 ID로 특정 일정 조회
-app.patch("/schedule/:date/:schedule_id", authenticateUser, handleUpdateSchedule); // 일정 수정
-app.delete("/schedule/:date/:schedule_id", authenticateUser, handleDeleteSchedule); // 일정 삭제
+app.post("/schedule", handleAddSchedule); // 일정 추가
+app.get("/schedule", handleGetSchedules); // 전체 일정 조회
+app.get("/schedule/:date", handleGetSchedules); // 날짜별 일정 조회
+app.get("/schedule/:date/:schedule_id", handleGetScheduleById); // 날짜별 ID로 특정 일정 조회
+app.patch("/schedule/:date/:schedule_id", handleUpdateSchedule); // 일정 수정
+app.delete("/schedule/:date/:schedule_id", handleDeleteSchedule); // 일정 삭제
 
 // 메인 페이지
-app.get("/home", authenticateUser, handleListMainPost); // 메인페이지의 일지조회
-app.get("/home/search", authenticateUser, handleSearchPosts); // 메인 페이지에서 검색
-app.get("/home/search/rankings", authenticateUser, handleGetSearchRankings); // 검색 순위 조회
+app.get("/home", handleListMainPost); // 메인페이지의 일지조회
+app.get("/home/search", handleSearchPosts); // 메인 페이지에서 검색
+app.get("/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
 
 // 친구 관리
 app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
@@ -174,10 +188,12 @@ app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게
 app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 
-app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
-app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
+app.get("/stars/:stars_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
+app.patch("/stars/name", upload.single("image"), setStarsNameWithImage); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
 app.post("/stars/vote", voteForStar); // 별자리 투표하기
+app.get("/stars/vote/check/:stars_id", checkIfUserVoted); //별자리 투표 신청 조회
+app.get("/stars/ranking/check", checkStarRanking); //별자리 랭킹 신청 여부 조회
 
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
@@ -189,6 +205,9 @@ app.get("/mypage", getMyPage); // 유저 정보 조회
 app.patch("/mypage", updateMyPage); // 유저 정보 수정
 app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
 app.patch("/mypage/storaged-posts/:postId", updateStoragePost); // 보관 글 상태 수정(보관->전체공개)
+app.patch("/profile-image", uploadUserImage); // 프로필 사진 등록/수정
+app.delete("/profile-image", deleteUserImage); // 프로필 사진 삭제
+app.get("/profile-image", getUserImage); // 프로필 사진 조회
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -749,7 +768,6 @@ app.listen(port, () => {
  *         description: 서버 내부 오류
  */
 
-
 // 일지 작성 API
 /**
  * @swagger
@@ -1144,7 +1162,7 @@ app.listen(port, () => {
 // 일지 화면 코멘트 작성 API
 /**
  * @swagger
- * /prod/posts/comment:
+ * /prod/comment:
  *   post:
  *     summary: "일지 화면 코멘트 작성"
  *     description: "사용자가 특정 게시글에 코멘트를 작성하는 API"
@@ -1208,6 +1226,56 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "서버 오류 발생"
+ */
+
+// 일지 화면 코멘트 조회 API
+/**
+ * @swagger
+ * /prod/comment:
+ *   get:
+ *     summary: "일지 화면 코멘트 조회"
+ *     description: "사용자의 코멘트를 조회합니다."
+ *     tags:
+ *       - "Post"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "코멘트 조회 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "코멘트 조회 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     comment:
+ *                       type: string
+ *                       example: "지호의 여행일지"
+ *       400:
+ *         description: "코멘트가 없습니다!"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "코멘트가 없습니다!"
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
  */
 
 // 다른 유저의 일지 조회(전체) API
@@ -1487,6 +1555,112 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "서버 내부 오류"
+ */
+
+// 일지 작성 화면 배경화면 생성/수정 API
+/**
+ * @swagger
+ * /prod/background:
+ *   patch:
+ *     summary: "일지 작성 화면 배경화면 생성/수정"
+ *     description: "사용자가 배경 이미지를 업로드하면 S3에 저장하고 URL을 반환합니다."
+ *     tags:
+ *       - "Post"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: string
+ *                 format: binary
+ *                 description: "업로드할 이미지 파일"
+ *     responses:
+ *       200:
+ *         description: "파일 업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrl:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/backImages/example.png"
+ *       400:
+ *         description: "파일이 없을 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일이 없어요.."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 일지 작성 화면 배경화면 조회 API
+/**
+ * @swagger
+ * /prod/background:
+ *   get:
+ *     summary: "일지 작성 화면 배경화면 조회"
+ *     description: "사용자의 배경 이미지를 조회합니다."
+ *     tags:
+ *       - "Post"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "배경 이미지 조회 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/backImages/449e7993f538d398b89ee19e3452caf7_1.png"
+ *       400:
+ *         description: "등록된 배경 이미지가 없음"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 배경사진이 없습니다."
+ *       500:
+ *         description: "서버 오류 발생"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
  */
 
 // 행성 이름 초기 설정 API
@@ -2269,10 +2443,6 @@ app.listen(port, () => {
  *         }'
  */
 
-
-
-
-
 // 하루 일정 조회 API
 /**
  * @swagger
@@ -2444,9 +2614,6 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
-
-
-
 
 // 일정 추가 API
 /**
@@ -2678,7 +2845,6 @@ app.listen(port, () => {
  *         description: 서버 내부 오류
  */
 
- 
 // 마이페이지 - 유저 정보 조회
 /**
  * @swagger
@@ -2686,8 +2852,6 @@ app.listen(port, () => {
  *   get:
  *     summary: "유저 정보 조회"
  *     description: "현재 로그인된 사용자의 정보를 조회합니다."
- *     tags:
- *       - mypage
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -2698,229 +2862,30 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
- *                 resultType:
+ *                 user_id:
  *                   type: string
- *                   example: "success"
- *                 message:
+ *                   example: "12345"
+ *                 nickname:
  *                   type: string
- *                   example: "유저 정보 조회 성공"
- *                 data:
- *                   type: object
- *                   properties:
- *                     user_id:
- *                       type: string
- *                       example: "12345"
- *                     nickname:
- *                       type: string
- *                       example: "닉네임"
- *                     name:
- *                       type: string
- *                       example: "이름"
- *                     birth:
- *                       type: string
- *                       format: date-time
- *                       example: "1990-01-01"
- *                     phonenum:
- *                       type: string
- *                       example: "010-0000-0000"
- *                     email:
- *                       type: string
- *                       example: "user@domain.com"
+ *                   example: "닉네임"
+ *                 name:
+ *                   type: string
+ *                   example: "이름"
+ *                 birth:
+ *                   type: string
+ *                   example: "1990-01-01"
+ *                 phonenum:
+ *                   type: string
+ *                   example: "010-0000-0000"
+ *                 email:
+ *                   type: string
+ *                   example: "user@domain.com"
  *       401:
  *         description: "인증 실패"
  *       404:
  *         description: "유저 정보를 찾을 수 없음"
- *       500:
- *         description: "서버 내부 오류"
- */
-
-// 마이페이지 - 유저 정보 수정
-/**
- * @swagger
- * /mypage:
- *   patch:
- *     summary: "유저 정보 수정"
- *     description: "현재 로그인된 사용자의 정보를 수정합니다."
- *     tags:
- *       - mypage
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       description: "수정할 유저 정보 데이터"
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - nickname
- *               - name
- *               - birth
- *               - phonenum
- *               - email
- *             properties:
- *               nickname:
- *                 type: string
- *                 example: "닉네임"
- *               name:
- *                 type: string
- *                 example: "이름"
- *               birth:
- *                 type: string
- *                 format: date-time
- *                 example: "생년월일"
- *               phonenum:
- *                 type: string
- *                 example: "010-0000-0000"
- *               email:
- *                 type: string
- *                 example: "user@domain.com"
- *     responses:
- *       200:
- *         description: "유저 정보 수정 성공"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 resultType:
- *                   type: string
- *                   example: "success"
- *                 message:
- *                   type: string
- *                   example: "유저 정보가 성공적으로 업데이트되었습니다."
- *                 data:
- *                   type: object
- *                   properties:
- *                     user_id:
- *                       type: string
- *                       example: "12345"
- *                     nickname:
- *                       type: string
- *                       example: "닉네임"
- *                     name:
- *                       type: string
- *                       example: "이름"
- *                     birth:
- *                       type: string
- *                       format: date-time
- *                       example: "1990-01-01"
- *                     phonenum:
- *                       type: string
- *                       example: "010-0000-0000"
- *                     email:
- *                       type: string
- *                       example: "user@domain.com"
- *       400:
- *         description: "잘못된 요청"
- *       401:
- *         description: "인증 실패"
- *       500:
- *         description: "서버 내부 오류"
- */
-
-// 마이페이지 - 보관 글 목록 조회
-/**
- * @swagger
- * /mypage/storaged-posts:
- *   get:
- *     summary: "보관 글 목록 조회"
- *     description: "현재 로그인된 사용자가 보관한 글 목록을 조회합니다."
- *     tags:
- *       - mypage
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: "보관 글 목록 조회 성공"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 resultType:
- *                   type: string
- *                   example: "success"
- *                 message:
- *                   type: string
- *                   example: "보관 글 목록 조회 성공"
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       post_id:
- *                         type: integer
- *                         example: 1
- *                       title:
- *                         type: string
- *                         example: "게시글 제목"
- *                       created_at:
- *                         type: string
- *                         format: date-time
- *                         example: "2025-01-01T00:00:00.000Z"
- *                       updated_at:
- *                         type: string
- *                         format: date-time
- *                         example: "2025-01-01T00:00:00.000Z"
- *       401:
- *         description: "인증 실패"
- *       404:
- *         description: "보관 글이 없음"
- *       500:
- *         description: "서버 내부 오류"
- */
-
-// 마이페이지 - 보관 글 상태 수정
-/**
- * @swagger
- * /mypage/storaged-posts/{postId}:
- *   patch:
- *     summary: "보관 글 상태 수정"
- *     description: "보관된 글의 상태를 전체 공개로 변경합니다."
- *     tags:
- *       - mypage
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: postId
- *         required: true
- *         schema:
- *           type: integer
- *         description: "상태를 수정할 보관 글의 ID"
- *     responses:
- *       200:
- *         description: "보관 글 상태 수정 성공"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 resultType:
- *                   type: string
- *                   example: "success"
- *                 message:
- *                   type: string
- *                   example: "보관 글 상태 수정 성공"
- *                 data:
- *                   type: object
- *                   properties:
- *                     post_id:
- *                       type: integer
- *                       example: 1
- *                     updated_at:
- *                       type: string
- *                       format: date-time
- *                       example: "2025-01-01T00:00:00.000Z"
- *       400:
- *         description: "잘못된 요청"
- *       401:
- *         description: "인증 실패"
- *       404:
- *         description: "보관 글을 찾을 수 없음"
- *       500:
- *         description: "서버 내부 오류"
+ *      500:
+ *        description: 서버 내부 오류
  */
 
 // 친구 요청
@@ -3190,4 +3155,155 @@ app.listen(port, () => {
  *         description: "서버 내부 오류"
  */
 
+// 프로필 사진 등록/수정
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   patch:
+ *     summary: "프로필 사진 등록/수정"
+ *     description: "사용자가 프로필 사진을 업로드하면 S3에 저장하고 URL을 반환합니다."
+ *     tags:
+ *       - "mypage"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: string
+ *                 format: binary
+ *                 description: "업로드할 프로필 이미지 파일"
+ *     responses:
+ *       200:
+ *         description: "파일 업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrl:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/profile-image/example.png"
+ *       400:
+ *         description: "파일이 없을 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일이 없어요.."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
 
+// 프로필 사진 삭제
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   delete:
+ *     summary: "프로필 사진 삭제"
+ *     description: "사용자의 프로필 사진을 삭제합니다."
+ *     tags:
+ *       - "mypage"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "이미지 삭제 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "이미지 삭제 완료"
+ *       400:
+ *         description: "등록된 이미지가 없는 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 이미지가 없습니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 프로필 사진 조회
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   get:
+ *     summary: 프로필 사진 조회
+ *     description: 현재 로그인한 사용자의 프로필 사진을 조회합니다.
+ *     tags:
+ *       - mypage
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 프로필 사진 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/profile-image/4c99c22f5504aef38f02c0e106802666_2.png"
+ *       400:
+ *         description: 등록된 프로필 사진이 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 배경사진이 없습니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */

@@ -25,7 +25,6 @@ class ScheduleRepository {
 
   // 특정 날짜에 해당하는 일정 조회
   async getSchedulesByDate(userId, date) {
-    // date는 이미 Date 객체여야 합니다.
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
 

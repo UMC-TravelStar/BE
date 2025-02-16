@@ -6,6 +6,7 @@ class UserPostResponseDTO {
         this.music = post.music;
         this.feeling = post.feeling;
         this.storage = post.storage;
+        this.images = post.post_images ? post.post_images.map(image => image.imageUrl).filter(url => url !== null) : [];
         this.created_at = post.created_at;
         this.updated_at = post.updated_at;
     }
@@ -20,6 +21,10 @@ class PostResponseDTO {
         this.created_at = post.created_at;
         this.star_id = post.star?.star_id;
         this.region = post.star?.region;
+        this.images = post.post_images ? post.post_images.map(image => image.imageUrl).filter(url => url !== null) : [];
+        this.user_id = post.user?.user_id || null;
+        this.nickname = post.user?.nickname || null;
+        this.user_image = post.user?.u_image?.length > 0 ? post.user.u_image[0].file_name : null;
     }
 }
 
@@ -32,11 +37,13 @@ const formatPostResponse = (post) => {
     return {
         id: post.post_id,
         title: post.title,
+        feel_color: post.feel_color,
         createdAt: post.created_at,
         star: {
             id: post.star.star_id,  // star_id 추가
             region: post.star.region // star 테이블의 region 값 추가
-        }
+        },
+        images: post.post_images.map(image => image.imageUrl)
     };
 };
 
