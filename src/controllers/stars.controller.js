@@ -23,22 +23,29 @@ const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
 // Multer 설정 (메모리 저장)
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
 const getFilteredStarRegions = async (req, res) => {
   try {
-    // req.params에서 user_id 추출 및 검증
-    const { user_id } = validateUserId(req.params);
+    // 요청에서 `stars_id` 가져오기
+    const { stars_id } = req.params;
 
-    // 서비스 호출
-    const regions = await getFilteredStarRegionsService(user_id);
+    if (!stars_id || isNaN(stars_id)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "유효한 stars_id가 필요합니다." });
+    }
 
-    // 결과 반환
-    res.status(200).json({ regions });
+    // 서비스 호출 (user_id 대신 stars_id로 조회)
+    const regions = await getFilteredStarRegionsService(parseInt(stars_id, 10));
+
+    res.status(StatusCodes.OK).json({ regions });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("별자리 지역 조회 오류:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "서버 오류가 발생했습니다.",
+      error: error.message,
+    });
   }
 };
-
 const setStarsNameWithImage = async (req, res) => {
   try {
     console.log("별자리 이름 설정 + 이미지 업로드 요청 도착!");
@@ -60,9 +67,11 @@ const setStarsNameWithImage = async (req, res) => {
         .json({ message: "별자리 이름이 필요합니다." });
     }
 
-    // 이미지 업로드 처리
+    let uploadPromise = Promise.resolve(null); // 기본값 (파일이 없을 때)
+
+    // 🌟 이미지 업로드를 비동기 처리
     if (req.file) {
-      const fileName = `stars/${userId}.png`; // 파일명을 유저 ID 기반으로 설정
+      const fileName = `stars/${userId}.png`;
       const uploadParams = {
         Bucket: BUCKET_NAME,
         Key: fileName,
@@ -71,19 +80,22 @@ const setStarsNameWithImage = async (req, res) => {
         ACL: "public-read",
       };
 
-      await s3Client.send(new PutObjectCommand(uploadParams));
+      uploadPromise = s3Client.send(new PutObjectCommand(uploadParams)); // S3 업로드 실행
     }
 
-    // DB에 별자리 이름만 업데이트 (S3 URL 저장 X)
-    const updatedStars = await setStarsNameService(userId, name);
+    // 🌟 DB 업데이트를 비동기 처리
+    const dbUpdatePromise = setStarsNameService(userId, name);
 
-    // S3 URL을 생성해서 반환
+    // 🌟 S3 업로드와 DB 업데이트를 병렬 처리 (속도 개선!)
+    await Promise.all([uploadPromise, dbUpdatePromise]);
+
+    // S3 URL 생성
     const fileUrl = `https://${BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/stars/${userId}.png`;
 
     res.status(StatusCodes.OK).json({
       message: "별자리 이름 및 이미지 설정 성공",
-      stars: updatedStars,
-      imageUrl: fileUrl, // S3 URL을 생성해서 반환
+      stars: await dbUpdatePromise, // 업데이트된 DB 정보 반환
+      imageUrl: req.file ? fileUrl : null, // 이미지가 있으면 URL 반환
     });
   } catch (error) {
     console.error("별자리 이름 및 이미지 설정 오류:", error);
