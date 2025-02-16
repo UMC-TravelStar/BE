@@ -2851,8 +2851,6 @@ app.listen(port, () => {
  *   get:
  *     summary: "유저 정보 조회"
  *     description: "현재 로그인된 사용자의 정보를 조회합니다."
- *     tags:
- *       - mypage
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -2863,229 +2861,30 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
- *                 resultType:
+ *                 user_id:
  *                   type: string
- *                   example: "success"
- *                 message:
+ *                   example: "12345"
+ *                 nickname:
  *                   type: string
- *                   example: "유저 정보 조회 성공"
- *                 data:
- *                   type: object
- *                   properties:
- *                     user_id:
- *                       type: string
- *                       example: "12345"
- *                     nickname:
- *                       type: string
- *                       example: "닉네임"
- *                     name:
- *                       type: string
- *                       example: "이름"
- *                     birth:
- *                       type: string
- *                       format: date-time
- *                       example: "1990-01-01"
- *                     phonenum:
- *                       type: string
- *                       example: "010-0000-0000"
- *                     email:
- *                       type: string
- *                       example: "user@domain.com"
+ *                   example: "닉네임"
+ *                 name:
+ *                   type: string
+ *                   example: "이름"
+ *                 birth:
+ *                   type: string
+ *                   example: "1990-01-01"
+ *                 phonenum:
+ *                   type: string
+ *                   example: "010-0000-0000"
+ *                 email:
+ *                   type: string
+ *                   example: "user@domain.com"
  *       401:
  *         description: "인증 실패"
  *       404:
  *         description: "유저 정보를 찾을 수 없음"
- *       500:
- *         description: "서버 내부 오류"
- */
-
-// 마이페이지 - 유저 정보 수정
-/**
- * @swagger
- * /mypage:
- *   patch:
- *     summary: "유저 정보 수정"
- *     description: "현재 로그인된 사용자의 정보를 수정합니다."
- *     tags:
- *       - mypage
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       description: "수정할 유저 정보 데이터"
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - nickname
- *               - name
- *               - birth
- *               - phonenum
- *               - email
- *             properties:
- *               nickname:
- *                 type: string
- *                 example: "닉네임"
- *               name:
- *                 type: string
- *                 example: "이름"
- *               birth:
- *                 type: string
- *                 format: date-time
- *                 example: "생년월일"
- *               phonenum:
- *                 type: string
- *                 example: "010-0000-0000"
- *               email:
- *                 type: string
- *                 example: "user@domain.com"
- *     responses:
- *       200:
- *         description: "유저 정보 수정 성공"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 resultType:
- *                   type: string
- *                   example: "success"
- *                 message:
- *                   type: string
- *                   example: "유저 정보가 성공적으로 업데이트되었습니다."
- *                 data:
- *                   type: object
- *                   properties:
- *                     user_id:
- *                       type: string
- *                       example: "12345"
- *                     nickname:
- *                       type: string
- *                       example: "닉네임"
- *                     name:
- *                       type: string
- *                       example: "이름"
- *                     birth:
- *                       type: string
- *                       format: date-time
- *                       example: "1990-01-01"
- *                     phonenum:
- *                       type: string
- *                       example: "010-0000-0000"
- *                     email:
- *                       type: string
- *                       example: "user@domain.com"
- *       400:
- *         description: "잘못된 요청"
- *       401:
- *         description: "인증 실패"
- *       500:
- *         description: "서버 내부 오류"
- */
-
-// 마이페이지 - 보관 글 목록 조회
-/**
- * @swagger
- * /mypage/storaged-posts:
- *   get:
- *     summary: "보관 글 목록 조회"
- *     description: "현재 로그인된 사용자가 보관한 글 목록을 조회합니다."
- *     tags:
- *       - mypage
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: "보관 글 목록 조회 성공"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 resultType:
- *                   type: string
- *                   example: "success"
- *                 message:
- *                   type: string
- *                   example: "보관 글 목록 조회 성공"
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       post_id:
- *                         type: integer
- *                         example: 1
- *                       title:
- *                         type: string
- *                         example: "게시글 제목"
- *                       created_at:
- *                         type: string
- *                         format: date-time
- *                         example: "2025-01-01T00:00:00.000Z"
- *                       updated_at:
- *                         type: string
- *                         format: date-time
- *                         example: "2025-01-01T00:00:00.000Z"
- *       401:
- *         description: "인증 실패"
- *       404:
- *         description: "보관 글이 없음"
- *       500:
- *         description: "서버 내부 오류"
- */
-
-// 마이페이지 - 보관 글 상태 수정
-/**
- * @swagger
- * /mypage/storaged-posts/{postId}:
- *   patch:
- *     summary: "보관 글 상태 수정"
- *     description: "보관된 글의 상태를 전체 공개로 변경합니다."
- *     tags:
- *       - mypage
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: postId
- *         required: true
- *         schema:
- *           type: integer
- *         description: "상태를 수정할 보관 글의 ID"
- *     responses:
- *       200:
- *         description: "보관 글 상태 수정 성공"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 resultType:
- *                   type: string
- *                   example: "success"
- *                 message:
- *                   type: string
- *                   example: "보관 글 상태 수정 성공"
- *                 data:
- *                   type: object
- *                   properties:
- *                     post_id:
- *                       type: integer
- *                       example: 1
- *                     updated_at:
- *                       type: string
- *                       format: date-time
- *                       example: "2025-01-01T00:00:00.000Z"
- *       400:
- *         description: "잘못된 요청"
- *       401:
- *         description: "인증 실패"
- *       404:
- *         description: "보관 글을 찾을 수 없음"
- *       500:
- *         description: "서버 내부 오류"
+ *      500:
+ *        description: 서버 내부 오류
  */
 
 // 친구 요청
