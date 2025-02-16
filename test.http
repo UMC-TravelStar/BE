@@ -1,10 +1,10 @@
 ###회원가입15.165.117.176
-POST http://15.165.117.176:4000/register
+POST http://localhost:4000/register
 Content-Type: application/json; charset=UTF-8
 
 {
-  "user_id": "rrrr",
-  "nickname": "rrr",
+  "user_id": "star2",
+  "nickname": "star2",
   "password": "rrrr",
   "name": "rrrr",
   "birth": "1990-01-01",
@@ -17,8 +17,8 @@ POST http://15.165.117.176:4000/login
 Content-Type: application/json; charset=UTF-8
 
 {
-  "id": "1",
-  "pw": "1234"
+  "id": "star2",
+  "pw": "rrrr"
 }
 
 ###이메일 인증코드 발송
@@ -81,7 +81,17 @@ Content-Type: application/json
 
 ### 별자리 랭킹 조회
 GET http://15.165.117.176:4000/stars/ranking
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3Mzk1NTgwMTMsImV4cCI6MTczOTU5NDAxM30.i52d10WTymqPtQa3CzOcIZPmKfHmfSbhFZb93_tr3bY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3Mzk2OTI5MzUsImV4cCI6MTczOTcyODkzNX0.qXTQpoHfa5n4_HvM84oKIrevCbmNPc5znlwBZWQYIXE
+Content-Type: application/json
+
+### 별자리 투표 여부 조회
+GET http://localhost:4000/stars/vote/check/8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3Mzk2OTI5MzUsImV4cCI6MTczOTcyODkzNX0.qXTQpoHfa5n4_HvM84oKIrevCbmNPc5znlwBZWQYIXE
+Content-Type: application/json
+
+### 별자리 랭킹 신청 조회
+GET http://localhost:4000/stars/ranking/check
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Njk2MDc0LCJleHAiOjE3Mzk3MzIwNzR9.p7m9Kwe3sL2jaetxwopn-nZnvoFARaT7sf9p8c8rFgw
 Content-Type: application/json
 
 ### 투표

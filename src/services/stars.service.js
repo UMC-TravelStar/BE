@@ -103,9 +103,35 @@ const voteForStarService = async (tokenUserId, starsId, postUserId) => {
   return updatedStar;
 };
 
+const checkIfUserVotedService = async (userId, starsId) => {
+  const existingVote = await prisma.votes.findUnique({
+    where: {
+      user_id_stars_id: {
+        user_id: userId,
+        stars_id: starsId,
+      },
+    },
+  });
+
+  return existingVote ? 1 : 0; // 투표한 경우 1, 아니면 0 반환
+};
+
+const checkStarRankingApplicationService = async (userId) => {
+  const userStar = await prisma.stars.findUnique({
+    where: { user_id: userId },
+    select: { name: true },
+  });
+  //console.log("🚀 [DEBUG] userStar 데이터:", userStar); // 🔥 현재 DB 값 확인
+  //console.log("🚀 [DEBUG] userStar.name 타입:", typeof userStar?.name); // 🔥 타입 확인
+
+  return userStar && userStar.name !== "0" ? 1 : 0; // "0"이면 신청 안함, 아니면 신청됨
+};
+
 module.exports = {
   getFilteredStarRegionsService,
   setStarsNameService,
   getStarsRankingService,
   voteForStarService,
+  checkIfUserVotedService,
+  checkStarRankingApplicationService,
 };

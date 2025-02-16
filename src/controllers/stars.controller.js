@@ -10,6 +10,8 @@ const {
   setStarsNameService,
   getStarsRankingService,
   voteForStarService,
+  checkIfUserVotedService,
+  checkStarRankingApplicationService,
 } = require("../services/stars.service.js");
 const {
   extractUserIdFromToken,
@@ -161,10 +163,66 @@ const voteForStar = async (req, res) => {
   }
 };
 
+const checkIfUserVoted = async (req, res) => {
+  try {
+    const userId = extractUserIdFromToken(req); // 토큰에서 사용자 ID 추출
+    if (!userId) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "로그인이 필요합니다." });
+    }
+
+    const { stars_id } = req.params;
+    if (!stars_id || isNaN(stars_id)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "유효한 stars_id가 필요합니다." });
+    }
+
+    // 투표 여부 확인 서비스 호출
+    const hasVoted = await checkIfUserVotedService(
+      userId,
+      parseInt(stars_id, 10)
+    );
+
+    res.status(StatusCodes.OK).json({ voted: hasVoted });
+  } catch (error) {
+    console.error("투표 여부 확인 오류:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "서버 오류가 발생했습니다.",
+      error: error.message,
+    });
+  }
+};
+
+const checkStarRanking = async (req, res) => {
+  try {
+    const userId = extractUserIdFromToken(req); // 토큰에서 사용자 ID 추출
+    if (!userId) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "로그인이 필요합니다." });
+    }
+
+    // 서비스 호출
+    const hasApplied = await checkStarRankingApplicationService(userId);
+
+    res.status(StatusCodes.OK).json({ applied: hasApplied });
+  } catch (error) {
+    console.error("별자리 랭킹 신청 여부 확인 오류:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "서버 오류가 발생했습니다.",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   upload,
   getFilteredStarRegions,
   setStarsNameWithImage,
   getStarsRanking,
   voteForStar,
+  checkIfUserVoted,
+  checkStarRanking,
 };
