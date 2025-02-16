@@ -74,7 +74,7 @@ const handleUserSignUp = async (req, res) => {
       await prisma.stars.create({
         data: {
           user_id: createdUser.user_id,
-          name: "Default Name", // 초기 이름 설정
+          name: "0", // 초기 이름 설정 => 이름을 설정하지 않았으면 string "0"임
           views: 0, // 초기 조회수
           vote_num: 0, // 초기 투표 수
           created_at: new Date(), // 현재 시간으로 설정

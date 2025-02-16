@@ -62,6 +62,8 @@ const {
   voteForStar,
   upload,
   setStarsNameWithImage,
+  checkIfUserVoted,
+  checkStarRanking,
 } = require("./controllers/stars.controller.js");
 
 const {
@@ -165,29 +167,17 @@ app.patch("/background", uploadBackImages); // 일지 작성 화면 배경화면
 app.get("/background", getBackImages); // 일지 작성 화면 배경화면 조회
 
 // 캘린더 일정
-app.post("/schedule", authenticateUser, handleAddSchedule); // 일정 추가
-app.get("/schedule", authenticateUser, handleGetSchedules); // 전체 일정 조회
-app.get("/schedule/:date", authenticateUser, handleGetSchedules); // 날짜별 일정 조회
-app.get(
-  "/schedule/:date/:schedule_id",
-  authenticateUser,
-  handleGetScheduleById
-); // 날짜별 ID로 특정 일정 조회
-app.patch(
-  "/schedule/:date/:schedule_id",
-  authenticateUser,
-  handleUpdateSchedule
-); // 일정 수정
-app.delete(
-  "/schedule/:date/:schedule_id",
-  authenticateUser,
-  handleDeleteSchedule
-); // 일정 삭제
+app.post("/schedule", handleAddSchedule); // 일정 추가
+app.get("/schedule", handleGetSchedules); // 전체 일정 조회
+app.get("/schedule/:date", handleGetSchedules); // 날짜별 일정 조회
+app.get("/schedule/:date/:schedule_id", handleGetScheduleById); // 날짜별 ID로 특정 일정 조회
+app.patch("/schedule/:date/:schedule_id", handleUpdateSchedule); // 일정 수정
+app.delete("/schedule/:date/:schedule_id", handleDeleteSchedule); // 일정 삭제
 
 // 메인 페이지
-app.get("/home", authenticateUser, handleListMainPost); // 메인페이지의 일지조회
-app.get("/home/search", authenticateUser, handleSearchPosts); // 메인 페이지에서 검색
-app.get("/home/search/rankings", authenticateUser, handleGetSearchRankings); // 검색 순위 조회
+app.get("/home", handleListMainPost); // 메인페이지의 일지조회
+app.get("/home/search", handleSearchPosts); // 메인 페이지에서 검색
+app.get("/home/search/rankings", handleGetSearchRankings); // 검색 순위 조회
 
 // 친구 관리
 app.post("/friends/request/:toUserId", handleSendFriendRequest); // 친구 요청
@@ -197,10 +187,12 @@ app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게
 app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 
-app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
+app.get("/stars/:stars_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
 app.patch("/stars/name", upload.single("image"), setStarsNameWithImage); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
 app.post("/stars/vote", voteForStar); // 별자리 투표하기
+app.get("/stars/vote/check/:stars_id", checkIfUserVoted); //별자리 투표 신청 조회
+app.get("/stars/ranking/check", checkStarRanking); //별자리 랭킹 신청 여부 조회
 
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
