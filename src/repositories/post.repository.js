@@ -421,6 +421,24 @@ const getImage = async (user_id) => {
     });
 };
 
+const updateFeeling = async (postId, feelingType, feelingComment) => {
+    try{
+        const updatedPost = await prisma.post.update({
+            where: {post_id: Number(postId)},
+            data: {
+                feeling_type: feelingType,
+                feeling_comment: feelingComment
+            }
+        });
+        return updatedPost;
+    } catch(error){
+        throw {
+            statusCode : 500,
+            message: 'Repository update error: ' + error.message
+        }
+    }
+}
+
 module.exports = {
     findStarByRegion,
     findStarsByUserId,
@@ -448,4 +466,5 @@ module.exports = {
     createBack,
     updateBack,
     getImage,
+    updateFeeling,
 };

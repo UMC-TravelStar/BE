@@ -34,6 +34,7 @@ const {
   deletePostImagesController,
   uploadBackImages,
   getBackImages,
+  analyzeFeeling,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
 const {
@@ -148,8 +149,8 @@ app.delete("/user", authenticateUser, handleDeleteUser);
 
 //행성
 app.post("/planet", setPlanetName);
-app.get("/planet/:user_id", getPlanetName);
-app.patch("/planet/:user_id", updatePlanetName);
+app.get("/planet", getPlanetName);
+app.patch("/planet", updatePlanetName);
 
 // 일지
 app.post("/posts", handleAddPost); // 일지 작성
@@ -164,7 +165,7 @@ app.get("/comment", handleGetComment); // 일지 화면 코멘트 조회
 app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
 app.delete("/posts/:posts_id/image", deletePostImagesController); // 일지 첨부파일 삭제
 app.patch("/background", uploadBackImages); // 일지 작성 화면 배경화면 생성/수정
-app.get("/background", getBackImages); // 일지 작성 화면 배경화면 조회
+app.get("/background", getBackImages); // 일지 작성 화면 배경화면 조회app.post("/posts/:postId/feeling", analyzeFeeling); // 감정분석
 
 // 캘린더 일정
 app.post("/schedule", handleAddSchedule); // 일정 추가
@@ -197,7 +198,7 @@ app.get("/stars/ranking/check", checkStarRanking); //별자리 랭킹 신청 여
 app.post("/planets", handleCreatePlanet); // 행성 생성
 app.get("/planets/mine", handleGetPlanet); // 사용자의 행성 조회
 app.patch("/planets/mine", handleUpdatePlanet); // 사용자의 행성 정보 수정(행성 이름 수정)
-app.get("/planets/:userId", handleGetOtherPlanet); // 다른 유저의 행성 조회
+app.get("/planets/:planetId", handleGetOtherPlanet); // 다른 유저의 행성 조회
 
 // 마이페이지
 app.get("/mypage", getMyPage); // 유저 정보 조회
