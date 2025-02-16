@@ -85,12 +85,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiO
 Content-Type: application/json
 
 ### 별자리 투표 여부 조회
-GET http://localhost:4000/stars/vote/check/8
+GET http://15.165.117.176:4000/stars/vote/check/8
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3Mzk2OTI5MzUsImV4cCI6MTczOTcyODkzNX0.qXTQpoHfa5n4_HvM84oKIrevCbmNPc5znlwBZWQYIXE
 Content-Type: application/json
 
 ### 별자리 랭킹 신청 조회
-GET http://localhost:4000/stars/ranking/check
+GET http://15.165.117.176:4000/stars/ranking/check
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Njk2MDc0LCJleHAiOjE3Mzk3MzIwNzR9.p7m9Kwe3sL2jaetxwopn-nZnvoFARaT7sf9p8c8rFgw
 Content-Type: application/json
 

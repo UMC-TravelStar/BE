@@ -187,7 +187,7 @@ app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게
 app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 
-app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
+app.get("/stars/:stars_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
 app.patch("/stars/name", upload.single("image"), setStarsNameWithImage); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
 app.post("/stars/vote", voteForStar); // 별자리 투표하기

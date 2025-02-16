@@ -8,20 +8,13 @@ const {
   updateStarsNameByUserId,
   findTopStars,
 } = require("../repositories/stars.repository.js");
+const getFilteredStarRegionsService = async (starsId) => {
+  // stars_id로 region 조회
+  const stars = await findFilteredStarRegions(starsId);
 
-const getFilteredStarRegionsService = async (userId) => {
-  // 사용자 관련 별자리 정보 조회
-  const userStars = await findStarsByUserId(userId);
-
-  if (!userStars) {
-    throw new Error("별자리를 찾을 수 없습니다.");
+  if (!stars.length) {
+    throw new Error("해당 별자리의 지역 정보를 찾을 수 없습니다.");
   }
-
-  // stars 테이블의 updated_at 값을 기준으로 star 테이블의 region 필터링
-  const stars = await findFilteredStarRegions(
-    userStars.stars_id,
-    userStars.updated_at
-  );
 
   // region 배열 반환
   return stars.map((star) => star.region);

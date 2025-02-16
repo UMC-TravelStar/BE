@@ -15,13 +15,10 @@ const findStarsByUserId = async (userId) => {
   });
 };
 // 특정 조건에 따라 star 테이블에서 region 조회
-const findFilteredStarRegions = async (starsId, updatedAt) => {
+const findFilteredStarRegions = async (starsId) => {
   return await prisma.star.findMany({
     where: {
-      stars_id: starsId, // stars 테이블의 별자리 ID와 연결된 별만 조회
-      created_at: {
-        lt: updatedAt, // stars 테이블의 updated_at 이전에 생성된 별
-      },
+      stars_id: starsId, // ⭐ stars_id를 직접 사용
     },
     select: {
       region: true, // region 값만 선택
