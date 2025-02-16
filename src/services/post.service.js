@@ -1,3 +1,5 @@
+import axios from 'axios';
+import dotenv from 'dotenv';
 const { 
     findStarByRegion, 
     findStarsByUserId,
@@ -22,6 +24,7 @@ const {
     checkBackImage,
     createBack,
     updateBack,
+    updateFeeling,
 } = require("../repositories/post.repository.js");
 const { 
     UserPostResponseDTO,
@@ -29,6 +32,11 @@ const {
     PostResponseDTO
 } = require("../dtos/post.dto.js");
 const { deleteImage } = require("../middlewares/deleteImage.js");
+
+// moni
+dotenv.config();
+const OPEN_API_KEY = process.env.OPEN_API_KEY;
+const OPEN_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 const checkOrCreateStar = async (userId, region) => {
     console.log("Checking or creating star for userId:", userId, "region:", region);
@@ -204,6 +212,75 @@ const registerBackImage = async (userId, file) => {
     return image.file_name;
 };
 
+// 감정 분석
+const analyzeFeeling = async (postId, review) => {
+    const prompt = `
+    사용자가 남긴 감상평:
+    "${review}"
+
+    아래 5가지 감정 분류 중 해당하는 감정을 선택하고,
+    해당 감정의 번호(feelingType)와 간단한 감정 분석(feelingComment)을 아래와 같이 JSON 형식으로 반환해줘.
+
+    1: 화남, 분노
+    2: 슬픔, 우울
+    3: 기쁨, 행복
+    4: 성장, 도전
+    5: 평온, 힐링
+
+    예시 출력: 
+    {
+        "feelingType": 3,
+        "feelingComment": "당신의 여행은 행복한 상태군요."
+    }
+    `;
+
+    // GPT API 호출
+    let response;
+    try{
+        response = await axios.post(OPEN_API_URL, 
+        {
+            model: 'gpt-4',
+            messages: [{role: 'system', content: prompt}],
+            max_tokens: 100,
+            temperature: 0.7,
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${OPEN_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (error) {
+        throw {
+            statusCode: error.response?.status || 500,
+            message: error.response?.data || 'GPT API 호출 오류'
+        }
+    }
+
+    const reply = response.data.choices[0].message.content;
+    let result;
+    try{
+        result = JSON.parse(reply);
+    } catch (error) {
+        throw {
+            statusCode: 500,
+            message: '감정 분석 결과 파싱 오류'
+        }
+    }
+
+    // post 테이블에 덮어쓰기(업데이트)
+    try{
+        await updateFeeling(postId, result.feelingType, result.feelingComment);
+    } catch (error) {
+        throw {
+            statusCode: error.statusCode || 500,
+            message: error.message || 'DB 업데이트 오류'
+        }
+    }
+
+    return result;
+}
+
 module.exports = {
     checkOrCreateStar,
     registerPost,
@@ -217,4 +294,5 @@ module.exports = {
     registerComment,
     deletePostImages,
     registerBackImage,
+    analyzeFeeling,
 };

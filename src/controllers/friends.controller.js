@@ -12,7 +12,11 @@ const handleSendFriendRequest = async (req, res) => {
       data: result
     });
 } catch(error) {
-    res.status(500).json({ message: error.message });
+    const statusCode = error.statusCode || 500;
+    res.status(statusCode).json({
+      resultType: 'error',
+      message: error.message
+    })
 }
 };
 
@@ -27,7 +31,11 @@ const handleAcceptFriendRequest = async (req, res) => {
       data: result
     });
   } catch(error) {
-      res.status(500).json({ message: error.message });
+      const statusCode = error.statusCode || 500;
+      res.status(statusCode).json({
+        resultType: 'error',
+        message: error.message
+      })
   }
 };
 
@@ -36,6 +44,15 @@ const handleGetSentFriendRequests = async (req, res) => {
   try{
     const userId = req.userId;
     const result = await FriendsService.getSentFriendRequests(userId);
+
+    if(result.length === 0){
+      return res.status(200).json({
+        resultType: 'empty',
+        message: '아직 친구 요청을 보낸 사람이 없습니다. 친구 요청을 보내보세요!',
+        data:[]
+      });
+    }
+
     res.status(200).json({
       resultType: 'success',
       message: '내가 친구 요청한 목록 조회 완료',
@@ -51,6 +68,15 @@ const handleGetReceivedFriendRequests = async (req, res) => {
   try{
     const userId = req.userId;
     const result = await FriendsService.getReceivedFriendRequests(userId);
+
+    if(result.length === 0){
+      return res.status(200).json({
+        resultType: 'empty',
+        message: '아직 친구 요청을 받은 사람이 없습니다.',
+        data:[]
+      });
+    }
+
     res.status(200).json({
       resultType: 'success',
       message: '나에게 친구 요청한 목록 조회 완료',
@@ -66,6 +92,15 @@ const handleGetFriendsList = async (req, res) => {
   try{
     const userId = req.userId;
     const result = await FriendsService.getFriendsList(userId);  
+
+    if(result.length === 0){
+      return res.status(200).json({
+        resultType: 'empty',
+        message: '현재 친구가 없습니다. 새로운 친구 관계를 형성해주세요.',
+        data:[]
+      });
+    }
+
     res.status(200).json({
       resultType: 'success',
       message: '서로 친구인 목록 조회 완료',
@@ -91,7 +126,11 @@ const handleDeleteFriend = async (req, res) => {
       // data: result
     });
   } catch(error) {
-      res.status(500).json({ message: error.message });
+      const statusCode = error.statusCode || 500;
+      res.status(statusCode).json({
+        resultType: 'error',
+        message: error.message
+      })
   }
 };
 
