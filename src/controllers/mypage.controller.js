@@ -1,4 +1,5 @@
 const MyPageService = require('../services/mypage.service');
+const MyPageRepository = require('../repositories/mypage.repository');
 const imageUploader = require("../middlewares/imageUploader.js");
 const profileImageUploader = imageUploader("profile-image");
 
@@ -99,11 +100,31 @@ const deleteUserImage = async (req, res) => {
     }
 };
 
+// 프로필 사진 조회
+const getUserImage = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const image = await MyPageRepository.findPostImages(userId);
+        console.log(`image: `, image);
+
+        if (!image) {
+            return res.status(400).json({ message: "등록된 배경사진이 없습니다." });
+        }
+
+        return res.status(200).json({
+            data: image.file_name
+        });
+    } catch (error) {
+        res.status(500).json({ message: "서버 오류", error: error.message });
+    }
+};
+
 module.exports = { 
     getMyPage,
     updateMyPage,
     getStoragedPost,
     updateStoragePost,
     uploadUserImage,
-    deleteUserImage
+    deleteUserImage,
+    getUserImage,
 };
