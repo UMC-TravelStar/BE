@@ -75,6 +75,9 @@ const {
   updateMyPage,
   getStoragedPost,
   updateStoragePost,
+  uploadUserImage,
+  deleteUserImage,
+  getUserImage,
 } = require("./controllers/mypage.controller.js");
 
 const options = {
@@ -209,6 +212,9 @@ app.get("/mypage", getMyPage); // 유저 정보 조회
 app.patch("/mypage", updateMyPage); // 유저 정보 수정
 app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
 app.patch("/mypage/storaged-posts/:postId", updateStoragePost); // 보관 글 상태 수정(보관->전체공개)
+app.patch("/profile-image", uploadUserImage); // 프로필 사진 등록/수정
+app.delete("/profile-image", deleteUserImage); // 프로필 사진 삭제
+app.get("/profile-image", getUserImage); // 프로필 사진 조회
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -3355,4 +3361,157 @@ app.listen(port, () => {
  *                   example: "친구 삭제 완료"
  *       500:
  *         description: "서버 내부 오류"
+ */
+
+// 프로필 사진 등록/수정
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   patch:
+ *     summary: "프로필 사진 등록/수정"
+ *     description: "사용자가 프로필 사진을 업로드하면 S3에 저장하고 URL을 반환합니다."
+ *     tags:
+ *       - "mypage"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: string
+ *                 format: binary
+ *                 description: "업로드할 프로필 이미지 파일"
+ *     responses:
+ *       200:
+ *         description: "파일 업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrl:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/profile-image/example.png"
+ *       400:
+ *         description: "파일이 없을 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일이 없어요.."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 프로필 사진 삭제
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   delete:
+ *     summary: "프로필 사진 삭제"
+ *     description: "사용자의 프로필 사진을 삭제합니다."
+ *     tags:
+ *       - "mypage"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "이미지 삭제 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "이미지 삭제 완료"
+ *       400:
+ *         description: "등록된 이미지가 없는 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 이미지가 없습니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 프로필 사진 조회
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   get:
+ *     summary: 프로필 사진 조회
+ *     description: 현재 로그인한 사용자의 프로필 사진을 조회합니다.
+ *     tags:
+ *       - mypage
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 프로필 사진 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/profile-image/4c99c22f5504aef38f02c0e106802666_2.png"
+ *       400:
+ *         description: 등록된 프로필 사진이 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 배경사진이 없습니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
  */
