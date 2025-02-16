@@ -32,6 +32,7 @@ const formatPostResponse = (post) => {
     return {
         id: post.post_id,
         title: post.title,
+        feel_color: post.feel_color,
         createdAt: post.created_at,
         star: {
             id: post.star.star_id,  // star_id 추가

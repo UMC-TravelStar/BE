@@ -12,7 +12,7 @@ const getUserPosts = async (skip, limit) => {
             },
             post_images: {
                 select: {
-                    file_name: true
+                    imageUrl: true // file_name 대신 imageUrl 사용
                 }
             },
             user: {

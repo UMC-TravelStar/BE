@@ -59,7 +59,7 @@ const searchPosts = async (searchTerm, page, limit, currentUserId) => {
             },
             post_images: {
                 select: {
-                    file_name: true
+                    imageUrl: true
                 }
             },
             user: {

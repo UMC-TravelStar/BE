@@ -1,15 +1,15 @@
 ###회원가입15.165.117.176
-POST http://localhost:4000/register
+POST http://15.165.117.176:4000/register
 Content-Type: application/json; charset=UTF-8
 
 {
-  "user_id": "1234",
-  "nickname": "qqqq",
-  "password": "1234",
-  "name": "qqqq",
+  "user_id": "rrrr",
+  "nickname": "rrr",
+  "password": "rrrr",
+  "name": "rrrr",
   "birth": "1990-01-01",
   "phonenum": "01067058085",
-  "email": "qqqq@naver.com"
+  "email": "rrrr@naver.com"
 }
 
 ###로그인15.165.117.176
@@ -17,12 +17,12 @@ POST http://15.165.117.176:4000/login
 Content-Type: application/json; charset=UTF-8
 
 {
-  "id": "1234",
+  "id": "1",
   "pw": "1234"
 }
 
 ###이메일 인증코드 발송
-POST http://localhost:4000/email
+POST http://15.165.117.176:4000/email
 Content-Type: application/json; charset=UTF-8
 
 {
@@ -34,7 +34,7 @@ post http://15.165.117.176:4000/find-id
 Content-Type: application/json; charset=UTF-8
 
 {
-  "email": "qqqq@naver.com"
+  "email": "rrrr@naver.com"
 }
 
 ### 이메일 중복 체크 
@@ -42,18 +42,18 @@ post http://15.165.117.176:4000/check-id
 Content-Type: application/json; charset=UTF-8
 
 {
-  "user_id": "1234"
+  "user_id": "rrrr"
 }
 
 ###비밀번호 찾기
-POST http://localhost:4000/reset-pw
+POST http://15.165.117.176:4000/reset-pw
 Content-Type: application/json; charset=UTF-8
 
 {
-  "user_id": "1234",
-  "email": "qqqq@naver.com",
-  "newPassword":"1234",
-  "confirmPassword":"1234"
+  "user_id": "rrrr",
+  "email": "rrrr@naver.com",
+  "newPassword":"rrrrr",
+  "confirmPassword":"rrrrr"
 }
 
 ###
@@ -65,14 +65,14 @@ Content-Type: application/json; charset=UTF-8
   "pw": "1234"
 }
 
-### 별자리 조회(아이디 기반반)
+### 별자리 조회(아이디 기반)
 GET http://15.165.117.176:4000/stars/1234/regions
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg3NjYwOTAsImV4cCI6MTczODgwMjA5MH0.z23L9I1urVBFIM8zBSo5YLzLQLcwhir1NKMhFwXujds
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3Mzk1MjI3NDksImV4cCI6MTczOTU1ODc0OX0.9UcvMVWiUvu7RtPi419rJZfo9lLybIe-vQCg6Kmd_xw
 Content-Type: application/json
 
 ### 별자리 이름 설정 변경 및 여행한 별들 추가
 PATCH http://15.165.117.176:4000/stars/name
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg3NjYwOTAsImV4cCI6MTczODgwMjA5MH0.z23L9I1urVBFIM8zBSo5YLzLQLcwhir1NKMhFwXujds
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3MzkxMDY1MjUsImV4cCI6MTczOTE0MjUyNX0.zWnCtvyc_z4UhQ0AqdHts5IXQrFf-ONzvnMadaqWMHM
 Content-Type: application/json
 
 {
@@ -81,15 +81,20 @@ Content-Type: application/json
 
 ### 별자리 랭킹 조회
 GET http://15.165.117.176:4000/stars/ranking
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg3NjYwOTAsImV4cCI6MTczODgwMjA5MH0.z23L9I1urVBFIM8zBSo5YLzLQLcwhir1NKMhFwXujds
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3Mzk1NTgwMTMsImV4cCI6MTczOTU5NDAxM30.i52d10WTymqPtQa3CzOcIZPmKfHmfSbhFZb93_tr3bY
 Content-Type: application/json
 
 ### 투표
 POST http://15.165.117.176:4000/stars/vote
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzg3NjYwOTAsImV4cCI6MTczODgwMjA5MH0.z23L9I1urVBFIM8zBSo5YLzLQLcwhir1NKMhFwXujds
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3Mzk0NDMwMzAsImV4cCI6MTczOTQ3OTAzMH0.NqWZTzV_jVUhMKQbxyBX4pvPdkWQ5YyfkTCcV8kjJwU
 Content-Type: application/json; charset=UTF-8
 
 {
-  "stars_id": 2,
+  "stars_id": 5,
   "post_user_id": "1" 
 }
+
+### 회원 탈퇴 요청
+DELETE http://localhost:4000/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1IiwiaWF0IjoxNzM5NTIwNTc5LCJleHAiOjE3Mzk1NTY1Nzl9.jUEoje5A_YqA6pXLK4pHfB-YdcjSxQRvMUZ7jEcrZqo
+Content-Type: application/json

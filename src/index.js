@@ -5,6 +5,7 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 require("dotenv").config();
+
 const {
   handleEmailCertification,
   handleUserSignUp,
@@ -16,8 +17,8 @@ const {
   setPlanetName,
   updatePlanetName,
   getPlanetName,
+  handleDeleteUser,
 } = require("./controllers/user.controller.js");
-const ScheduleController = require("./controllers/schedule.controller");
 const server_ip = process.env.IP;
 const {
   handleAddPost,
@@ -28,20 +29,20 @@ const {
   handleGetPost,
   handleGetUPost,
   handleAddComment,
+  handleGetComment,
+  uploadPostImages,
+  deletePostImagesController,
+  uploadBackImages,
+  getBackImages,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
 const {
-  handleAddDaySchedule,
-  handleGetDaySchedules,
-  handleGetDaySchedulesByDateInUrl,
-  handleUpdateDaySchedule,
-  handleDeleteDaySchedule,
   handleAddSchedule,
   handleGetSchedules,
-  handleGetSchedulesByDateInUrl,
+  handleGetScheduleById,
   handleUpdateSchedule,
   handleDeleteSchedule,
-} = require("./controllers/schedule.controller.js");
+} = require("./controllers/schedule.controller");
 const {
   handleSendFriendRequest,
   handleAcceptFriendRequest,
@@ -57,9 +58,10 @@ const {
 } = require("./controllers/mainpage.controller.js");
 const {
   getFilteredStarRegions,
-  setStarsName,
   getStarsRanking,
   voteForStar,
+  upload,
+  setStarsNameWithImage,
 } = require("./controllers/stars.controller.js");
 
 const {
@@ -72,7 +74,10 @@ const {
   getMyPage,
   updateMyPage,
   getStoragedPost,
-  updateStoragePost
+  updateStoragePost,
+  uploadUserImage,
+  deleteUserImage,
+  getUserImage,
 } = require("./controllers/mypage.controller.js");
 
 const options = {
@@ -137,6 +142,7 @@ app.post("/login", handleUserLogin);
 app.post("/logout", handleUserLogout);
 app.post("/find-id", handleFindUserIdByEmail);
 app.post("/reset-pw", handleresetPassword);
+app.delete("/user", authenticateUser, handleDeleteUser);
 
 //행성
 app.post("/planet", setPlanetName);
@@ -151,30 +157,32 @@ app.patch("/posts/:postsId", handleEditPost); // 일지 수정
 app.delete("/posts/:postsId", handleDeletePost); // 일지 삭제
 app.get("/posts/user/:userId", handleGetPost); // 다른 유저의 일지 조회(전체)
 app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일지 조회(1개)
-app.post("/posts/comment", handleAddComment); // 일지 화면 코멘트 작성
+app.post("/comment", handleAddComment); // 일지 화면 코멘트 작성
+app.get("/comment", handleGetComment); // 일지 화면 코멘트 조회
+app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
+app.delete("/posts/:posts_id/image", deletePostImagesController); // 일지 첨부파일 삭제
+app.patch("/background", uploadBackImages); // 일지 작성 화면 배경화면 생성/수정
+app.get("/background", getBackImages); // 일지 작성 화면 배경화면 조회
 
-// 하루 일정 작성
-app.post("/day-schedules", handleAddDaySchedule); // Day Schedule 추가
-app.get("/day-schedules", handleGetDaySchedules); // Day Schedule 조회
-app.get("/day-schedules/:date", handleGetDaySchedulesByDateInUrl); // 날짜별 Day Schedule 조회
-app.patch("/day-schedules/:day_id", handleUpdateDaySchedule); // Day Schedule 수정
-app.delete("/day-schedules/:day_id", handleDeleteDaySchedule); // Day Schedule 삭제
-
-// 일정 작성
-app.post("/day-schedules/:day_id/schedules", handleAddSchedule); // Schedule 추가
-app.get("/day-schedules/:day_id/schedules", handleGetSchedules); // Schedule 조회
+// 캘린더 일정
+app.post("/schedule", authenticateUser, handleAddSchedule); // 일정 추가
+app.get("/schedule", authenticateUser, handleGetSchedules); // 전체 일정 조회
+app.get("/schedule/:date", authenticateUser, handleGetSchedules); // 날짜별 일정 조회
 app.get(
-  "/day-schedules/:day_id/schedules/:date",
-  handleGetSchedulesByDateInUrl
-); // 날짜별 Schedule 조회
+  "/schedule/:date/:schedule_id",
+  authenticateUser,
+  handleGetScheduleById
+); // 날짜별 ID로 특정 일정 조회
 app.patch(
-  "/day-schedules/:day_id/schedules/:schedule_id",
+  "/schedule/:date/:schedule_id",
+  authenticateUser,
   handleUpdateSchedule
-); // Schedule 수정
+); // 일정 수정
 app.delete(
-  "/day-schedules/:day_id/schedules/:schedule_id",
+  "/schedule/:date/:schedule_id",
+  authenticateUser,
   handleDeleteSchedule
-); // Schedule 삭제
+); // 일정 삭제
 
 // 메인 페이지
 app.get("/home", authenticateUser, handleListMainPost); // 메인페이지의 일지조회
@@ -190,7 +198,7 @@ app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조�
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
 
 app.get("/stars/:user_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
-app.patch("/stars/name", setStarsName); // 별자리 이름 설정 및 업데이트
+app.patch("/stars/name", upload.single("image"), setStarsNameWithImage); // 별자리 이름 설정 및 업데이트
 app.get("/stars/ranking", getStarsRanking); // 별자리 랭킹 조회
 app.post("/stars/vote", voteForStar); // 별자리 투표하기
 
@@ -204,6 +212,9 @@ app.get("/mypage", getMyPage); // 유저 정보 조회
 app.patch("/mypage", updateMyPage); // 유저 정보 수정
 app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
 app.patch("/mypage/storaged-posts/:postId", updateStoragePost); // 보관 글 상태 수정(보관->전체공개)
+app.patch("/profile-image", uploadUserImage); // 프로필 사진 등록/수정
+app.delete("/profile-image", deleteUserImage); // 프로필 사진 삭제
+app.get("/profile-image", getUserImage); // 프로필 사진 조회
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -564,13 +575,13 @@ app.listen(port, () => {
  *                   example: "Internal Server Error"
  */
 
-//메인 페이지 일지 조회 API
+// 메인 페이지 일지 조회 API
 /**
  * @swagger
  * /prod/home:
  *   get:
  *     summary: 메인 페이지의 일지 조회
- *     description: 사용자의 일지를 조회합니다.
+ *     description: 사용자의 일지를 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: query
  *         name: page
@@ -586,8 +597,13 @@ app.listen(port, () => {
  *           type: integer
  *           example: 10
  *         description: "한 페이지에 표시할 일지 수 (기본값: 10)"
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer your_jwt_token_here"
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 포스트 조회 성공
@@ -645,7 +661,7 @@ app.listen(port, () => {
  * /prod/home/search:
  *   get:
  *     summary: 메인 페이지에서 검색
- *     description: 특정 키워드를 사용하여 포스트를 검색합니다.
+ *     description: 특정 키워드를 사용하여 포스트를 검색합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: query
  *         name: term
@@ -667,8 +683,13 @@ app.listen(port, () => {
  *           type: integer
  *           example: 10
  *         description: "한 페이지에 표시할 포스트 수 (기본값: 10)"
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer your_jwt_token_here"
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 검색 결과
@@ -721,9 +742,15 @@ app.listen(port, () => {
  * /prod/home/search/rankings:
  *   get:
  *     summary: 검색 순위 조회
- *     description: 사용자의 검색 순위를 조회합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 사용자의 검색 순위를 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer your_jwt_token_here"
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 검색 순위 조회 성공
@@ -748,7 +775,6 @@ app.listen(port, () => {
  *         description: 서버 내부 오류
  */
 
-
 // 일지 작성 API
 /**
  * @swagger
@@ -756,6 +782,8 @@ app.listen(port, () => {
  *   post:
  *     summary: 일지 작성
  *     description: 로그인된 사용자가 일지를 작성합니다.
+ *     tags:
+ *       - "Post"
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -838,6 +866,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 유저의 일지 조회(전체)
  *     description: 로그인된 사용자의 일지를 조회합니다. 최신순으로 10개씩 반환합니다.
+ *     tags:
+ *       - "Post"
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -916,6 +946,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 유저의 일지 조회(1개)
  *     description: 사용자가 작성한 일지를 조회합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -986,6 +1018,8 @@ app.listen(port, () => {
  *   patch:
  *     summary: 일지 수정
  *     description: 사용자가 작성한 일지를 수정합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -1096,6 +1130,8 @@ app.listen(port, () => {
  *   delete:
  *     summary: 일지 삭제
  *     description: 사용자가 작성한 일지를 삭제합니다. 사용자 ID는 JWT 토큰에서 추출됩니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -1133,12 +1169,12 @@ app.listen(port, () => {
 // 일지 화면 코멘트 작성 API
 /**
  * @swagger
- * /prod/posts/comment:
+ * /prod/comment:
  *   post:
  *     summary: "일지 화면 코멘트 작성"
  *     description: "사용자가 특정 게시글에 코멘트를 작성하는 API"
  *     tags:
- *       - "Comments"
+ *       - "Post"
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -1199,6 +1235,56 @@ app.listen(port, () => {
  *                   example: "서버 오류 발생"
  */
 
+// 일지 화면 코멘트 조회 API
+/**
+ * @swagger
+ * /prod/comment:
+ *   get:
+ *     summary: "일지 화면 코멘트 조회"
+ *     description: "사용자의 코멘트를 조회합니다."
+ *     tags:
+ *       - "Post"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "코멘트 조회 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "코멘트 조회 성공"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     comment:
+ *                       type: string
+ *                       example: "지호의 여행일지"
+ *       400:
+ *         description: "코멘트가 없습니다!"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "코멘트가 없습니다!"
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */
+
 // 다른 유저의 일지 조회(전체) API
 /**
  * @swagger
@@ -1206,6 +1292,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 다른 유저의 일지 조회(전체)
  *     description: 특정 유저가 작성한 모든 일지를 조회합니다. 페이징 처리 기능이 포함되어 있습니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: userId
@@ -1278,6 +1366,8 @@ app.listen(port, () => {
  *   get:
  *     summary: 다른 유저의 일지 조회(1개)
  *     description: 사용자가 작성한 일지(1개)를 조회합니다.
+ *     tags:
+ *       - "Post"
  *     parameters:
  *       - in: path
  *         name: postsId
@@ -1353,6 +1443,231 @@ app.listen(port, () => {
  *         description: 해당 게시글을 찾을 수 없음
  *       500:
  *         description: 서버 오류
+ */
+
+// 일지 이미지 업로드 API
+/**
+ * @swagger
+ * /prod/posts/{posts_id}/image:
+ *   post:
+ *     summary: "게시글 이미지 업로드"
+ *     description: "S3에 이미지를 업로드하고, DB에 저장합니다."
+ *     tags:
+ *       - "Post"
+ *     parameters:
+ *       - name: posts_id
+ *         in: path
+ *         required: true
+ *         description: "이미지를 업로드할 게시글 ID"
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: "업로드할 이미지 파일들"
+ *     responses:
+ *       200:
+ *         description: "업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrls:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["https://s3-bucket-url.com/posts/image1.jpg"]
+ *       400:
+ *         description: "파일이 없거나 업로드 실패"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 실패"
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 일지 이미지 삭제 API
+/**
+ * @swagger
+ * /prod/posts/{posts_id}/image:
+ *   delete:
+ *     summary: "특정 일지의 모든 이미지 삭제"
+ *     description: "S3 및 DB에서 특정 게시글의 모든 이미지를 삭제합니다."
+ *     tags:
+ *       - "Post"
+ *     parameters:
+ *       - name: posts_id
+ *         in: path
+ *         required: true
+ *         description: "삭제할 게시글 ID"
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: "삭제 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "해당 게시글의 모든 이미지 삭제 완료"
+ *       404:
+ *         description: "이미지가 존재하지 않음"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "해당 게시글에 등록된 이미지가 없습니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 내부 오류"
+ */
+
+// 일지 작성 화면 배경화면 생성/수정 API
+/**
+ * @swagger
+ * /prod/background:
+ *   patch:
+ *     summary: "일지 작성 화면 배경화면 생성/수정"
+ *     description: "사용자가 배경 이미지를 업로드하면 S3에 저장하고 URL을 반환합니다."
+ *     tags:
+ *       - "Post"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: string
+ *                 format: binary
+ *                 description: "업로드할 이미지 파일"
+ *     responses:
+ *       200:
+ *         description: "파일 업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrl:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/backImages/example.png"
+ *       400:
+ *         description: "파일이 없을 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일이 없어요.."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 일지 작성 화면 배경화면 조회 API
+/**
+ * @swagger
+ * /prod/background:
+ *   get:
+ *     summary: "일지 작성 화면 배경화면 조회"
+ *     description: "사용자의 배경 이미지를 조회합니다."
+ *     tags:
+ *       - "Post"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "배경 이미지 조회 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/backImages/449e7993f538d398b89ee19e3452caf7_1.png"
+ *       400:
+ *         description: "등록된 배경 이미지가 없음"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 배경사진이 없습니다."
+ *       500:
+ *         description: "서버 오류 발생"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
  */
 
 // 행성 이름 초기 설정 API
@@ -2059,9 +2374,7 @@ app.listen(port, () => {
  * /prod/day-schedules:
  *   post:
  *     summary: 하루 일정 추가
- *     description: 사용자의 하루 일정을 추가합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 사용자의 하루 일정을 추가합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     requestBody:
  *       required: true
  *       content:
@@ -2079,6 +2392,14 @@ app.listen(port, () => {
  *               content:
  *                 type: string
  *                 description: "일정 내용"
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     responses:
  *       201:
  *         description: 일정 추가 성공
@@ -2106,6 +2427,27 @@ app.listen(port, () => {
  *         description: 날짜가 필요합니다.
  *       500:
  *         description: 서버 내부 오류
+ *     x-code-samples:
+ *       - lang: curl
+ *         source: |
+ *           curl -X POST http://localhost:4000/prod/day-schedules \
+ *           -H "Content-Type: application/json" \
+ *           -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+ *           -d '{
+ *               "date": "2025-01-30T10:00:00Z",
+ *               "title": "회의",
+ *               "content": "팀 미팅"
+ *           }'
+ *     curl:
+ *       - |
+ *         curl -X POST http://localhost:4000/prod/day-schedules \
+ *         -H "Content-Type: application/json" \
+ *         -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+ *         -d '{
+ *             "date": "2025-01-30T10:00:00Z",
+ *             "title": "회의",
+ *             "content": "팀 미팅"
+ *         }'
  */
 
 // 하루 일정 조회 API
@@ -2114,9 +2456,15 @@ app.listen(port, () => {
  * /prod/day-schedules:
  *   get:
  *     summary: 하루 일정 조회
- *     description: 사용자의 모든 하루 일정을 조회합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 사용자의 모든 하루 일정을 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 일정 조회 성공
@@ -2146,9 +2494,7 @@ app.listen(port, () => {
  * /prod/day-schedules/{date}:
  *   get:
  *     summary: 날짜별 하루 일정 조회
- *     description: 특정 날짜의 하루 일정을 조회합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 특정 날짜의 하루 일정을 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: path
  *         name: date
@@ -2157,6 +2503,13 @@ app.listen(port, () => {
  *           type: string
  *           format: date
  *         description: "조회할 날짜"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 일정 조회 성공
@@ -2186,9 +2539,7 @@ app.listen(port, () => {
  * /prod/day-schedules/{day_id}:
  *   patch:
  *     summary: 하루 일정 수정
- *     description: 특정 하루 일정을 수정합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 특정 하루 일정을 수정합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: path
  *         name: day_id
@@ -2196,6 +2547,13 @@ app.listen(port, () => {
  *         schema:
  *           type: integer
  *         description: "수정할 하루 일정 ID"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     requestBody:
  *       required: true
  *       content:
@@ -2232,9 +2590,7 @@ app.listen(port, () => {
  * /prod/day-schedules/{day_id}:
  *   delete:
  *     summary: 하루 일정 삭제
- *     description: 특정 하루 일정을 삭제합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
+ *     description: 특정 하루 일정을 삭제합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
  *     parameters:
  *       - in: path
  *         name: day_id
@@ -2242,6 +2598,13 @@ app.listen(port, () => {
  *         schema:
  *           type: integer
  *         description: "삭제할 하루 일정 ID"
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
+ *         description: "JWT 토큰"
  *     responses:
  *       200:
  *         description: 일정 삭제 성공
@@ -2258,7 +2621,6 @@ app.listen(port, () => {
  *       500:
  *         description: 서버 내부 오류
  */
-
 
 // 일정 추가 API
 /**
@@ -2490,6 +2852,7 @@ app.listen(port, () => {
  *         description: 서버 내부 오류
  */
 
+// 마이페이지 - 유저 정보 조회
 /**
  * @swagger
  * /mypage:
@@ -2530,4 +2893,424 @@ app.listen(port, () => {
  *         description: "유저 정보를 찾을 수 없음"
  *      500:
  *        description: 서버 내부 오류
+ */
+
+// 친구 요청
+/**
+ * @swagger
+ * /friends/request/{toUserId}:
+ *   post:
+ *     summary: "친구 요청"
+ *     description: "현재 로그인된 사용자가 toUserId에 해당하는 사용자에게 친구 요청을 보냅니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: toUserId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "친구 요청을 보낼 대상 사용자 ID"
+ *     responses:
+ *       200:
+ *         description: "친구 요청 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "친구 요청 완료"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     createdRequestFromUser:
+ *                       type: object
+ *                       description: "요청을 보낸 사용자의 요청 생성 결과"
+ *                     createdRequestToUser:
+ *                       type: object
+ *                       description: "요청을 받는 사용자의 요청 생성 결과"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 친구 요청 수락
+/**
+ * @swagger
+ * /friends/request/{requestId}:
+ *   patch:
+ *     summary: "친구 요청 수락"
+ *     description: "친구 요청 ID에 해당하는 친구 요청을 수락하여 양방향 친구 관계를 설정합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: requestId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: "수락할 친구 요청의 ID"
+ *     responses:
+ *       200:
+ *         description: "친구 요청 수락 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "친구 요청 수락 완료"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     createdRequestFromUser:
+ *                       type: object
+ *                       description: "요청을 보낸 사용자의 업데이트 결과"
+ *                     createdRequestToUser:
+ *                       type: object
+ *                       description: "요청을 받은 사용자의 업데이트 결과"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 내가 친구 요청한 목록 조회
+/**
+ * @swagger
+ * /friends/list/sent:
+ *   get:
+ *     summary: "내가 친구 요청한 목록 조회"
+ *     description: "현재 로그인된 사용자가 보낸(아직 수락되지 않은) 친구 요청 목록을 조회합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "내가 친구 요청한 목록 조회 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "내가 친구 요청한 목록 조회 완료"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       requestId:
+ *                         type: integer
+ *                         example: 101
+ *                       toUserNickname:
+ *                         type: string
+ *                         example: "친구닉네임"
+ *                       toUserImage:
+ *                         type: string
+ *                         example: "profile.jpg"
+ *                       requestedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-01T12:00:00.000Z"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 나에게 친구 요청한 목록 조회
+/**
+ * @swagger
+ * /friends/list/received:
+ *   get:
+ *     summary: "나에게 친구 요청한 목록 조회"
+ *     description: "현재 로그인된 사용자에게 온(아직 수락하지 않은) 친구 요청 목록을 조회합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "나에게 친구 요청한 목록 조회 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "나에게 친구 요청한 목록 조회 완료"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       requestId:
+ *                         type: integer
+ *                         example: 102
+ *                       fromUserNickname:
+ *                         type: string
+ *                         example: "요청보낸닉네임"
+ *                       fromUserImage:
+ *                         type: string
+ *                         example: "profile2.jpg"
+ *                       requestedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-02T15:30:00.000Z"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 서로 친구인 목록 조회
+/**
+ * @swagger
+ * /friends/list:
+ *   get:
+ *     summary: "서로 친구인 목록 조회"
+ *     description: "현재 로그인된 사용자의 친구 목록(서로 친구 관계인 목록)을 조회합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "서로 친구인 목록 조회 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "서로 친구인 목록 조회 완료"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       requestId:
+ *                         type: integer
+ *                         example: 103
+ *                       friendNickname:
+ *                         type: string
+ *                         example: "친구닉네임"
+ *                       friendImage:
+ *                         type: string
+ *                         example: "friend_profile.jpg"
+ *                       requestedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-03T10:00:00.000Z"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 친구 삭제
+/**
+ * @swagger
+ * /friends/request/{friendId}:
+ *   delete:
+ *     summary: "친구 삭제"
+ *     description: "현재 로그인된 사용자가 friendId에 해당하는 친구와의 친구 관계를 해제합니다."
+ *     tags:
+ *       - friends
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: friendId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "삭제할 친구의 사용자 ID"
+ *     responses:
+ *       200:
+ *         description: "친구 삭제 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 resultType:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "친구 삭제 완료"
+ *       500:
+ *         description: "서버 내부 오류"
+ */
+
+// 프로필 사진 등록/수정
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   patch:
+ *     summary: "프로필 사진 등록/수정"
+ *     description: "사용자가 프로필 사진을 업로드하면 S3에 저장하고 URL을 반환합니다."
+ *     tags:
+ *       - "mypage"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: string
+ *                 format: binary
+ *                 description: "업로드할 프로필 이미지 파일"
+ *     responses:
+ *       200:
+ *         description: "파일 업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrl:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/profile-image/example.png"
+ *       400:
+ *         description: "파일이 없을 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일이 없어요.."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 프로필 사진 삭제
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   delete:
+ *     summary: "프로필 사진 삭제"
+ *     description: "사용자의 프로필 사진을 삭제합니다."
+ *     tags:
+ *       - "mypage"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "이미지 삭제 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "이미지 삭제 완료"
+ *       400:
+ *         description: "등록된 이미지가 없는 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 이미지가 없습니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 프로필 사진 조회
+/**
+ * @swagger
+ * /prod/profile-image:
+ *   get:
+ *     summary: 프로필 사진 조회
+ *     description: 현재 로그인한 사용자의 프로필 사진을 조회합니다.
+ *     tags:
+ *       - mypage
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 프로필 사진 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/profile-image/4c99c22f5504aef38f02c0e106802666_2.png"
+ *       400:
+ *         description: 등록된 프로필 사진이 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 배경사진이 없습니다."
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
  */

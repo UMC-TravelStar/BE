@@ -1,5 +1,6 @@
 const { request } = require('express');
 const MyPageRepository = require('../repositories/mypage.repository');
+const { deleteImage } = require("../middlewares/deleteImage.js");
 
 class MyPageService {
     // 유저 정보 조회
@@ -40,6 +41,44 @@ class MyPageService {
         }
 
         return post;
+    };
+
+    // 프로필 이미지 등록/수정
+    async registerProfileImage(userId, fileUrl) {
+        // 1. 원래 프로필 이미지가 있는지 확인
+        const checkImage = await MyPageRepository.checkProfileImage(userId);
+
+        // 2. 이미지가 없다면 생성 / 있다면 데이터 바꾸기
+        let image;
+
+        if (!checkImage) {
+            image = await MyPageRepository.createImage(userId, fileUrl);
+        }
+        else {
+            image = await MyPageRepository.updateImage(userId, fileUrl);
+
+            await deleteImage("profile-image", [checkImage.file_name]);
+        }
+
+        return image.file_name;
+    };
+
+    // 프로필 이미지 삭제
+    async deleteProfileImage(userId) {
+        // 이미지 조회
+        const image = await MyPageRepository.findPostImages(userId);
+
+        if (!image) {
+            return { message: "등록된 이미지가 없습니다." };
+        }
+
+        // S3에서 이미지 삭제
+        await deleteImage("profile-image", [image.file_name]);
+
+        // DB에서 이미지 삭제
+        await MyPageRepository.deleteImageDB(userId);
+
+        return { message: "이미지 삭제 완료" };
     };
 };
 module.exports = new MyPageService();
