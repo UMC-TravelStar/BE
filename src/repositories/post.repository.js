@@ -75,6 +75,11 @@ const getAllUserPosts = async (skip, userId) => {
                     star_id: true,
                     region: true, // star 테이블의 region 컬럼 추가
                 }
+            },
+            post_images: {
+                select: {
+                    imageUrl: true,
+                }
             }
         },
         where: {
@@ -91,14 +96,12 @@ const getAllUserPosts = async (skip, userId) => {
 
 const getFrPost = async (skip, userId) => {
     return prisma.post.findMany({
-        select: {
-            post_id: true,
-            title: true,
-            created_at: true,
-            star: {
-                select: {
-                    star_id: true,
-                    region: true,
+        include: {  
+            star: true,  // 별 정보 가져오기
+            post_images: true,  // 이미지 정보 가져오기
+            user: {
+                include: {
+                    u_image: true // 유저 이미지 가져오기
                 }
             }
         },
@@ -119,7 +122,12 @@ const getFrPost2 = async (userId, postsId) => {
         where: {
             user_id: userId,
             post_id: parseInt(postsId),
-            storage: { in: [0, 1] }
+            storage: { in: [0, 1] },
+            post_images: {
+                select: {
+                    imageUrl: true,
+                }
+            }
         }
     })
 };
@@ -130,6 +138,9 @@ const getPostList2 = async (userId, postsId) => {
             user_id: userId,
             post_id: postsId,
             storage: 0
+        },
+        include: {
+            post_images: true // post_images 배열 포함
         }
     })
 };
@@ -144,6 +155,16 @@ const getPostList = async (skip, userId) => {
                 select: {
                     star_id: true,
                     region: true,
+                }
+            },
+            post_images: {
+                imageUrl: true,     
+            },
+            user: {  
+                select: {
+                    user_id: true,
+                    nickname: true,
+                    user_images: { select: { file_name: true } } // user_image 테이블에서 file_name 가져오기
                 }
             }
         },
@@ -169,7 +190,7 @@ const getPostById = async (userId, postsId) => {
           views: {
             increment: 1
           }
-        }
+        },
     });
 
     return prisma.post.findUnique({
@@ -177,6 +198,9 @@ const getPostById = async (userId, postsId) => {
             user_id: userId,
             post_id: parseInt(postsId),
         },
+        include: {
+            post_images: true // post_images 배열 포함
+        }
     });
 };
 
