@@ -76,6 +76,7 @@ const {
   getStoragedPost,
   updateStoragePost,
   uploadUserImage,
+  deleteUserImage,
 } = require("./controllers/mypage.controller.js");
 
 const options = {
@@ -211,6 +212,7 @@ app.patch("/mypage", updateMyPage); // 유저 정보 수정
 app.get("/mypage/storaged-posts", getStoragedPost); // 보관 글 목록 조회
 app.patch("/mypage/storaged-posts/:postId", updateStoragePost); // 보관 글 상태 수정(보관->전체공개)
 app.patch("/profile-image", uploadUserImage); // 프로필 사진 등록/수정
+app.delete("/profile-image", deleteUserImage); // 프로필 사진 삭제
 
 app.listen(port, () => {
   console.log(`포트가 4000인 서버 실행`);
@@ -3413,6 +3415,53 @@ app.listen(port, () => {
  *                 message:
  *                   type: string
  *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
+// 프로필 사진 삭제
+/**
+ * @swagger
+ * /profile-image:
+ *   delete:
+ *     summary: "프로필 사진 삭제"
+ *     description: "사용자의 프로필 사진을 삭제합니다."
+ *     tags:
+ *       - "mypage"
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "이미지 삭제 완료"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "이미지 삭제 완료"
+ *       400:
+ *         description: "등록된 이미지가 없는 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 이미지가 없습니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류"
  *                 error:
  *                   type: string
  *                   example: "Error message"

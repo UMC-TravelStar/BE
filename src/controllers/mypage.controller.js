@@ -83,10 +83,27 @@ const uploadUserImage = async (req, res) => {
     })
 };
 
+// 프로필 사진 삭제
+const deleteUserImage = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const result = await MyPageService.deleteProfileImage(userId);
+
+        if (result.message === "등록된 이미지가 없습니다.") {
+            return res.status(400).json(result);
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ message: "서버 오류", error: error.message });
+    }
+};
+
 module.exports = { 
     getMyPage,
     updateMyPage,
     getStoragedPost,
     updateStoragePost,
     uploadUserImage,
+    deleteUserImage
 };

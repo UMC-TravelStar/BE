@@ -89,5 +89,26 @@ class MyPageRepository {
             }
         });
     };
+
+    // 프로필 이미지 삭제 - 이미지 가져오기
+    async findPostImages(userId) {
+        return prisma.user_image.findUnique({
+            where: {
+                user_id: userId
+            },
+            select: {
+                file_name: true,
+            }
+        });
+    };
+
+    // 프로필 이미지 삭제 - 이미지 삭제
+    async deleteImageDB(userId) {
+        return prisma.user_image.delete({
+            where: {
+                user_id: userId,
+            }
+        });
+    };
 };
 module.exports = new MyPageRepository();

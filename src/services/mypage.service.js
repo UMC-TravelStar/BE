@@ -62,5 +62,23 @@ class MyPageService {
 
         return image.file_name;
     };
+
+    // 프로필 이미지 삭제
+    async deleteProfileImage(userId) {
+        // 이미지 조회
+        const image = await MyPageRepository.findPostImages(userId);
+
+        if (!image) {
+            return { message: "등록된 이미지가 없습니다." };
+        }
+
+        // S3에서 이미지 삭제
+        await deleteImage("profile-image", [image.file_name]);
+
+        // DB에서 이미지 삭제
+        await MyPageRepository.deleteImageDB(userId);
+
+        return { message: "이미지 삭제 완료" };
+    };
 };
 module.exports = new MyPageService();
