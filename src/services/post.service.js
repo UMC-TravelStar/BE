@@ -197,7 +197,8 @@ const registerBackImage = async (userId, file) => {
     }
     else {
         image = await updateBack(userId, file);
-        await deleteImage("backImages", [checkBack]);
+
+        await deleteImage("backImages", [checkBack.file_name]);
     }
 
     return image.file_name;

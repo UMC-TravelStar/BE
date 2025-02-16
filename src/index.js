@@ -1556,6 +1556,65 @@ app.listen(port, () => {
  *                   example: "서버 내부 오류"
  */
 
+// 일지 작성 화면 배경화면 생성/수정 API
+/**
+ * @swagger
+ * /prod/background:
+ *   patch:
+ *     summary: "일지 작성 화면 배경화면 생성/수정"
+ *     description: "사용자가 배경 이미지를 업로드하면 S3에 저장하고 URL을 반환합니다."
+ *     tags:
+ *       - "Post"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: string
+ *                 format: binary
+ *                 description: "업로드할 이미지 파일"
+ *     responses:
+ *       200:
+ *         description: "파일 업로드 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 성공"
+ *                 fileUrl:
+ *                   type: string
+ *                   example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/backImages/example.png"
+ *       400:
+ *         description: "파일이 없을 경우"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일이 없어요.."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "파일 업로드 중 오류 발생"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message"
+ */
+
 // 행성 이름 초기 설정 API
 /**
  * @swagger

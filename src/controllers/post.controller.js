@@ -258,7 +258,7 @@ const uploadBackImages = (req, res) => {
 
     backImageUploader.single("images")(req, res, (err) => {
         if (err) {
-            return res.status(400).json({ message: "파일 업로드 중 오류 발생", error: err.message });
+            return res.status(500).json({ message: "파일 업로드 중 오류 발생", error: err.message });
         }
 
         if (!req.file) {
