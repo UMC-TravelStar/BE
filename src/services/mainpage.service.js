@@ -40,38 +40,38 @@ const listUserPosts = async (currentUserId, page, limit) => {
   };
 };
 
-// 검색 기능 – 제목에 searchTerm이 포함된 게시글 조회 (이미지 포함)
 const searchPosts = async (searchTerm, page, limit, currentUserId) => {
-  const skip = (page - 1) * limit;
-  const results = await prisma.post.findMany({
-    where: {
-      title: { contains: searchTerm, mode: 'insensitive' },
-    },
-    include: {
-      star: { select: { star_id: true, region: true } },
-      post_images: { select: { imageUrl: true } },
-      user: {
-        select: {
-          user_id: true,
-          nickname: true,
-          u_image: { select: { file_name: true } },
+    const skip = (page - 1) * limit;
+    const results = await prisma.post.findMany({
+      where: {
+        title: { contains: searchTerm }, // mode: 'insensitive' 제거
+      },
+      include: {
+        star: { select: { star_id: true, region: true } },
+        post_images: { select: { imageUrl: true } },
+        user: {
+          select: {
+            user_id: true,
+            nickname: true,
+            u_image: { select: { file_name: true } },
+          },
         },
       },
-    },
-    orderBy: { updated_at: 'desc' },
-    skip,
-    take: limit,
-  });
-
-  const formattedResults = await Promise.all(
-    results.map(async post => {
-      const isFriend = await checkFriendship(currentUserId, post.user.user_id);
-      return new PostResponseDTO(post, isFriend);
-    })
-  );
-
-  return formattedResults;
-};
+      orderBy: { updated_at: 'desc' },
+      skip,
+      take: limit,
+    });
+  
+    const formattedResults = await Promise.all(
+      results.map(async post => {
+        const isFriend = await checkFriendship(currentUserId, post.user.user_id);
+        return new PostResponseDTO(post, isFriend);
+      })
+    );
+  
+    return formattedResults;
+  };
+  
 
 // 검색 기록 저장
 const recordSearch = async (searchTerm) => {

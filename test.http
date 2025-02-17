@@ -134,15 +134,15 @@ GET http://15.165.117.176:4000/schedule
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
 
 ### 특정 날짜 일정 조회
-GET http://15.165.117.176:4000/schedule/2025-02-09
+GET http://15.165.117.176:4000/schedule/2025-02-17
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
 
 ### 특정 일정 조회
-GET http://15.165.117.176:4000/schedule/2025-02-09/1
+GET http://15.165.117.176:4000/schedule/2025-02-17/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
 
 ### 일정 수정
-PATCH http://15.165.117.176:4000/schedule/2025-02-09/23
+PATCH http://15.165.117.176:4000/schedule/2025-02-17/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
 Content-Type: application/json
 
@@ -152,7 +152,7 @@ Content-Type: application/json
 }
 
 ### 일정 삭제
-DELETE http://15.165.117.176:4000/schedule/2025-02-09/1
+DELETE http://15.165.117.176:4000/schedule/2025-02-17/3
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
 
 ### 홈 조회
@@ -160,7 +160,7 @@ GET http://15.165.117.176:4000/home
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
 
 ### 홈 검색
-GET http://15.165.117.176:4000/home/search?term=검색어&page=1&limit=10
+GET http://15.165.117.176:4000/home/search?term=오사카&page=1&limit=10
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
 
 ### 홈 검색 랭킹 조회
