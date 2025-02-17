@@ -74,7 +74,7 @@ const handleUserSignUp = async (req, res) => {
       await prisma.stars.create({
         data: {
           user_id: createdUser.user_id,
-          name: "Default Name", // 초기 이름 설정
+          name: "0", // 초기 이름 설정 => 이름을 설정하지 않았으면 string "0"임
           views: 0, // 초기 조회수
           vote_num: 0, // 초기 투표 수
           created_at: new Date(), // 현재 시간으로 설정
@@ -278,19 +278,21 @@ const handleresetPassword = async (req, res) => {
 //행성 설정
 const setPlanetName = async (req, res) => {
   try {
-    // 1. 요청 헤더에서 JWT 토큰 추출
-    const authHeader = req.headers.authorization;
+    // // 1. 요청 헤더에서 JWT 토큰 추출
+    // const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "로그인이 필요합니다." });
-    }
+    // if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    //   return res.status(401).json({ message: "로그인이 필요합니다." });
+    // }
 
-    const token = authHeader.split(" ")[1]; // "Bearer <TOKEN>" 형식에서 토큰 부분만 추출
+    // const token = authHeader.split(" ")[1]; // "Bearer <TOKEN>" 형식에서 토큰 부분만 추출
 
-    // 2. 토큰 디코딩하여 user_id 추출
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded Token:", decoded);
-    const userId = decoded.id;
+    // // 2. 토큰 디코딩하여 user_id 추출
+    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // console.log("Decoded Token:", decoded);
+    // const userId = decoded.id;
+
+    const userId = req.userId; // 헤더에서 userId 추출 (모니 수정)
 
     if (!userId) {
       return res.status(400).json({ message: "유효하지 않은 토큰입니다." });
@@ -323,27 +325,34 @@ const setPlanetName = async (req, res) => {
 const updatePlanetName = async (req, res) => {
   try {
     // 1. 경로 파라미터에서 user_id 추출
-    const userId = req.params.user_id;
+    // const userId = req.params.user_id;
+    
+
+    // if (!userId) {
+    //   return res.status(400).json({ message: "사용자 ID가 필요합니다." });
+    // }
+
+    // // 2. 요청 헤더에서 토큰 추출
+    // const authHeader = req.headers.authorization;
+
+    // if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    //   return res.status(401).json({ message: "로그인이 필요합니다." });
+    // }
+
+    // const token = authHeader.split(" ")[1]; // "Bearer <TOKEN>"에서 TOKEN만 추출
+
+    // // 3. 토큰 디코딩 및 유효성 확인
+    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // console.log("Decoded Token:", decoded);
+
+    // if (decoded.id !== userId) {
+    //   return res.status(403).json({ message: "권한이 없습니다." });
+    // }
+
+    const userId = req.userId; // 헤더에서 userId 추출 (모니 수정)
 
     if (!userId) {
-      return res.status(400).json({ message: "사용자 ID가 필요합니다." });
-    }
-
-    // 2. 요청 헤더에서 토큰 추출
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "로그인이 필요합니다." });
-    }
-
-    const token = authHeader.split(" ")[1]; // "Bearer <TOKEN>"에서 TOKEN만 추출
-
-    // 3. 토큰 디코딩 및 유효성 확인
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded Token:", decoded);
-
-    if (decoded.id !== userId) {
-      return res.status(403).json({ message: "권한이 없습니다." });
+      return res.status(400).json({ message: "유효하지 않은 토큰입니다." });
     }
 
     // 4. 요청 바디에서 행성 이름 추출
@@ -372,7 +381,9 @@ const updatePlanetName = async (req, res) => {
 
 const getPlanetName = async (req, res) => {
   try {
-    const userId = req.params.user_id; // URL에서 user_id 추출
+    // const userId = req.params.user_id; // URL에서 user_id 추출
+    const userId = req.userId; // 헤더에서 userId 추출 (모니 수정)
+
     if (!userId) {
       return res.status(400).json({ message: "사용자 ID가 필요합니다." });
     }

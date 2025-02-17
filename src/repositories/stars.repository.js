@@ -2,26 +2,39 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 require("dotenv").config();
 
-// 사용자 ID로 별자리 조회
-const findStarsByUserId = async (userId) => {
-  return await prisma.stars.findUnique({
+// // 사용자 ID로 별자리 조회
+// const findStarsByUserId = async (userId) => {
+//   return await prisma.stars.findUnique({
+//     where: {
+//       user_id: String(userId), // user_id를 그대로 사용
+//     },
+//     select: {
+//       stars_id: true,
+//       updated_at: true, // updated_at 값을 가져옴
+//     },
+//   });
+// };
+
+const findStarsByUserId = async (starsId) => {
+  console.log("📌 [DEBUG] DB에서 조회할 stars_id:", starsId); // 🔥 stars_id 확인
+
+  const result = await prisma.star.findMany({
     where: {
-      user_id: String(userId), // user_id를 그대로 사용
+      stars_id: starsId, // ⭐ `stars_id`를 바로 사용하여 region 조회
     },
     select: {
-      stars_id: true,
-      updated_at: true, // updated_at 값을 가져옴
+      region: true, // 지역 정보만 선택
     },
   });
+
+  console.log("📌 [DEBUG] DB 조회 결과:", result); // 🔥 실제 DB 조회된 데이터 출력
+  return result;
 };
 // 특정 조건에 따라 star 테이블에서 region 조회
-const findFilteredStarRegions = async (starsId, updatedAt) => {
+const findFilteredStarRegions = async (starsId) => {
   return await prisma.star.findMany({
     where: {
-      stars_id: starsId, // stars 테이블의 별자리 ID와 연결된 별만 조회
-      created_at: {
-        lt: updatedAt, // stars 테이블의 updated_at 이전에 생성된 별
-      },
+      stars_id: starsId, // ⭐ stars_id를 직접 사용
     },
     select: {
       region: true, // region 값만 선택
