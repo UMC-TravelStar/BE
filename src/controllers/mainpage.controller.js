@@ -29,7 +29,6 @@ const handleSearchPosts = async (req, res) => {
             return res.status(StatusCodes.BAD_REQUEST).json({ message: "검색어가 필요합니다." });
         }
 
-        // 만약 term이 인코딩된 문자열이라면 복원
         const decodedTerm = Buffer.from(term, 'binary').toString('utf-8');
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 10;
@@ -38,7 +37,7 @@ const handleSearchPosts = async (req, res) => {
         const posts = await searchPosts(decodedTerm, page, limit, userId);
 
         return res.status(StatusCodes.OK).json({
-            message: '검색 결과',
+            message: `${decodedTerm} 검색 결과`, 
             data: posts
         });
     } catch (error) {
