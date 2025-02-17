@@ -1,16 +1,25 @@
+// controllers/schedule.controller.js
 const ScheduleService = require("../services/schedule.service");
 const ScheduleDto = require("../dtos/schedule.dto");
 
 const handleAddSchedule = async (req, res) => {
   const { location, date_time } = req.body;
-  const userId = req.userId; // 인증된 사용자 ID
+  const userId = req.userId; // 인증 미들웨어에서 설정된 값
+
+  if (!userId) {
+    return res.status(401).json({ message: "인증이 필요합니다." });
+  }
 
   if (!location || !date_time) {
     return res.status(400).json({ message: "위치와 날짜/시간을 입력해주세요." });
   }
 
   try {
-    const schedule = await ScheduleService.createSchedule(userId, location, new Date(date_time));
+    const schedule = await ScheduleService.createSchedule(
+      userId,
+      location,
+      new Date(date_time)
+    );
     res.status(201).json(new ScheduleDto(schedule));
   } catch (error) {
     console.error("일정 추가 실패:", error);
@@ -19,8 +28,12 @@ const handleAddSchedule = async (req, res) => {
 };
 
 const handleGetSchedules = async (req, res) => {
-  const userId = req.userId; // 인증된 사용자 ID
-  const { date } = req.params; // 날짜 파라미터 (있을 수도, 없을 수도 있음)
+  const userId = req.userId;
+  if (!userId) {
+    return res.status(401).json({ message: "인증이 필요합니다." });
+  }
+  
+  const { date } = req.params; // 날짜 파라미터(옵션)
 
   try {
     let schedules;
@@ -41,10 +54,16 @@ const handleGetSchedules = async (req, res) => {
 };
 
 const handleGetScheduleById = async (req, res) => {
+  const userId = req.userId;
+  if (!userId) {
+    return res.status(401).json({ message: "인증이 필요합니다." });
+  }
   const scheduleId = parseInt(req.params.schedule_id);
-
   try {
     const schedule = await ScheduleService.getScheduleById(scheduleId);
+    if (!schedule) {
+      return res.status(404).json({ message: "일정을 찾을 수 없습니다." });
+    }
     res.status(200).json(new ScheduleDto(schedule));
   } catch (error) {
     console.error("일정 조회 실패:", error);
@@ -53,6 +72,10 @@ const handleGetScheduleById = async (req, res) => {
 };
 
 const handleUpdateSchedule = async (req, res) => {
+  const userId = req.userId;
+  if (!userId) {
+    return res.status(401).json({ message: "인증이 필요합니다." });
+  }
   const scheduleId = parseInt(req.params.schedule_id);
   const { location, date_time } = req.body;
 
@@ -70,6 +93,10 @@ const handleUpdateSchedule = async (req, res) => {
 };
 
 const handleDeleteSchedule = async (req, res) => {
+  const userId = req.userId;
+  if (!userId) {
+    return res.status(401).json({ message: "인증이 필요합니다." });
+  }
   const scheduleId = parseInt(req.params.schedule_id);
 
   try {

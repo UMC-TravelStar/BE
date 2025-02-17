@@ -1,65 +1,34 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const scheduleRepository = require("../repositories/schedule.repository");
 
-class ScheduleRepository {
-  async createSchedule(userId, location, dateTime) {
-    return await prisma.schedule.create({
-      data: {
-        user: {
-          connect: {
-            user_id: userId,
-          },
-        },
-        location,
-        date_time: dateTime,
-      },
-    });
-  }
+const createSchedule = async (userId, location, dateTime) => {
+  return await scheduleRepository.createSchedule(userId, location, dateTime);
+};
 
-  // 전체 일정 조회 (날짜 필터 없이)
-  async getAllSchedules(userId) {
-    return await prisma.schedule.findMany({
-      where: { user_id: userId },
-    });
-  }
+const getAllSchedules = async (userId) => {
+  return await scheduleRepository.getAllSchedules(userId);
+};
 
-  // 특정 날짜에 해당하는 일정 조회
-  async getSchedulesByDate(userId, date) {
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
+const getSchedulesByDate = async (userId, date) => {
+  return await scheduleRepository.getSchedulesByDate(userId, date);
+};
 
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+const getScheduleById = async (scheduleId) => {
+  return await scheduleRepository.getScheduleById(scheduleId);
+};
 
-    return await prisma.schedule.findMany({
-      where: {
-        user_id: userId,
-        date_time: {
-          gte: startOfDay,
-          lt: endOfDay,
-        },
-      },
-    });
-  }
+const updateSchedule = async (scheduleId, location, dateTime) => {
+  return await scheduleRepository.updateSchedule(scheduleId, location, dateTime);
+};
 
-  async getScheduleById(scheduleId) {
-    return await prisma.schedule.findUnique({
-      where: { schedule_id: scheduleId },
-    });
-  }
+const deleteSchedule = async (scheduleId) => {
+  return await scheduleRepository.deleteSchedule(scheduleId);
+};
 
-  async updateSchedule(scheduleId, location, dateTime) {
-    return await prisma.schedule.update({
-      where: { schedule_id: scheduleId },
-      data: { location, date_time: dateTime },
-    });
-  }
-
-  async deleteSchedule(scheduleId) {
-    return await prisma.schedule.delete({
-      where: { schedule_id: scheduleId },
-    });
-  }
-}
-
-module.exports = new ScheduleRepository();
+module.exports = {
+  createSchedule,
+  getAllSchedules,
+  getSchedulesByDate,
+  getScheduleById,
+  updateSchedule,
+  deleteSchedule,
+};

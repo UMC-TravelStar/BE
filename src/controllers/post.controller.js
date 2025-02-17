@@ -308,8 +308,7 @@ const getBackImages = async (req, res) => {
 };
 
 // write from moni
-const analyzeFeeling = async (req, res) => {
-    const {postId} = req.params;
+const handleAnalyzeFeeling = async (req, res) => {
     const {review} = req.body;
 
     if(!review) {
@@ -319,7 +318,7 @@ const analyzeFeeling = async (req, res) => {
     }
 
     try{
-        const result = await postService.analyzeFeeling(postId, review);
+        const result = await analyzeFeeling(review);
         res.status(200).json({
             resultType: 'success',
             message: '감정분석 완료',
@@ -348,5 +347,5 @@ module.exports = {
     deletePostImagesController,
     uploadBackImages,
     getBackImages,
-    analyzeFeeling, //write from moni
+    handleAnalyzeFeeling , //write from moni
 };
