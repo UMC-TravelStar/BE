@@ -1,5 +1,5 @@
 ###회원가입15.165.117.176
-POST http://localhost:4000/register
+POST http://15.165.117.176:4000/register
 Content-Type: application/json; charset=UTF-8
 
 {
@@ -66,8 +66,8 @@ Content-Type: application/json; charset=UTF-8
 }
 
 ### 별자리 조회(아이디 기반)
-GET http://15.165.117.176:4000/stars/1234/regions
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJycnIiLCJpYXQiOjE3Mzk1MjI3NDksImV4cCI6MTczOTU1ODc0OX0.9UcvMVWiUvu7RtPi419rJZfo9lLybIe-vQCg6Kmd_xw
+GET http://15.165.117.176:4000/stars/1/regions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3Mzk2OTI5MzUsImV4cCI6MTczOTcyODkzNX0.qXTQpoHfa5n4_HvM84oKIrevCbmNPc5znlwBZWQYIXE
 Content-Type: application/json
 
 ### 별자리 이름 설정 변경 및 여행한 별들 추가
