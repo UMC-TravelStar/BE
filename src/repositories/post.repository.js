@@ -12,6 +12,7 @@ const findStarByRegion = async (region, starsId) => {
     console.log(existingStar)
     return existingStar;
 };
+
 const findStarsByUserId = async (userId) => {
     const stars = await prisma.stars.findFirst({
         where: {
@@ -20,6 +21,7 @@ const findStarsByUserId = async (userId) => {
     });
     return stars; 
 };
+
 const createStar = async (region, starsId) => {
     try {
         const star = await prisma.star.create({
@@ -34,6 +36,7 @@ const createStar = async (region, starsId) => {
         throw new Error(error); // 오류 발생 시 처리
     }
 };
+
 const savePost = async (userId, starId, postData) => {
     if (!starId) {
         throw new Error('Star ID is required');
@@ -55,6 +58,7 @@ const savePost = async (userId, starId, postData) => {
         },
     });
 };
+
 const getAllUserPosts = async (skip, userId) => {
     const posts = await prisma.post.findMany({
         select: {
@@ -84,6 +88,7 @@ const getAllUserPosts = async (skip, userId) => {
     console.log(posts); // 반환된 posts 확인
     return posts;
 };
+
 const getFrPost = async (skip, userId) => {
     return prisma.post.findMany({
         include: {  
@@ -106,32 +111,27 @@ const getFrPost = async (skip, userId) => {
         take: 10,
     });
 };
+
 const getFrPost2 = async (userId, postsId) => {
     return prisma.post.findUnique({
         where: {
             user_id: userId,
             post_id: parseInt(postsId),
-            storage: { in: [0, 1] },
-            post_images: {
-                select: {
-                    imageUrl: true,
-                }
-            }
+            storage: { in: [0, 1] }
         }
     })
 };
+
 const getPostList2 = async (userId, postsId) => {
     return prisma.post.findUnique({
         where: {
             user_id: userId,
             post_id: postsId,
             storage: 0
-        },
-        include: {
-            post_images: true // post_images 배열 포함
         }
     })
 };
+
 const getPostList = async (skip, userId) => {
     return prisma.post.findMany({
         select: {
@@ -166,6 +166,7 @@ const getPostList = async (skip, userId) => {
         take: 10,
     });
 };
+
 const getPostById = async (userId, postsId) => {
     await prisma.post.update({
         where: {
@@ -188,6 +189,7 @@ const getPostById = async (userId, postsId) => {
         }
     });
 };
+
 const getStarById = async (starId) => {
     return prisma.star.findUnique({
         where: {
@@ -195,6 +197,7 @@ const getStarById = async (starId) => {
         },
     });
 };
+
 const checkFriendship = async (userId, viewerId) => {
     console.log(typeof userId, userId); 
     console.log(typeof viewerId, viewerId);
@@ -209,6 +212,7 @@ const checkFriendship = async (userId, viewerId) => {
         },
     });
 };
+
 const updatePost = async (post, editData) => {
     const star_id = post.star_id;
     const existingStar = await prisma.star.findUnique({
@@ -266,6 +270,7 @@ const updatePost = async (post, editData) => {
         data: postData,
     });
 }
+
 const getPostById2 = async (userId, postsId) => {
     return prisma.post.findUnique({
         where: { 
@@ -274,6 +279,7 @@ const getPostById2 = async (userId, postsId) => {
         },
     });
 };
+
 const getRelatedPostsByStarId = async (starId) => {
     return await prisma.post.findMany({
         where: { 
@@ -281,6 +287,7 @@ const getRelatedPostsByStarId = async (starId) => {
         },
     });
 };
+
 const deletePost = async (userId, postsId) => {
     return await prisma.post.delete({
         where: {
@@ -289,6 +296,7 @@ const deletePost = async (userId, postsId) => {
         },
     });
 };
+
 const deleteStar = async (starId) => {
     return await prisma.star.delete({
         where: {
@@ -296,6 +304,7 @@ const deleteStar = async (starId) => {
         },
     });
 };
+
 const createComment = async (userId, commentData) => {
     return prisma.user.update({
         where: {
@@ -306,6 +315,7 @@ const createComment = async (userId, commentData) => {
         }
     });
 };
+
 const getComment = async (userId) => {
     return prisma.user.findUnique({
         where: {
@@ -316,6 +326,7 @@ const getComment = async (userId) => {
         }
     });
 };
+
 const registerPostImages = async (posts_id, fileUrls) => {
     return prisma.post_image.createMany({
         data: fileUrls.map(url => ({
@@ -324,6 +335,7 @@ const registerPostImages = async (posts_id, fileUrls) => {
         })),
     });
 };
+
 const findPostImages = async (posts_id) => {
     return prisma.post_image.findMany({
         where: {
@@ -331,6 +343,7 @@ const findPostImages = async (posts_id) => {
         }
     });
 };
+
 const deleteImageDB = async (posts_id) => {
     return prisma.post_image.deleteMany({
         where: {
@@ -338,6 +351,7 @@ const deleteImageDB = async (posts_id) => {
         }
     });
 };
+
 const checkBackImage = async (userId) => {
     return prisma.user_bgimage.findUnique({
         where: {
@@ -348,6 +362,7 @@ const checkBackImage = async (userId) => {
         }
     });
 };
+
 const createBack = async (userId, file) => {
     return prisma.user_bgimage.create({
         data: {
@@ -356,6 +371,7 @@ const createBack = async (userId, file) => {
         }
     });
 };
+
 const updateBack = async (userId, file) => {
     return prisma.user_bgimage.update({
         where: {
@@ -395,6 +411,7 @@ const getImage = async (user_id) => {
 //         }
 //     }
 // }
+
 module.exports = {
     findStarByRegion,
     findStarsByUserId,

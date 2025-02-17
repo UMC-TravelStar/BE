@@ -1,5 +1,4 @@
 const { 
-    findStars,
     checkOrCreateStar, 
     registerPost,
     listUserPosts,

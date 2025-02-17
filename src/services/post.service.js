@@ -38,23 +38,28 @@ const OPEN_API_KEY = process.env.OPEN_API_KEY;
 const OPEN_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 const checkOrCreateStar = async (userId, region) => {
-    console.log("Checking or creating star for userId:", userId, "region:", region);
+    try {
+        console.log("Checking or creating star for userId:", userId, "region:", region);
 
-    // 별자리 아이디 찾기
-    const stars = await findStarsByUserId(userId);
-    console.log("Stars ID for user:", stars.stars_id);
+        // 별자리 아이디 찾기
+        console.log(typeof findStarsByUserId)
+        const stars = await findStarsByUserId(userId);
+        console.log("Stars ID for user:", stars.stars_id);
 
-    // 별자리에서 해당 region에 맞는 별을 찾는다
-    let star = await findStarByRegion(region, stars.stars_id);
-    console.log("Found star:", star);
+        // 별자리에서 해당 region에 맞는 별을 찾는다
+        let star = await findStarByRegion(region, stars.stars_id);
+        console.log("Found star:", star);
 
-    if (!star) {
-        // 별이 없다면 새로 생성
-        star = await createStar(region, stars.stars_id);
-        console.log("Created Star ID:", star.star_id);
+        if (!star) {
+            // 별이 없다면 새로 생성
+            star = await createStar(region, stars.stars_id);
+            console.log("Created Star ID:", star.star_id);
+        }
+
+        return star.star_id;
+    } catch (error) {
+        console.error("Error in findStarsByUserId:", error);
     }
-
-    return star.star_id;
 };
 
 const registerPost = async (userId, starId, postData) => {
