@@ -1,40 +1,40 @@
-const { listUserPosts, searchPosts, recordSearch, getSearchRankings } = require("../services/mainpage.service.js");
+const { listUserPosts, searchPosts, recordSearch, getSearchRankings } = require("../services/mainpage.service");
 const { StatusCodes } = require("http-status-codes");
 
 // 포스트 조회 핸들러
 const handleListMainPost = async (req, res) => {
-    const userId = req.userId; 
-    const page = parseInt(req.query.page) || 1;
+    const userId = req.userId;
+    const page = parseInt(req.query.page, 10) || 1;
     const limit = 10;
 
     try {
-        const postData = await listUserPosts(userId, page, limit); 
+        const postData = await listUserPosts(userId, page, limit);
         return res.status(StatusCodes.OK).json({
             message: '포스트 조회 성공',
             data: postData
         });
     } catch (error) {
-        console.error(error);
+        console.error("포스트 조회 오류:", error);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "서버 내부 오류" });
     }
 };
 
 // 검색 핸들러
 const handleSearchPosts = async (req, res) => {
-    const userId = req.userId; 
+    const userId = req.userId;
 
     try {
         const { term } = req.query;
-
         if (!term) {
             return res.status(StatusCodes.BAD_REQUEST).json({ message: "검색어가 필요합니다." });
         }
 
+        // 만약 term이 인코딩된 문자열이라면 복원
         const decodedTerm = Buffer.from(term, 'binary').toString('utf-8');
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 10;
 
-        await recordSearch(decodedTerm); 
+        await recordSearch(decodedTerm);
         const posts = await searchPosts(decodedTerm, page, limit, userId);
 
         return res.status(StatusCodes.OK).json({
@@ -57,7 +57,7 @@ const handleGetSearchRankings = async (req, res) => {
             data: topRankings
         });
     } catch (error) {
-        console.error(error);
+        console.error("검색 순위 조회 오류:", error);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "서버 내부 오류" });
     }
 };

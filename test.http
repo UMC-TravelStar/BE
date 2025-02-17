@@ -95,6 +95,64 @@ Content-Type: application/json; charset=UTF-8
 }
 
 ### 회원 탈퇴 요청
-DELETE http://localhost:4000/user
+DELETE http://15.165.117.176:4000/user
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1IiwiaWF0IjoxNzM5NTIwNTc5LCJleHAiOjE3Mzk1NTY1Nzl9.jUEoje5A_YqA6pXLK4pHfB-YdcjSxQRvMUZ7jEcrZqo
 Content-Type: application/json
+
+
+### 로그인
+POST http://15.165.117.176:4000/login
+Content-Type: application/json
+
+{
+    "id": "star2",
+    "pw": "rrrr"
+}
+
+### 일정 추가
+POST http://15.165.117.176:4000/schedule
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg0MTg4LCJleHAiOjE3Mzk4MjAxODh9.VUg30mOpBaHdz-n0pQtkmFtW9iUwIiayTJB14tpr_Kc
+Content-Type: application/json
+
+{
+    "location": "집에가기",
+    "date_time": "2025-02-17T10:00:00Z"
+}
+
+### 일정 조회
+GET http://15.165.117.176:4000/schedule
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg0MTg4LCJleHAiOjE3Mzk4MjAxODh9.VUg30mOpBaHdz-n0pQtkmFtW9iUwIiayTJB14tpr_Kc
+
+### 특정 날짜 일정 조회
+GET http://15.165.117.176:4000/schedule/2025-02-09
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg0MTg4LCJleHAiOjE3Mzk4MjAxODh9.VUg30mOpBaHdz-n0pQtkmFtW9iUwIiayTJB14tpr_Kc
+
+### 특정 일정 조회
+GET http://15.165.117.176:4000/schedule/2025-02-09/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg0MTg4LCJleHAiOjE3Mzk4MjAxODh9.VUg30mOpBaHdz-n0pQtkmFtW9iUwIiayTJB14tpr_Kc
+
+### 일정 수정
+PATCH http://15.165.117.176:4000/schedule/2025-02-09/23
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg0MTg4LCJleHAiOjE3Mzk4MjAxODh9.VUg30mOpBaHdz-n0pQtkmFtW9iUwIiayTJB14tpr_Kc
+Content-Type: application/json
+
+{
+    "location": "수정된 위치",
+    "date_time": "2025-02-09T11:00:00Z"
+}
+
+### 일정 삭제
+DELETE http://15.165.117.176:4000/schedule/2025-02-09/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg0MTg4LCJleHAiOjE3Mzk4MjAxODh9.VUg30mOpBaHdz-n0pQtkmFtW9iUwIiayTJB14tpr_Kc
+
+### 홈 조회
+GET http://15.165.117.176:4000/home
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg0MTg4LCJleHAiOjE3Mzk4MjAxODh9.VUg30mOpBaHdz-n0pQtkmFtW9iUwIiayTJB14tpr_Kc
+
+### 홈 검색
+GET http://15.165.117.176:4000/home/search?term=검색어&page=1&limit=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg0MTg4LCJleHAiOjE3Mzk4MjAxODh9.VUg30mOpBaHdz-n0pQtkmFtW9iUwIiayTJB14tpr_Kc
+
+### 홈 검색 랭킹 조회
+GET http://15.165.117.176:4000/home/search/rankings
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg0MTg4LCJleHAiOjE3Mzk4MjAxODh9.VUg30mOpBaHdz-n0pQtkmFtW9iUwIiayTJB14tpr_Kc
