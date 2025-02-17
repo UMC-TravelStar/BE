@@ -28,8 +28,7 @@ const handleSearchPosts = async (req, res) => {
         if (!term) {
             return res.status(StatusCodes.BAD_REQUEST).json({ message: "검색어가 필요합니다." });
         }
-
-        const decodedTerm = Buffer.from(term, 'binary').toString('utf-8');
+        const decodedTerm = decodeURIComponent(term);
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 10;
 

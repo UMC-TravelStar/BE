@@ -160,7 +160,7 @@ GET http://15.165.117.176:4000/home
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
 
 ### 홈 검색
-GET http://15.165.117.176:4000/home/search?term=atat&page=1&limit=10
+GET http://15.165.117.176:4000/home/search?term=오사카&page=1&limit=10
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
 
 ### 홈 검색 랭킹 조회
