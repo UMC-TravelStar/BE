@@ -47,7 +47,7 @@ const savePost = async (userId, starId, postData) => {
             content: postData.content,
             music: postData.music,
             feel_color: postData.feel_color,
-            // feeling: postData.feeling,
+            feeling: postData.feeling,
             storage: postData.storage,
             user: {
                 connect: { user_id: userId },  // user와 연결 (user_id를 통해)
@@ -264,7 +264,7 @@ const updatePost = async (post, editData) => {
     } else {
         console.log('Region 변경되지 않음.');
     }
-    const { region, photos, ...postData } = editData;
+    const { region, ...postData } = editData;
     return await prisma.post.update({
         where: { post_id: post.post_id },
         data: postData,
