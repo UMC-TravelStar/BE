@@ -42,6 +42,7 @@ const listUserPosts = async (currentUserId, page, limit) => {
     };
 };
 
+
 // 검색 기능 – 제목에 searchTerm이 포함된 게시글 조회 (이미지 포함)
 const searchPosts = async (searchTerm, page, limit, currentUserId) => {
     const skip = (page - 1) * limit;
