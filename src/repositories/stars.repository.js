@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { TOO_MANY_REQUESTS } = require("http-status-codes");
 const prisma = new PrismaClient();
 require("dotenv").config();
 
@@ -37,7 +38,13 @@ const findFilteredStarRegions = async (starsId) => {
       stars_id: starsId, // ⭐ stars_id를 직접 사용
     },
     select: {
+      star_id: true,
       region: true, // region 값만 선택
+      posts: {
+        select: {
+          feel_color: true, // post 테이블에서 feel_color 값 가져오기
+        },
+      },
     },
   });
 };
