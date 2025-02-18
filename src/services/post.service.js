@@ -152,6 +152,15 @@ const deleteUserPost = async (userId, postsId) => {
             return null;
         }
 
+        const postImages = await findPostImages(postsId);
+
+        if (postImages.length != 0) {
+            const imageUrls = postImages.map(img => img.imageUrl);
+            await deleteImage("posts", imageUrls);
+        
+            await deleteImageDB(postsId);
+        }
+
         const starId = post.star_id; 
 
         // 게시글 삭제
