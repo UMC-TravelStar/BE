@@ -5,6 +5,7 @@ class UserPostResponseDTO {
         this.content = post.content;
         this.music = post.music;
         this.feeling = post.feeling;
+        this.feel_color = post.feel_color;
         this.storage = post.storage;
         this.images = post.post_images ? post.post_images.map(image => image.imageUrl).filter(url => url !== null) : [];
         this.created_at = post.created_at;
@@ -48,13 +49,13 @@ const formatPostResponse = (post) => {
 };
 
 class EditPostDto {
-    constructor({ title, region, music, content, photos, feeling }) {
+    constructor({ title, region, music, content, feeling, feel_color }) {
         this.title = title;
         this.region = region;
         this.music = music || "";
         this.content = content;
-        this.photos = Array.isArray(photos) ? photos : [];
         this.feeling = feeling;
+        this.feel_color = feel_color;
     }
 }
 

@@ -17,7 +17,11 @@ const getFilteredStarRegionsService = async (starsId) => {
   }
 
   // region 배열 반환
-  return stars.map((star) => star.region);
+  // return stars.map((star) => star.region);
+  return stars.map((star) => ({
+    id: star.star_id,
+    region: star.region,
+    feel_color: star.posts?.length > 0 ? star.posts[0].feel_color : null, }))
 };
 
 const setStarsNameService = async (userId, name) => {
