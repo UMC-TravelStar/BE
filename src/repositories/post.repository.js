@@ -127,6 +127,7 @@ const getFrPost2 = async (userId, postsId) => {
             },
             post_images: {
                 select: {
+                    p_image_id: true,
                     imageUrl: true,
                 }
             },
@@ -148,10 +149,15 @@ const getPostList2 = async (userId, postsId) => {
         },
         include: {
             star: true,
-            post_images: true,
+            post_images: {
+                p_image_id: true,
+                imageUrl: true,
+            },
             user: {
                 include: {
-                    u_image: true
+                    u_image: {
+                        file_name: true
+                    }
                 }
             }
         }
