@@ -49,7 +49,7 @@ const searchPosts = async (searchTerm, page, limit, currentUserId) => {
         where: {
             title: { contains: searchTerm },
             user: {
-                user_id: { not: currentUserId } // 로그인된 사용자의 게시물 제외
+                user_id: { not: currentUserId }
             }
         },
         include: {
