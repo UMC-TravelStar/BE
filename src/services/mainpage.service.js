@@ -42,6 +42,7 @@ const listUserPosts = async (currentUserId, page, limit) => {
     };
 };
 
+
 // 검색 기능 – 제목에 searchTerm이 포함된 게시글 조회 (이미지 포함)
 const searchPosts = async (searchTerm, page, limit, currentUserId) => {
     const skip = (page - 1) * limit;
@@ -80,20 +81,20 @@ const searchPosts = async (searchTerm, page, limit, currentUserId) => {
 
 // 검색 기록 저장
 const recordSearch = async (searchTerm) => {
-    const existingSearch = await prisma.search.findFirst({
-        where: { word: searchTerm },
+    const normalizedTerm = searchTerm.trim().toLowerCase(); // 전처리
+    return await prisma.search.upsert({
+      where: { word: normalizedTerm },
+      update: {
+        number: { increment: 1 },
+        updated_at: new Date(),
+      },
+      create: {
+        word: normalizedTerm,
+        number: 1,
+      },
     });
-    if (existingSearch) {
-        return await prisma.search.update({
-            where: { search_id: existingSearch.search_id },
-            data: { number: existingSearch.number + 1 },
-        });
-    } else {
-        return await prisma.search.create({
-            data: { word: searchTerm, number: 1 },
-        });
-    }
-};
+  };
+  
 
 // 검색 순위 조회
 const getSearchRankings = async () => {
