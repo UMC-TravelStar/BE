@@ -152,6 +152,15 @@ const deleteUserPost = async (userId, postsId) => {
             return null;
         }
 
+        const postImages = await findPostImages(postsId);
+
+        if (postImages.length != 0) {
+            const imageUrls = postImages.map(img => img.imageUrl);
+            await deleteImage("posts", imageUrls);
+        
+            await deleteImageDB(postsId);
+        }
+
         const starId = post.star_id; 
 
         // 게시글 삭제
@@ -177,23 +186,22 @@ const registerComment = async (userId, comment) => {
     return commentData;
 };
 
-// ✅ 특정 게시글의 모든 이미지 삭제 함수
-const deletePostImages = async (posts_id) => {
-    // 🔹 1. posts_id에 해당하는 이미지들 조회
-    const postImages = await findPostImages(posts_id);
+// ✅ 특정 게시글의 모든 이미지 삭제 함수 /////////////////////////////////////////////////////////////
+const deletePostImages = async (postId, url_id) => {
+    // 🔹 1. posts_id에 해당하는 이미지 조회
+    const postImage = await findPostImages(postId, url_id);
 
-    if (postImages.length === 0) {
-        return { message: "해당 게시글에 등록된 이미지가 없습니다." };
+    if (!postImage) {
+        return { message: "해당 등록된 이미지가 없습니다." };
     }
 
     // 🔹 2. S3에서 이미지 삭제 (posts 폴더)
-    const imageUrls = postImages.map(img => img.imageUrl);
-    await deleteImage("posts", imageUrls);
+    await deleteImage("posts", [postImage.imageUrl]);
 
     // 🔹 3. DB에서 이미지 데이터 삭제
-    await deleteImageDB(posts_id);
+    await deleteImageDB(postId, url_id);
 
-    return { message: "해당 게시글의 모든 이미지 삭제 완료" };
+    return { message: "해당 이미지 삭제 완료" };
 };
 
 const registerBackImage = async (userId, file) => {

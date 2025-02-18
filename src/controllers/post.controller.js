@@ -276,10 +276,12 @@ const uploadBackImages = (req, res) => {
 
 const deletePostImagesController = async (req, res) => {
     try {
-        const posts_id = parseInt(req.params.posts_id);
-        const result = await deletePostImages(posts_id);
+        const postId = parseInt(req.params.posts_id);
+        const url_id = parseInt(req.body.url_id);
 
-        if (result.message === "해당 게시글에 등록된 이미지가 없습니다.") {
+        const result = await deletePostImages(postId, url_id);
+
+        if (result.message === "해당 이미지가 없습니다.") {
             return res.status(404).json(result); // 404: 이미지가 없음
         }
 
