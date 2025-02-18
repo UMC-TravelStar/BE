@@ -326,7 +326,6 @@ const updatePlanetName = async (req, res) => {
   try {
     // 1. 경로 파라미터에서 user_id 추출
     // const userId = req.params.user_id;
-    
 
     // if (!userId) {
     //   return res.status(400).json({ message: "사용자 ID가 필요합니다." });
@@ -424,31 +423,45 @@ const handleDeleteUser = async (req, res) => {
         .json({ message: "사용자를 찾을 수 없습니다." });
     }
 
-    // 🔹 FK 제약 조건 해결 (연관 데이터 삭제)
-    await prisma.post.deleteMany({ where: { user_id: userId } });
-    await prisma.friend.deleteMany({
-      where: {
-        OR: [{ from_user_id: userId }, { to_user_id: userId }],
-      },
-    });
-    await prisma.votes.deleteMany({ where: { user_id: userId } });
-    await prisma.stars.deleteMany({ where: { user_id: userId } });
-    await prisma.subscrition.deleteMany({ where: { user_id: userId } });
-    await prisma.user_image.deleteMany({ where: { user_id: userId } });
-    await prisma.user_bgimage.deleteMany({ where: { user_id: userId } });
-    await prisma.planet.deleteMany({ where: { user_id: userId } });
+    // 🔹 트랜잭션을 사용하여 FK 제약 조건 해결 후 삭제
+    await prisma.$transaction(async (prismaTx) => {
+      console.log("🚀 트랜잭션 시작");
 
-    // 🔹 사용자 삭제 (FK 문제 해결 후 삭제 가능)
-    await prisma.user.delete({
-      where: { user_id: userId },
+      // ✅ Prisma 트랜잭션 객체가 올바르게 생성되었는지 확인
+      if (!prismaTx || typeof prismaTx !== "object") {
+        throw new Error("Prisma 트랜잭션 객체가 생성되지 않았습니다.");
+      }
+
+      // ✅ FK를 참조하는 모든 테이블의 데이터 먼저 삭제
+      await prismaTx.post.deleteMany({ where: { user_id: userId } });
+      await prismaTx.friend.deleteMany({
+        where: {
+          OR: [{ from_user_id: userId }, { to_user_id: userId }],
+        },
+      });
+      await prismaTx.votes.deleteMany({ where: { user_id: userId } });
+      await prismaTx.stars.deleteMany({ where: { user_id: userId } });
+      await prismaTx.subscrition.deleteMany({ where: { user_id: userId } });
+      await prismaTx.user_image.deleteMany({ where: { user_id: userId } });
+      await prismaTx.user_bgimage.deleteMany({ where: { user_id: userId } });
+      await prismaTx.planet.deleteMany({ where: { user_id: userId } });
+      await prismaTx.schedule.deleteMany({ where: { user_id: userId } }); // ✅ 추가됨
+
+      // 🔹 최종적으로 사용자 삭제
+      await prismaTx.user.delete({
+        where: { user_id: userId },
+      });
+
+      console.log("✅ 회원 탈퇴 성공");
     });
 
     res.status(StatusCodes.OK).json({ message: "회원 탈퇴 성공" });
   } catch (error) {
     console.error("회원 탈퇴 오류:", error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "서버 오류가 발생했습니다.", error: error.message });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "서버 오류가 발생했습니다.",
+      error: error.message,
+    });
   }
 };
 

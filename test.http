@@ -106,7 +106,7 @@ Content-Type: application/json; charset=UTF-8
 
 ### 회원 탈퇴 요청
 DELETE http://15.165.117.176:4000/user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1IiwiaWF0IjoxNzM5NTIwNTc5LCJleHAiOjE3Mzk1NTY1Nzl9.jUEoje5A_YqA6pXLK4pHfB-YdcjSxQRvMUZ7jEcrZqo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5ODkxNTE1LCJleHAiOjE3Mzk5Mjc1MTV9.Rp-wlsvZiAhhhqbd3ZrQvHwkHiOhbDmMjStBPhMOqwY
 Content-Type: application/json
 
 
