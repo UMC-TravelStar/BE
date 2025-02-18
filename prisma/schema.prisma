@@ -145,10 +145,10 @@ model user_bgimage {
 
 model search {
   search_id  Int      @id @default(autoincrement())
-  word       String?
+  word       String   @unique
   number     Int      @default(0)
   created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  updated_at DateTime @default(now())
 }
 
 model planet {
