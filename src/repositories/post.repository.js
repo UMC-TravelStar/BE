@@ -362,18 +362,23 @@ const registerPostImages = async (posts_id, fileUrls) => {
     });
 };
 
-const findPostImages = async (posts_id) => {
-    return prisma.post_image.findMany({
+const findPostImages = async (posts_id, url_id) => {
+    return prisma.post_image.findFirst({
         where: {
-            post_id: parseInt(posts_id)
+            post_id: parseInt(posts_id),
+            p_image_id: parseInt(url_id),
+        },
+        select: {
+            imageUrl: true
         }
     });
 };
 
-const deleteImageDB = async (posts_id) => {
-    return prisma.post_image.deleteMany({
+const deleteImageDB = async (posts_id, url_id) => {
+    return prisma.post_image.delete({
         where: {
-            post_id: parseInt(posts_id)
+            post_id: parseInt(posts_id),
+            p_image_id: parseInt(url_id),
         }
     });
 };

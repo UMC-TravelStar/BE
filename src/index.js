@@ -163,7 +163,7 @@ app.get("/posts/:postsId/user/:userId", handleGetUPost); // 다른 유저의 일
 app.post("/comment", handleAddComment); // 일지 화면 코멘트 작성
 app.get("/comment", handleGetComment); // 일지 화면 코멘트 조회
 app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생성
-app.delete("/posts/:posts_id/image", deletePostImagesController); // 일지 첨부파일 삭제
+app.patch("/posts/:posts_id/image", deletePostImagesController); // 일지 첨부파일 삭제
 app.patch("/background", uploadBackImages); // 일지 작성 화면 배경화면 생성/수정
 app.get("/background", getBackImages); // 일지 작성 화면 배경화면 조회
 app.post("/posts/feeling", handleAnalyzeFeeling ); // 감정분석
@@ -1513,7 +1513,7 @@ app.listen(port, () => {
 /**
  * @swagger
  * /prod/posts/{posts_id}/image:
- *   delete:
+ *   patch:
  *     summary: "특정 일지의 모든 이미지 삭제"
  *     description: "S3 및 DB에서 특정 게시글의 모든 이미지를 삭제합니다."
  *     tags:
