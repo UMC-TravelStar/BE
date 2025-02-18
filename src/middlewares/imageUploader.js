@@ -30,7 +30,7 @@ const getImageUploader = (uploadPath) => {
           return callback(new Error("Unsupported file type"));
         }
 
-        callback(null, `${uploadPath}/${uuid}_${file.originalname}`);
+        callback(null, `${uploadPath}/${uuid}${extension}`);
       },
       acl: "public-read-write",
     }),
