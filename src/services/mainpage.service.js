@@ -21,11 +21,14 @@ const checkFriendship = async (currentUserId, userId) => {
 const listUserPosts = async (currentUserId, page, limit) => {
     const skip = (page - 1) * limit;
     const totalPosts = await countUserPosts();
+
+    // 현재 사용자가 작성한 포스트를 제외한 게시물 조회
     const posts = await getUserPosts(skip, limit);
+    const filteredPosts = posts.filter(post => post.user.user_id !== currentUserId);
 
     // 각 포스트에 대해 친구 여부를 체크하고 DTO 변환
     const formattedPosts = await Promise.all(
-        posts.map(async post => {
+        filteredPosts.map(async post => {
             const isFriend = await checkFriendship(currentUserId, post.user.user_id);
             return new PostResponseDTO(post, isFriend);
         })
@@ -33,9 +36,9 @@ const listUserPosts = async (currentUserId, page, limit) => {
 
     return {
         posts: formattedPosts,
-        totalPosts,
+        totalPosts: filteredPosts.length, // 필터링된 게시물 수
         currentPage: page,
-        totalPages: Math.ceil(totalPosts / limit),
+        totalPages: Math.ceil(filteredPosts.length / limit),
     };
 };
 
@@ -44,7 +47,10 @@ const searchPosts = async (searchTerm, page, limit, currentUserId) => {
     const skip = (page - 1) * limit;
     const results = await prisma.post.findMany({
         where: {
-            title: { contains: searchTerm }, 
+            title: { contains: searchTerm },
+            user: {
+                user_id: { not: currentUserId } // 로그인된 사용자의 게시물 제외
+            }
         },
         include: {
             star: { select: { star_id: true, region: true } },

@@ -1,4 +1,3 @@
-// dtos/mainpage.dto.js
 class PostResponseDTO {
   constructor(post, isFriend) {
     this.post_id = post.post_id;
