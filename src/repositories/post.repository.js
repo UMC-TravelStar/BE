@@ -118,8 +118,25 @@ const getFrPost2 = async (userId, postsId) => {
             user_id: userId,
             post_id: parseInt(postsId),
             storage: { in: [0, 1] }
+        },
+        include: {
+            star: {
+                select: {
+                    region: true,
+                }
+            },
+            post_images: {
+                select: {
+                    imageUrl: true,
+                }
+            },
+            user: {
+                select: {
+                    u_image: true
+                }
+            }
         }
-    })
+    });
 };
 
 const getPostList2 = async (userId, postsId) => {
@@ -128,6 +145,15 @@ const getPostList2 = async (userId, postsId) => {
             user_id: userId,
             post_id: postsId,
             storage: 0
+        },
+        include: {
+            star: true,
+            post_images: true,
+            user: {
+                include: {
+                    u_image: true
+                }
+            }
         }
     })
 };
