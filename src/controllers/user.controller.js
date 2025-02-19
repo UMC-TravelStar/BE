@@ -406,11 +406,10 @@ const getPlanetName = async (req, res) => {
   }
 };
 
-// 회원 탈퇴 핸들러
 const handleDeleteUser = async (req, res) => {
   try {
     const userId = req.userId; // JWT 미들웨어에서 저장한 userId 사용
-    console.log("회원 탈퇴 요청:", userId);
+    console.log("🚀 회원 탈퇴 요청:", userId);
 
     // 🔹 회원 존재 여부 확인
     const user = await prisma.user.findUnique({
@@ -427,27 +426,29 @@ const handleDeleteUser = async (req, res) => {
     await prisma.$transaction(async (prismaTx) => {
       console.log("🚀 트랜잭션 시작");
 
-      // ✅ Prisma 트랜잭션 객체가 올바르게 생성되었는지 확인
-      if (!prismaTx || typeof prismaTx !== "object") {
-        throw new Error("Prisma 트랜잭션 객체가 생성되지 않았습니다.");
-      }
-
       // ✅ FK를 참조하는 모든 테이블의 데이터 먼저 삭제
+      // ✅ post_image 먼저 삭제 후 post 삭제
+      await prismaTx.post_image.deleteMany({
+        where: { post: { user_id: userId } },
+      });
+
       await prismaTx.post.deleteMany({ where: { user_id: userId } });
+
       await prismaTx.friend.deleteMany({
         where: {
           OR: [{ from_user_id: userId }, { to_user_id: userId }],
         },
       });
+
       await prismaTx.votes.deleteMany({ where: { user_id: userId } });
       await prismaTx.stars.deleteMany({ where: { user_id: userId } });
       await prismaTx.subscrition.deleteMany({ where: { user_id: userId } });
       await prismaTx.user_image.deleteMany({ where: { user_id: userId } });
       await prismaTx.user_bgimage.deleteMany({ where: { user_id: userId } });
       await prismaTx.planet.deleteMany({ where: { user_id: userId } });
-      await prismaTx.schedule.deleteMany({ where: { user_id: userId } }); // ✅ 추가됨
+      await prismaTx.schedule.deleteMany({ where: { user_id: userId } });
 
-      // 🔹 최종적으로 사용자 삭제
+      // ✅ 최종적으로 사용자 삭제
       await prismaTx.user.delete({
         where: { user_id: userId },
       });
@@ -457,7 +458,15 @@ const handleDeleteUser = async (req, res) => {
 
     res.status(StatusCodes.OK).json({ message: "회원 탈퇴 성공" });
   } catch (error) {
-    console.error("회원 탈퇴 오류:", error);
+    console.error("❌ 회원 탈퇴 오류:", error);
+
+    if (error.code === "P2003") {
+      return res.status(StatusCodes.CONFLICT).json({
+        message: "외래 키 제약 조건으로 인해 회원 탈퇴가 실패했습니다.",
+        error: error.message,
+      });
+    }
+
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "서버 오류가 발생했습니다.",
       error: error.message,
