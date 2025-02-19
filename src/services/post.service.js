@@ -148,7 +148,7 @@ const deleteBackImage = async (url, userId) => {
     await deleteImage("backImages", [url]);
     await deleteImageDB3(userId);
 
-    return { success: true, message: '일지 삭제 성공' };
+    return { success: true, message: '삭제 성공' };
 };
 
 const deleteUserPost = async (userId, postsId) => {
