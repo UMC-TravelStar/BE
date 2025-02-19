@@ -57,13 +57,14 @@ const formatPostResponse = (post) => {
 };
 
 class EditPostDto {
-    constructor({ title, region, music, content, feeling, feel_color }) {
+    constructor({ title, region, music, content, feeling, feel_color, storage }) {
         this.title = title;
         this.region = region;
         this.music = music || "";
         this.content = content;
         this.feeling = feeling;
         this.feel_color = feel_color;
+        this.storage = storage;
     }
 }
 

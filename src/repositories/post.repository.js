@@ -48,7 +48,7 @@ const savePost = async (userId, starId, postData) => {
             music: postData.music,
             feel_color: postData.feel_color,
             feeling: postData.feeling,
-            storage: postData.storage,
+            storage: parseInt(postData.storage),
             user: {
                 connect: { user_id: userId },  // user와 연결 (user_id를 통해)
             },
