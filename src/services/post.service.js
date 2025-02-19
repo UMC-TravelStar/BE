@@ -23,6 +23,7 @@ const {
     findPostImage,
     deleteImageDB,
     deleteImageDB2,
+    deleteImageDB3,
     checkBackImage,
     createBack,
     updateBack,
@@ -141,6 +142,13 @@ const editPost = async (post, editData) => {
     const updatedPost = await updatePost(post, editData);
 
     return updatedPost;
+};
+
+const deleteBackImage = async (url, userId) => {
+    await deleteImage("backImages", [url]);
+    await deleteImageDB3(userId);
+
+    return { success: true, message: '일지 삭제 성공' };
 };
 
 const deleteUserPost = async (userId, postsId) => {
@@ -307,6 +315,7 @@ module.exports = {
     deleteUserPost,
     registerComment,
     deletePostImages,
+    deleteBackImage,
     registerBackImage,
     analyzeFeeling,
 };

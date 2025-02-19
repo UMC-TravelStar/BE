@@ -34,6 +34,7 @@ const {
   deletePostImagesController,
   uploadBackImages,
   getBackImages,
+  deleteBack,
   handleAnalyzeFeeling ,
 } = require("./controllers/post.controller.js");
 const { authenticateUser } = require("./auth");
@@ -166,6 +167,7 @@ app.post("/posts/:posts_id/image", uploadPostImages); // 일지 첨부파일 생
 app.patch("/posts/:posts_id/image", deletePostImagesController); // 일지 첨부파일 삭제
 app.patch("/background", uploadBackImages); // 일지 작성 화면 배경화면 생성/수정
 app.get("/background", getBackImages); // 일지 작성 화면 배경화면 조회
+app.delete("/background", deleteBack); // 일지 작성 화면 배경화면 삭제
 app.post("/posts/feeling", handleAnalyzeFeeling ); // 감정분석
 
 // 캘린더 일정

@@ -11,6 +11,7 @@ const {
     registerComment,
     deletePostImages,
     registerBackImage,
+    deleteBackImage,
     analyzeFeeling, //write from moni
 } = require("../services/post.service.js");
 const { 
@@ -19,7 +20,7 @@ const {
 const {
     registerPostImages,
     getComment,
-    getImage
+    getImage,
 } = require("../repositories/post.repository.js")
 const imageUploader = require("../middlewares/imageUploader.js");
 const postImageUploader = imageUploader("posts");
@@ -172,6 +173,25 @@ const handleEditPost = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: "서버 내부 오류" });
+    }
+};
+
+const deleteBack = async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        const image = await getImage(userId);
+
+        if (!image) {
+            return res.status(400).json({ success: false, message: "등록된 배경화면이 없습니다." });
+        } else {
+            const result = await deleteBackImage(image.file_name, userId);
+            res.status(200).json({ success: true, message: result.message });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: '서버 내부 오류' });
     }
 };
 
@@ -348,5 +368,6 @@ module.exports = {
     deletePostImagesController,
     uploadBackImages,
     getBackImages,
+    deleteBack,
     handleAnalyzeFeeling , //write from moni
 };
