@@ -408,6 +408,14 @@ const deleteImageDB2 = async (posts_id) => {
     });
 };
 
+const deleteImageDB3 = async (userId) => {
+    return prisma.user_bgimage.delete({
+        where: {
+            user_id: userId
+        }
+    })
+};
+
 const checkBackImage = async (userId) => {
     return prisma.user_bgimage.findUnique({
         where: {
@@ -493,6 +501,7 @@ module.exports = {
     findPostImage,
     deleteImageDB,
     deleteImageDB2,
+    deleteImageDB3,
     checkBackImage,
     createBack,
     updateBack,
