@@ -115,13 +115,13 @@ POST http://15.165.117.176:4000/login
 Content-Type: application/json
 
 {
-    "id": "star2",
-    "pw": "rrrr"
+    "id": "test2",
+    "pw": "Dddddddd"
 }
 
 ### 일정 추가
 POST http://15.165.117.176:4000/schedule
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 Content-Type: application/json
 
 {
@@ -131,19 +131,19 @@ Content-Type: application/json
 
 ### 일정 조회
 GET http://15.165.117.176:4000/schedule
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 특정 날짜 일정 조회
 GET http://15.165.117.176:4000/schedule/2025-02-17
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 특정 일정 조회
 GET http://15.165.117.176:4000/schedule/2025-02-17/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 일정 수정
 PATCH http://15.165.117.176:4000/schedule/2025-02-17/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 Content-Type: application/json
 
 {
@@ -153,16 +153,16 @@ Content-Type: application/json
 
 ### 일정 삭제
 DELETE http://15.165.117.176:4000/schedule/2025-02-17/3
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 홈 조회
 GET http://15.165.117.176:4000/home
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 홈 검색
-GET http://15.165.117.176:4000/home/search?term=오사카&page=1&limit=10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+GET http://15.165.117.176:4000/home/search?term=파리&page=1&limit=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 홈 검색 랭킹 조회
 GET http://15.165.117.176:4000/home/search/rankings
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU

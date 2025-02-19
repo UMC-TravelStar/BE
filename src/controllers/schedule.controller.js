@@ -1,10 +1,15 @@
-// controllers/schedule.controller.js
 const ScheduleService = require("../services/schedule.service");
 const ScheduleDto = require("../dtos/schedule.dto");
 
+const convertToKST = (date) => {
+  const kstOffset = 9 * 60 * 60 * 1000; // KST는 UTC+9
+  return new Date(date.getTime() + kstOffset);
+};
+
+// handleAddSchedule
 const handleAddSchedule = async (req, res) => {
   const { location, date_time } = req.body;
-  const userId = req.userId; // 인증 미들웨어에서 설정된 값
+  const userId = req.userId;
 
   if (!userId) {
     return res.status(401).json({ message: "인증이 필요합니다." });
@@ -18,7 +23,7 @@ const handleAddSchedule = async (req, res) => {
     const schedule = await ScheduleService.createSchedule(
       userId,
       location,
-      new Date(date_time)
+      convertToKST(new Date(date_time)) 
     );
     res.status(201).json(new ScheduleDto(schedule));
   } catch (error) {
@@ -71,6 +76,7 @@ const handleGetScheduleById = async (req, res) => {
   }
 };
 
+
 const handleUpdateSchedule = async (req, res) => {
   const userId = req.userId;
   if (!userId) {
@@ -83,7 +89,7 @@ const handleUpdateSchedule = async (req, res) => {
     const updatedSchedule = await ScheduleService.updateSchedule(
       scheduleId,
       location,
-      new Date(date_time)
+      convertToKST(new Date(date_time)) 
     );
     res.status(200).json(new ScheduleDto(updatedSchedule));
   } catch (error) {
