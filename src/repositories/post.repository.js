@@ -368,7 +368,18 @@ const registerPostImages = async (posts_id, fileUrls) => {
     });
 };
 
-const findPostImages = async (posts_id, url_id) => {
+const findPostImages = async (posts_id) => {
+    return prisma.post_image.findMany({
+        where: {
+            post_id: parseInt(posts_id),
+        },
+        select: {
+            imageUrl: true
+        }
+    });
+};
+
+const findPostImage = async (posts_id, url_id) => {
     return prisma.post_image.findFirst({
         where: {
             post_id: parseInt(posts_id),
@@ -385,6 +396,14 @@ const deleteImageDB = async (posts_id, url_id) => {
         where: {
             post_id: parseInt(posts_id),
             p_image_id: parseInt(url_id),
+        }
+    });
+};
+
+const deleteImageDB2 = async (posts_id) => {
+    return prisma.post_image.deleteMany({
+        where: {
+            post_id: parseInt(posts_id),
         }
     });
 };
@@ -471,7 +490,9 @@ module.exports = {
     getComment,
     registerPostImages,
     findPostImages,
+    findPostImage,
     deleteImageDB,
+    deleteImageDB2,
     checkBackImage,
     createBack,
     updateBack,
