@@ -83,18 +83,17 @@ const searchPosts = async (searchTerm, page, limit, currentUserId) => {
 const recordSearch = async (searchTerm) => {
     const normalizedTerm = searchTerm.trim().toLowerCase(); // 전처리
     return await prisma.search.upsert({
-      where: { word: normalizedTerm },
-      update: {
-        number: { increment: 1 },
-        updated_at: new Date(),
-      },
-      create: {
-        word: normalizedTerm,
-        number: 1,
-      },
+        where: { word: normalizedTerm }, 
+        update: {
+            number: { increment: 1 },
+            updated_at: new Date(),
+        },
+        create: {
+            word: normalizedTerm,
+            number: 1,
+        },
     });
-  };
-  
+};
 
 // 검색 순위 조회
 const getSearchRankings = async () => {
