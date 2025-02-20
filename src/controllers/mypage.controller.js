@@ -38,7 +38,24 @@ const updateMyPage = async (req, res) => {
 const getStoragedPost = async (req, res) => {
     try{
         const userId = req.userId;
+        if(!userId){
+            return res.status(400).json({
+                resultType: 'error',
+                message: '로그인이 필요합니다.'
+            })
+        }
+
         const posts = await MyPageService.findStoragedPost(userId);
+
+        // 빈 배열인 경우
+        if (posts.length === 0) {
+            return res.status(200).json({
+                resultType: 'success',
+                message: '보관 글이 없습니다.',
+                data: []
+            });
+        }
+
         res.status(200).json({
             resultType: 'success',
             message: '보관 글 목록 조회 성공',

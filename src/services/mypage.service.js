@@ -27,7 +27,8 @@ class MyPageService {
     async findStoragedPost(userId){
         const posts = await MyPageRepository.findStoragedPost(userId);
         if(!posts || posts.length === 0){
-            throw new Error('보관 글 목록 조회에 실패했습니다.');
+            // throw new Error('보관 글 목록 조회에 실패했습니다.');
+            return [];
         }
 
         return posts;
