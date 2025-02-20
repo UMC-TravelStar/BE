@@ -914,6 +914,8 @@ app.listen(port, () => {
  *                         type: integer
  *                       title:
  *                         type: string
+ *                       feel_color:
+ *                         type: string
  *                       createdAt:
  *                         type: string
  *                         format: date-time
@@ -924,33 +926,35 @@ app.listen(port, () => {
  *                             type: integer
  *                           region:
  *                             type: string
+ *                       images:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                       size:
+ *                         type: integer
  *             example:
  *               message: "일지 조회 성공"
  *               data:
- *                 - id: 17
- *                   title: "post1"
- *                   createdAt: "2025-01-25T18:53:48.928Z"
+ *                 - id: 46
+ *                   title: "프랑스 파리 가보고싶다"
+ *                   feel_color: "3"
+ *                   createdAt: "2025-02-20T04:08:44.043Z"
  *                   star:
- *                     id: 16
- *                     region: "여수2"
- *                 - id: 18
- *                   title: "post1"
- *                   createdAt: "2025-01-25T18:53:49.508Z"
+ *                     id: 35
+ *                     region: "프랑스 파리"
+ *                   images:
+ *                     - "https://travelstar.s3.ap-northeast-2.amazonaws.com/posts/4916553a295ec8b896a8b588f0272180.png"
+ *                   size: 1
+ *                 - id: 45
+ *                   title: "미쿡여행"
+ *                   feel_color: "4"
+ *                   createdAt: "2025-02-20T04:07:06.651Z"
  *                   star:
- *                     id: 16
- *                     region: "여수2"
- *                 - id: 19
- *                   title: "post1"
- *                   createdAt: "2025-01-25T18:53:49.988Z"
- *                   star:
- *                     id: 16
- *                     region: "여수2"
- *                 - id: 20
- *                   title: "post1"
- *                   createdAt: "2025-01-25T18:53:50.428Z"
- *                   star:
- *                     id: 16
- *                     region: "여수2"
+ *                     id: 34
+ *                     region: "미국 캘리포니아 로스앤젤레스"
+ *                   images:
+ *                     - "https://travelstar.s3.ap-northeast-2.amazonaws.com/posts/462b7016b5e3f4c59b446aad2b9142a9.png"
+ *                   size: 3
  *       404:
  *         description: 일지가 없어요. 작성해주세요!
  */
