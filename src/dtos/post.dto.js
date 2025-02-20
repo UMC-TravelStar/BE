@@ -23,6 +23,7 @@ class PostResponseDTO {
         this.title = post.title;
         this.content = post.content;
         this.music = post.music;
+        this.feel_color = post.feel_color;
         this.created_at = post.created_at;
         this.star_id = post.star?.star_id;
         this.region = post.star?.region;
