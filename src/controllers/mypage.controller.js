@@ -51,18 +51,34 @@ const updateMyPage = async (req, res) => {
 
 // 보관 글 목록 조회
 const getStoragedPost = async (req, res) => {
-  try {
-    const userId = req.userId;
-    const posts = await MyPageService.findStoragedPost(userId);
+    try{
+        const userId = req.userId;
+        if(!userId){
+            return res.status(400).json({
+                resultType: 'error',
+                message: '로그인이 필요합니다.'
+            })
+        }
 
-    res.status(200).json({
-      resultType: "success",
-      message: "보관 글 목록 조회 성공",
-      data: posts,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+        const posts = await MyPageService.findStoragedPost(userId);
+
+        // 빈 배열인 경우
+        if (posts.length === 0) {
+            return res.status(200).json({
+                resultType: 'success',
+                message: '보관 글이 없습니다.',
+                data: []
+            });
+        }
+
+        res.status(200).json({
+            resultType: 'success',
+            message: '보관 글 목록 조회 성공',
+            data: posts
+        });
+    } catch(error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
 // 보관 글 상태 수정(보관->전체공개)
