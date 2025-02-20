@@ -65,7 +65,7 @@ class FriendsService{
     }
 
     //서로 친구인 목록 조회
-    async getFriendList(userId){
+    async getFriendsList(userId){
         const friends = await FriendsRepository.findFriends(userId);
         return friends.map((friend) => {
             // 현재 유저가 from_user_id인 경우 => 친구 정보는 friend.to_user

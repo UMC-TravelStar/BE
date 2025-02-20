@@ -65,7 +65,7 @@ const findTopStars = async () => {
     orderBy: {
       vote_num: "desc",
     },
-    take: 10,
+    //take: 10, 상위 10개
     select: {
       stars_id: true,
       user_id: true,

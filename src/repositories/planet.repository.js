@@ -3,9 +3,12 @@ const prisma = new PrismaClient();
 
 class PlanetRepository{
     // planetId로 행성 찾기
-    async findPlanetByUserId(planetId){
-        return await prisma.planet.findUnique({
-            where: {planet_id: planetId}
+    async findPlanetByUserId(userId){
+        return await prisma.user.findUnique({
+            where: {user_id: userId},
+            select: {
+                planet_name: true
+            }
         })
     }
 

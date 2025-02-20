@@ -7,7 +7,11 @@ class UserPostResponseDTO {
         this.feeling = post.feeling;
         this.feel_color = post.feel_color;
         this.storage = post.storage;
-        this.images = post.post_images ? post.post_images.map(image => image.imageUrl).filter(url => url !== null) : [];
+        this.images = post.post_images
+        ? post.post_images
+            .filter(image => image.imageUrl !== null)
+            .map(image => ({ id: image.p_image_id, url: image.imageUrl }))
+        : [];   
         this.created_at = post.created_at;
         this.updated_at = post.updated_at;
     }
@@ -22,12 +26,28 @@ class PostResponseDTO {
         this.created_at = post.created_at;
         this.star_id = post.star?.star_id;
         this.region = post.star?.region;
-        this.images = post.post_images ? post.post_images.map(image => image.imageUrl).filter(url => url !== null) : [];
+        this.images = post.post_images
+        ? post.post_images
+            .filter(image => image.imageUrl !== null)
+            .map(image => ({ id: image.p_image_id, url: image.imageUrl }))
+        : [];    
         this.user_id = post.user?.user_id || null;
         this.nickname = post.user?.nickname || null;
         this.user_image = post.user?.u_image?.length > 0 ? post.user.u_image[0].file_name : null;
     }
 }
+
+class StoragePostResponseDTO {
+    constructor(post) {
+        this.post_id = post.post_id;
+        this.title = post.title;
+        this.created_at = post.created_at;
+        this.updated_at = post.updated_at;
+    }
+}
+
+
+const getRandomSize = () => Math.floor(Math.random() * 3) + 1;
 
 const formatPostResponse = (post) => {
     if (!post) {
@@ -44,24 +64,28 @@ const formatPostResponse = (post) => {
             id: post.star.star_id,  // star_id 추가
             region: post.star.region // star 테이블의 region 값 추가
         },
-        images: post.post_images.map(image => image.imageUrl)
+        images: post.post_images.map(image => image.imageUrl),
+        size: getRandomSize()
     };
 };
 
 class EditPostDto {
-    constructor({ title, region, music, content, feeling, feel_color }) {
+    constructor({ title, region, music, content, feeling, feel_color, storage }) {
         this.title = title;
         this.region = region;
         this.music = music || "";
         this.content = content;
         this.feeling = feeling;
         this.feel_color = feel_color;
+        this.storage = storage;
     }
 }
 
 module.exports = {
     formatPostResponse,
     UserPostResponseDTO,
+    StoragePostResponseDTO,
     EditPostDto,
     PostResponseDTO,
+    getRandomSize,
 };

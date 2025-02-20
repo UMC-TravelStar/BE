@@ -15,8 +15,8 @@ class PlanetService{
     };
 
     //유저 행성 조회
-    async getPlanet(planetId){
-        const planet = await PlanetRepository.findPlanetByUserId(planetId);
+    async getPlanet(userId){
+        const planet = await PlanetRepository.findPlanetByUserId(userId);
         if(!planet){
             throw new Error('행성이 존재하지 않습니다.');
         }

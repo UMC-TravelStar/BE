@@ -48,7 +48,7 @@ const savePost = async (userId, starId, postData) => {
             music: postData.music,
             feel_color: postData.feel_color,
             feeling: postData.feeling,
-            storage: postData.storage,
+            storage: parseInt(postData.storage),
             user: {
                 connect: { user_id: userId },  // user와 연결 (user_id를 통해)
             },
@@ -80,6 +80,7 @@ const getAllUserPosts = async (skip, userId) => {
         },
         where: {
             user_id: userId,
+            storage: { in: [0, 1] }
         },
         orderBy: { post_id: "desc" },
         skip, // 앞에서 skip 개수만큼 건너뛰기
@@ -127,6 +128,7 @@ const getFrPost2 = async (userId, postsId) => {
             },
             post_images: {
                 select: {
+                    p_image_id: true,
                     imageUrl: true,
                 }
             },
@@ -148,10 +150,15 @@ const getPostList2 = async (userId, postsId) => {
         },
         include: {
             star: true,
-            post_images: true,
+            post_images: {
+                p_image_id: true,
+                imageUrl: true,
+            },
             user: {
                 include: {
-                    u_image: true
+                    u_image: {
+                        file_name: true
+                    }
                 }
             }
         }
@@ -366,6 +373,17 @@ const findPostImages = async (posts_id, url_id) => {
     return prisma.post_image.findFirst({
         where: {
             post_id: parseInt(posts_id),
+        },
+        select: {
+            imageUrl: true
+        }
+    });
+};
+
+const findPostImage = async (posts_id, url_id) => {
+    return prisma.post_image.findFirst({
+        where: {
+            post_id: parseInt(posts_id),
             p_image_id: parseInt(url_id),
         },
         select: {
@@ -381,6 +399,22 @@ const deleteImageDB = async (posts_id, url_id) => {
             p_image_id: parseInt(url_id),
         }
     });
+};
+
+const deleteImageDB2 = async (posts_id) => {
+    return prisma.post_image.deleteMany({
+        where: {
+            post_id: parseInt(posts_id),
+        }
+    });
+};
+
+const deleteImageDB3 = async (userId) => {
+    return prisma.user_bgimage.delete({
+        where: {
+            user_id: userId
+        }
+    })
 };
 
 const checkBackImage = async (userId) => {
@@ -465,7 +499,10 @@ module.exports = {
     getComment,
     registerPostImages,
     findPostImages,
+    findPostImage,
     deleteImageDB,
+    deleteImageDB2,
+    deleteImageDB3,
     checkBackImage,
     createBack,
     updateBack,

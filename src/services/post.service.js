@@ -20,7 +20,10 @@ const {
     getAllUserPosts,
     createComment,
     findPostImages,
+    findPostImage,
     deleteImageDB,
+    deleteImageDB2,
+    deleteImageDB3,
     checkBackImage,
     createBack,
     updateBack,
@@ -141,6 +144,13 @@ const editPost = async (post, editData) => {
     return updatedPost;
 };
 
+const deleteBackImage = async (url, userId) => {
+    await deleteImage("backImages", [url]);
+    await deleteImageDB3(userId);
+
+    return { success: true, message: '삭제 성공' };
+};
+
 const deleteUserPost = async (userId, postsId) => {
     try {
         // 게시글 가져오기
@@ -158,7 +168,7 @@ const deleteUserPost = async (userId, postsId) => {
             const imageUrls = postImages.map(img => img.imageUrl);
             await deleteImage("posts", imageUrls);
         
-            await deleteImageDB(postsId);
+            await deleteImageDB2(postsId);
         }
 
         const starId = post.star_id; 
@@ -186,6 +196,10 @@ const registerComment = async (userId, comment) => {
     return commentData;
 };
 
+// ✅ 특정 게시글의 이미지 1개 삭제 함수
+const deletePostImages = async (postId, url_id) => {
+    // 🔹 1. posts_id에 해당하는 이미지 조회
+    const postImage = await findPostImage(postId, url_id);
 // ✅ 특정 게시글의 모든 이미지 삭제 함수 /////////////////////////////////////////////////////////////
 const deletePostImages = async (postId, url_id) => {
     // 🔹 1. posts_id에 해당하는 이미지 조회
@@ -193,14 +207,19 @@ const deletePostImages = async (postId, url_id) => {
 
     if (!postImage) {
         return { message: "해당 등록된 이미지가 없습니다." };
+    if (!postImage) {
+        return { message: "해당 등록된 이미지가 없습니다." };
     }
 
     // 🔹 2. S3에서 이미지 삭제 (posts 폴더)
     await deleteImage("posts", [postImage.imageUrl]);
+    await deleteImage("posts", [postImage.imageUrl]);
 
     // 🔹 3. DB에서 이미지 데이터 삭제
     await deleteImageDB(postId, url_id);
+    await deleteImageDB(postId, url_id);
 
+    return { message: "해당 이미지 삭제 완료" };
     return { message: "해당 이미지 삭제 완료" };
 };
 
@@ -305,6 +324,7 @@ module.exports = {
     deleteUserPost,
     registerComment,
     deletePostImages,
+    deleteBackImage,
     registerBackImage,
     analyzeFeeling,
 };

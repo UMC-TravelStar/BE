@@ -3,10 +3,10 @@ POST http://15.165.117.176:4000/register
 Content-Type: application/json; charset=UTF-8
 
 {
-  "user_id": "star2",
-  "nickname": "star2",
-  "password": "rrrr",
-  "name": "rrrr",
+  "user_id": "1234",
+  "nickname": "1234",
+  "password": "1234",
+  "name": "1234",
   "birth": "1990-01-01",
   "phonenum": "01067058085",
   "email": "rrrr@naver.com"
@@ -17,8 +17,8 @@ POST http://15.165.117.176:4000/login
 Content-Type: application/json; charset=UTF-8
 
 {
-  "id": "star2",
-  "pw": "rrrr"
+  "id": "1234",
+  "pw": "1234"
 }
 
 ###이메일 인증코드 발송
@@ -66,8 +66,8 @@ Content-Type: application/json; charset=UTF-8
 }
 
 ### 별자리 조회(아이디 기반)
-GET http://15.165.117.176:4000/stars/1/regions
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3Mzk2OTI5MzUsImV4cCI6MTczOTcyODkzNX0.qXTQpoHfa5n4_HvM84oKIrevCbmNPc5znlwBZWQYIXE
+GET http://15.165.117.176:4000/stars/5/regions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzk5Mzg5MjUsImV4cCI6MTczOTk3NDkyNX0._UscOJyERKCZiaXqBdiPJlqoxdFbDtrzAVYcKHmbWTo
 Content-Type: application/json
 
 ### 별자리 이름 설정 변경 및 여행한 별들 추가
@@ -81,7 +81,7 @@ Content-Type: application/json
 
 ### 별자리 랭킹 조회
 GET http://15.165.117.176:4000/stars/ranking
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3Mzk2OTI5MzUsImV4cCI6MTczOTcyODkzNX0.qXTQpoHfa5n4_HvM84oKIrevCbmNPc5znlwBZWQYIXE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3NDAwNDcyMzAsImV4cCI6MTc0MDA4MzIzMH0.GnvT2X8eLoLFM6C4dL40zbRquS79Y2gRg-Fn8H8tPwM
 Content-Type: application/json
 
 ### 별자리 투표 여부 조회
@@ -104,9 +104,9 @@ Content-Type: application/json; charset=UTF-8
   "post_user_id": "1" 
 }
 
-### 회원 탈퇴 요청
+### 회원 탈퇴 요청 15.165.117.176
 DELETE http://15.165.117.176:4000/user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5ODkxNTE1LCJleHAiOjE3Mzk5Mjc1MTV9.Rp-wlsvZiAhhhqbd3ZrQvHwkHiOhbDmMjStBPhMOqwY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQiLCJpYXQiOjE3Mzk5NjgzNjUsImV4cCI6MTc0MDAwNDM2NX0.YXu6iN_HjACcDqAAQM5LK0tWYEyzEDCgGpn7gWo6AtA
 Content-Type: application/json
 
 
@@ -115,13 +115,13 @@ POST http://15.165.117.176:4000/login
 Content-Type: application/json
 
 {
-    "id": "star2",
-    "pw": "rrrr"
+    "id": "test2",
+    "pw": "Dddddddd"
 }
 
 ### 일정 추가
 POST http://15.165.117.176:4000/schedule
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 Content-Type: application/json
 
 {
@@ -131,19 +131,19 @@ Content-Type: application/json
 
 ### 일정 조회
 GET http://15.165.117.176:4000/schedule
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 특정 날짜 일정 조회
 GET http://15.165.117.176:4000/schedule/2025-02-17
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 특정 일정 조회
 GET http://15.165.117.176:4000/schedule/2025-02-17/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 일정 수정
 PATCH http://15.165.117.176:4000/schedule/2025-02-17/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 Content-Type: application/json
 
 {
@@ -153,16 +153,16 @@ Content-Type: application/json
 
 ### 일정 삭제
 DELETE http://15.165.117.176:4000/schedule/2025-02-17/3
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 홈 조회
 GET http://15.165.117.176:4000/home
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3Q3IiwiaWF0IjoxNzQwMDQ2NjgzLCJleHAiOjE3NDAwODI2ODN9.w5TK5-BsTG5GPnTbekl-z8Tv5xXU1FzrO_RReHRn6Mw
 
 ### 홈 검색
-GET http://15.165.117.176:4000/home/search?term=오사카&page=1&limit=10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+GET http://15.165.117.176:4000/home/search?term=제주도&page=1&limit=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzQwMDIyODcyLCJleHAiOjE3NDAwNTg4NzJ9.uOqMo_gp5Qotsb3BaddD7KrTVvF9BZMA1OkMbLIav24
 
 ### 홈 검색 랭킹 조회
 GET http://15.165.117.176:4000/home/search/rankings
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InN0YXIyIiwiaWF0IjoxNzM5Nzg4MjU1LCJleHAiOjE3Mzk4MjQyNTV9.YtxvXLwRrZSCpecX3Jy74NGGJQbhogunnhtw2fGe37w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU

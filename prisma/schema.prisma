@@ -37,7 +37,7 @@ model user {
 model post {
   post_id     Int          @id @default(autoincrement())
   title       String?
-  content     String?
+  content     String?      @db.Text
   music       String?
   feeling     String?
   feel_color  String?
@@ -145,7 +145,7 @@ model user_bgimage {
 
 model search {
   search_id  Int      @id @default(autoincrement())
-  word       String   @unique
+  word       String   
   number     Int      @default(0)
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
