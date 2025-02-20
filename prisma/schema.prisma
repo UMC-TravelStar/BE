@@ -32,9 +32,6 @@ model user {
 
   from_friends friend[] @relation("FromUser")
   to_friends   friend[] @relation("ToUser")
-
-  sent_notifications     notification[] @relation(name: "sender")
-  received_notifications notification[] @relation(name: "receiver")
 }
 
 model post {
@@ -174,19 +171,4 @@ model votes {
   stars  stars  @relation(fields: [stars_id], references: [stars_id], onDelete: Cascade)
 
   @@unique([user_id, stars_id]) // 사용자와 별자리 조합으로 중복 방지
-}
-
-model notifications {
-  id            Int         @id @default(autoincrement())
-  type          String      // 알림 유형 (예: "friend_request", "friend_accept", "post")
-  sender_id     String      // 보낸 사람 ID
-  receiver_id   String      // 받는 사람 ID
-  content       String?     // 알림 내용
-  is_read       Boolean     @default(false) // 읽음 여부
-  created_at    DateTime    @default(now())
-
-  sender        user        @relation(name: "sender", fields: [sender_id], references: [user_id])
-  receiver      user        @relation(name: "receiver", fields: [receiver_id], references: [user_id])
-
-  @@index([receiver_id])
 }
