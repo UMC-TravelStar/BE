@@ -824,9 +824,12 @@ app.listen(port, () => {
  *               feeling:
  *                 type: string
  *                 description: 이번 여행을 통해 느낀 감정
+ *               feel_color:
+ *                 type: string
+ *                 description: 감정을 나타내는 색상 (1~5)
  *               storage:
  *                 type: integer
- *                 description: 저장 공간 여부
+ *                 description: "저장 공간 여부 (0: 비공개, 1: 공개)"
  *     responses:
  *       201:
  *         description: 일지 작성 성공
@@ -856,14 +859,22 @@ app.listen(port, () => {
  *                     feeling:
  *                       type: string
  *                       description: 감정
+ *                     feel_color:
+ *                       type: string
+ *                       description: 감정을 나타내는 색상 (1~5)
+ *                     views:
+ *                       type: integer
+ *                       description: "조회 수 (기본값: 0)"
  *                     storage:
  *                       type: integer
  *                       description: 공개 여부
  *                     created_at:
  *                       type: string
+ *                       format: date-time
  *                       description: 일지 생성 시간
  *                     updated_at:
  *                       type: string
+ *                       format: date-time
  *                       description: 일지 업데이트 시간
  *                     user_id:
  *                       type: string
@@ -976,7 +987,7 @@ app.listen(port, () => {
  *           type: integer
  *         description: 일지 ID
  *     security:
- *       - BearerAuth: []  # JWT 토큰 인증 추가
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: 일지 조회 성공
@@ -1006,9 +1017,24 @@ app.listen(port, () => {
  *                     feeling:
  *                       type: string
  *                       description: 감정
+ *                     feel_color:
+ *                       type: string
+ *                       description: 감정 색상 코드
  *                     storage:
  *                       type: integer
  *                       description: 공개 여부
+ *                     images:
+ *                       type: array
+ *                       description: 게시글에 포함된 이미지 리스트
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             description: 이미지 ID
+ *                           url:
+ *                             type: string
+ *                             description: 이미지 URL
  *                     created_at:
  *                       type: string
  *                       format: date-time
@@ -1048,7 +1074,7 @@ app.listen(port, () => {
  *           type: integer
  *         description: "수정할 일지의 ID"
  *     security:
- *       - BearerAuth: []  # JWT 토큰 인증 추가
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1071,6 +1097,9 @@ app.listen(port, () => {
  *               feeling:
  *                 type: string
  *                 description: "수정된 감정"
+ *               feel_color:
+ *                 type: string
+ *                 description: "감정 색상 코드"
  *               storage:
  *                 type: integer
  *                 description: "스토리지 여부 (0 또는 1)"
@@ -1093,7 +1122,7 @@ app.listen(port, () => {
  *                   properties:
  *                     post_id:
  *                       type: integer
- *                       example: 31
+ *                       example: 47
  *                     title:
  *                       type: string
  *                       example: "수정된 제목"
@@ -1102,33 +1131,33 @@ app.listen(port, () => {
  *                       example: "수정된 내용입니다."
  *                     music:
  *                       type: string
- *                       example: "새로운 음악 링크"
+ *                       example: ""
  *                     feeling:
  *                       type: string
  *                       example: "행복"
  *                     feel_color:
  *                       type: string
- *                       nullable: true
+ *                       example: "1"
  *                     views:
  *                       type: integer
- *                       example: 8
+ *                       example: 0
  *                     storage:
  *                       type: integer
  *                       example: 0
  *                     created_at:
  *                       type: string
  *                       format: date-time
- *                       example: "2025-01-31T14:53:09.466Z"
+ *                       example: "2025-02-20T05:36:48.986Z"
  *                     updated_at:
  *                       type: string
  *                       format: date-time
- *                       example: "2025-01-31T16:42:51.980Z"
+ *                       example: "2025-02-20T05:42:38.703Z"
  *                     user_id:
  *                       type: string
- *                       example: "1"
+ *                       example: "2"
  *                     star_id:
  *                       type: integer
- *                       example: 19
+ *                       example: 30
  *       400:
  *         description: 파라미터 누락 또는 잘못된 요청
  *       404:
@@ -1359,20 +1388,48 @@ app.listen(port, () => {
  *                     properties:
  *                       post_id:
  *                         type: integer
- *                         example: 16
+ *                         example: 44
  *                       title:
  *                         type: string
- *                         example: "일지"
+ *                         example: "일본 여행"
+ *                       content:
+ *                         type: string
+ *                         example: "조금 아쉬운 여행이였다.\n---"
+ *                       music:
+ *                         type: string
+ *                         example: "HAPPY - DAY6"
  *                       created_at:
  *                         type: string
  *                         format: date-time
- *                         example: "2025-02-01T15:59:10.478Z"
+ *                         example: "2025-02-20T03:47:23.278Z"
  *                       star_id:
  *                         type: integer
- *                         example: 4
+ *                         example: 29
  *                       region:
  *                         type: string
- *                         example: "서울"
+ *                         example: "일본 오사카부 오사카시"
+ *                       images:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: integer
+ *                               example: 95
+ *                             url:
+ *                               type: string
+ *                               format: uri
+ *                               example: "https://travelstar.s3.ap-northeast-2.amazonaws.com/posts/4f844d4eb3ee301ab07347d4c76e1d53.jpg"
+ *                       user_id:
+ *                         type: string
+ *                         example: "yoonsu0214"
+ *                       nickname:
+ *                         type: string
+ *                         example: "윤9"
+ *                       user_image:
+ *                         type: string
+ *                         nullable: true
+ *                         example: null
  *       404:
  *         description: 해당 게시글을 찾을 수 없음
  *       500:
@@ -1423,42 +1480,59 @@ app.listen(port, () => {
  *                   properties:
  *                     post_id:
  *                       type: integer
- *                       example: 16
+ *                       example: 44
  *                     title:
  *                       type: string
- *                       example: "일지"
+ *                       example: "일본 여행"
  *                     content:
  *                       type: string
- *                       example: "서울여행"
+ *                       example: "조금 아쉬운 여행이였다.\n---"
  *                     music:
  *                       type: string
- *                       example: "흠"
+ *                       example: "HAPPY - DAY6"
  *                     feeling:
  *                       type: string
- *                       example: "재밌었당"
+ *                       example: "우울한 날씨로 기분이 좋지 않았다."
  *                     feel_color:
  *                       type: string
  *                       nullable: true
+ *                       example: "2"
  *                     views:
  *                       type: integer
  *                       example: 0
  *                     storage:
  *                       type: integer
- *                       example: 1
+ *                       example: 0
  *                     created_at:
  *                       type: string
  *                       format: date-time
- *                       example: "2025-02-01T15:59:10.478Z"
+ *                       example: "2025-02-20T03:47:23.278Z"
  *                     updated_at:
  *                       type: string
  *                       format: date-time
- *                       example: "2025-02-01T15:59:10.478Z"
+ *                       example: "2025-02-20T03:47:23.278Z"
  *                     user_id:
  *                       type: string
- *                       example: "1"
+ *                       example: "yoonsu0214"
  *                     star_id:
  *                       type: integer
- *                       example: 4
+ *                       example: 29
+ *                     star:
+ *                       type: object
+ *                       properties:
+ *                         region:
+ *                           type: string
+ *                           example: "일본 오사카부 오사카시"
+ *                     post_images:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         u_image:
+ *                           type: string
+ *                           nullable: true
  *       404:
  *         description: 해당 게시글을 찾을 수 없음
  *       500:
@@ -1470,7 +1544,7 @@ app.listen(port, () => {
  * @swagger
  * /prod/posts/{posts_id}/image:
  *   post:
- *     summary: "게시글 이미지 업로드"
+ *     summary: "일지 이미지 업로드"
  *     description: "S3에 이미지를 업로드하고, DB에 저장합니다."
  *     tags:
  *       - "Post"
@@ -1551,6 +1625,17 @@ app.listen(port, () => {
  *         description: "삭제할 게시글 ID"
  *         schema:
  *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               url_id:
+ *                 type: string
+ *                 description: "삭제할 이미지의 ID"
+ *                 example: "99"
  *     responses:
  *       200:
  *         description: "삭제 성공"
@@ -1561,7 +1646,7 @@ app.listen(port, () => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "해당 게시글의 모든 이미지 삭제 완료"
+ *                   example: "해당 이미지 삭제 완료"
  *       404:
  *         description: "이미지가 존재하지 않음"
  *         content:
@@ -1688,6 +1773,59 @@ app.listen(port, () => {
  *                 error:
  *                   type: string
  *                   example: "Error message"
+ */
+
+// 일지 작성 화면 배경화면 삭제 API
+/**
+ * @swagger
+ * /prod/background:
+ *   delete:
+ *     summary: "일지 작성 화면 배경화면 삭제"
+ *     description: "사용자의 배경화면을 S3 및 DB에서 삭제합니다."
+ *     tags:
+ *       - "Post"
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "삭제 성공"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "삭제 성공"
+ *       400:
+ *         description: "등록된 배경화면 없음"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "등록된 배경화면이 없습니다."
+ *       500:
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "서버 내부 오류"
  */
 
 // 행성 이름 초기 설정 API
