@@ -26,7 +26,7 @@ class FriendsRepository{
     // 특정 요청 찾기
     async findFriendRequestById(requestId){
         return await prisma.friend.findUnique({
-            where: { id: parseInt(requestId) }
+            where: { request_id: parseInt(requestId) }
         });
     }
 
