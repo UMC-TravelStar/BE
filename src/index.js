@@ -571,13 +571,21 @@ app.listen(port, () => {
  *                   example: "Internal Server Error"
  */
 
-// 메인 페이지 일지 조회 API
+/**
+ * @swagger
+ * tags:
+ *   - name: mainpage
+ *     description: 메인 페이지 관련 API
+ */
+
+//메인페이지 일지 조회 API
 /**
  * @swagger
  * /prod/home:
  *   get:
+ *     tags: [mainpage]
  *     summary: 메인 페이지의 일지 조회
- *     description: 사용자의 일지를 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
+ *     description: "사용자의 일지를 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요."
  *     parameters:
  *       - in: query
  *         name: page
@@ -602,7 +610,7 @@ app.listen(port, () => {
  *         description: "JWT 토큰"
  *     responses:
  *       200:
- *         description: 포스트 조회 성공
+ *         description: "포스트 조회 성공"
  *         content:
  *           application/json:
  *             schema:
@@ -651,20 +659,22 @@ app.listen(port, () => {
  *                       type: integer
  */
 
-// 메인 페이지 검색 API
+//메인페이지 검색 API
 /**
  * @swagger
  * /prod/home/search:
  *   get:
+ *     tags: [mainpage]
  *     summary: 메인 페이지에서 검색
- *     description: 특정 키워드를 사용하여 포스트를 검색합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
+ *     description: "사용자가 입력한 검색어로 포스트를 검색합니다."
  *     parameters:
  *       - in: query
  *         name: term
  *         required: true
  *         schema:
  *           type: string
- *         description: 검색어
+ *           example: "여행"
+ *         description: "검색어"
  *       - in: query
  *         name: page
  *         required: false
@@ -679,16 +689,9 @@ app.listen(port, () => {
  *           type: integer
  *           example: 10
  *         description: "한 페이지에 표시할 포스트 수 (기본값: 10)"
- *       - in: header
- *         name: Authorization
- *         required: true
- *         schema:
- *           type: string
- *           example: "Bearer your_jwt_token_here"
- *         description: "JWT 토큰"
  *     responses:
  *       200:
- *         description: 검색 결과
+ *         description: "검색 결과 성공"
  *         content:
  *           application/json:
  *             schema:
@@ -696,7 +699,7 @@ app.listen(port, () => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "검색 결과"
+ *                   example: "여행 검색 결과"
  *                 data:
  *                   type: array
  *                   items:
@@ -708,11 +711,11 @@ app.listen(port, () => {
  *                         type: string
  *                       title:
  *                         type: string
- *                       updated_at:
+ *                       content:
+ *                         type: string
+ *                       created_at:
  *                         type: string
  *                         format: date-time
- *                       region:
- *                         type: string
  *                       images:
  *                         type: array
  *                         items:
@@ -727,29 +730,37 @@ app.listen(port, () => {
  *                       isFriend:
  *                         type: boolean
  *       400:
- *         description: 검색어가 필요합니다.
+ *         description: "잘못된 요청 - 검색어 미입력"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "검색어가 필요합니다."
  *       500:
- *         description: 서버 내부 오류
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 
-// 검색 순위 조회 API
+//메인페이지 검색 순위 조회
 /**
  * @swagger
  * /prod/home/search/rankings:
  *   get:
+ *     tags: [mainpage]
  *     summary: 검색 순위 조회
- *     description: 사용자의 검색 순위를 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
- *     parameters:
- *       - in: header
- *         name: Authorization
- *         required: true
- *         schema:
- *           type: string
- *           example: "Bearer your_jwt_token_here"
- *         description: "JWT 토큰"
+ *     description: "최근 검색된 순위를 조회합니다."
  *     responses:
  *       200:
- *         description: 검색 순위 조회 성공
+ *         description: "검색 순위 조회 성공"
  *         content:
  *           application/json:
  *             schema:
@@ -768,8 +779,17 @@ app.listen(port, () => {
  *                       number:
  *                         type: integer
  *       500:
- *         description: 서버 내부 오류
+ *         description: "서버 오류"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
+
+
 
 // 일지 작성 API
 /**
@@ -2364,276 +2384,22 @@ app.listen(port, () => {
  *                   example: "서버 오류가 발생했습니다."
  */
 
-// 하루 일정 작성 API
+
 /**
  * @swagger
- * /prod/day-schedules:
+ * tags:
+ *   - name: schedule
+ *     description: 일정 관련 API
+ */
+
+//일정 추가 API
+/**
+ * @swagger
+ * /prod/schedule:
  *   post:
- *     summary: 하루 일정 추가
- *     description: 사용자의 하루 일정을 추가합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               date:
- *                 type: string
- *                 format: date
- *                 description: "일정 날짜"
- *               title:
- *                 type: string
- *                 description: "일정 제목"
- *               content:
- *                 type: string
- *                 description: "일정 내용"
- *     parameters:
- *       - in: header
- *         name: Authorization
- *         required: true
- *         schema:
- *           type: string
- *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
- *         description: "JWT 토큰"
- *     responses:
- *       201:
- *         description: 일정 추가 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "일정 추가 성공"
- *                 data:
- *                   type: object
- *                   properties:
- *                     day_id:
- *                       type: integer
- *                     date:
- *                       type: string
- *                       format: date
- *                     title:
- *                       type: string
- *                     content:
- *                       type: string
- *       400:
- *         description: 날짜가 필요합니다.
- *       500:
- *         description: 서버 내부 오류
- *     x-code-samples:
- *       - lang: curl
- *         source: |
- *           curl -X POST http://localhost:4000/prod/day-schedules \
- *           -H "Content-Type: application/json" \
- *           -H "Authorization: Bearer YOUR_JWT_TOKEN" \
- *           -d '{
- *               "date": "2025-01-30T10:00:00Z",
- *               "title": "회의",
- *               "content": "팀 미팅"
- *           }'
- *     curl:
- *       - |
- *         curl -X POST http://localhost:4000/prod/day-schedules \
- *         -H "Content-Type: application/json" \
- *         -H "Authorization: Bearer YOUR_JWT_TOKEN" \
- *         -d '{
- *             "date": "2025-01-30T10:00:00Z",
- *             "title": "회의",
- *             "content": "팀 미팅"
- *         }'
- */
-
-// 하루 일정 조회 API
-/**
- * @swagger
- * /prod/day-schedules:
- *   get:
- *     summary: 하루 일정 조회
- *     description: 사용자의 모든 하루 일정을 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
- *     parameters:
- *       - in: header
- *         name: Authorization
- *         required: true
- *         schema:
- *           type: string
- *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
- *         description: "JWT 토큰"
- *     responses:
- *       200:
- *         description: 일정 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   day_id:
- *                     type: integer
- *                   date:
- *                     type: string
- *                     format: date
- *                   title:
- *                     type: string
- *                   content:
- *                     type: string
- *       500:
- *         description: 서버 내부 오류
- */
-
-// 날짜별 하루 일정 조회 API
-/**
- * @swagger
- * /prod/day-schedules/{date}:
- *   get:
- *     summary: 날짜별 하루 일정 조회
- *     description: 특정 날짜의 하루 일정을 조회합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
- *     parameters:
- *       - in: path
- *         name: date
- *         required: true
- *         schema:
- *           type: string
- *           format: date
- *         description: "조회할 날짜"
- *       - in: header
- *         name: Authorization
- *         required: true
- *         schema:
- *           type: string
- *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
- *         description: "JWT 토큰"
- *     responses:
- *       200:
- *         description: 일정 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   day_id:
- *                     type: integer
- *                   date:
- *                     type: string
- *                     format: date
- *                   title:
- *                     type: string
- *                   content:
- *                     type: string
- *       500:
- *         description: 서버 내부 오류
- */
-
-// 하루 일정 수정 API
-/**
- * @swagger
- * /prod/day-schedules/{day_id}:
- *   patch:
- *     summary: 하루 일정 수정
- *     description: 특정 하루 일정을 수정합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
- *     parameters:
- *       - in: path
- *         name: day_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: "수정할 하루 일정 ID"
- *       - in: header
- *         name: Authorization
- *         required: true
- *         schema:
- *           type: string
- *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
- *         description: "JWT 토큰"
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 description: "일정 제목"
- *               content:
- *                 type: string
- *                 description: "일정 내용"
- *     responses:
- *       200:
- *         description: 일정 수정 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "일정 수정 성공"
- *       404:
- *         description: 해당 일정이 존재하지 않습니다.
- *       500:
- *         description: 서버 내부 오류
- */
-
-// 하루 일정 삭제 API
-/**
- * @swagger
- * /prod/day-schedules/{day_id}:
- *   delete:
- *     summary: 하루 일정 삭제
- *     description: 특정 하루 일정을 삭제합니다. JWT 토큰을 Authorization 헤더에 입력하세요.
- *     parameters:
- *       - in: path
- *         name: day_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: "삭제할 하루 일정 ID"
- *       - in: header
- *         name: Authorization
- *         required: true
- *         schema:
- *           type: string
- *           example: "Bearer YOUR_JWT_TOKEN"  # 여기에 JWT 토큰을 입력합니다.
- *         description: "JWT 토큰"
- *     responses:
- *       200:
- *         description: 일정 삭제 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "일정 삭제 성공"
- *       404:
- *         description: 해당 일정이 존재하지 않습니다.
- *       500:
- *         description: 서버 내부 오류
- */
-
-// 일정 추가 API
-/**
- * @swagger
- * /prod/day-schedules/{day_id}/schedules:
- *   post:
+ *     tags: [schedule]
  *     summary: 일정 추가
- *     description: 특정 하루 일정에 일정을 추가합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
- *     parameters:
- *       - in: path
- *         name: day_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: "추가할 일정을 포함할 하루 일정 ID"
+ *     description: 사용자가 새로운 일정을 추가합니다.
  *     requestBody:
  *       required: true
  *       content:
@@ -2643,11 +2409,11 @@ app.listen(port, () => {
  *             properties:
  *               location:
  *                 type: string
- *                 description: "일정 위치"
+ *                 description: 일정의 위치
  *               date_time:
  *                 type: string
  *                 format: date-time
- *                 description: "일정 날짜 및 시간"
+ *                 description: 일정의 날짜 및 시간 (ISO 8601 형식)
  *     responses:
  *       201:
  *         description: 일정 추가 성공
@@ -2656,41 +2422,35 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
+ *                 schedule_id:
+ *                   type: integer
+ *                   description: 일정 ID
+ *                 location:
+ *                   type: string
+ *                 date_time:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: 잘못된 요청
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
  *                 message:
  *                   type: string
- *                   example: "일정 추가 성공"
- *                 data:
- *                   type: object
- *                   properties:
- *                     schedule_id:
- *                       type: integer
- *                     location:
- *                       type: string
- *                     date_time:
- *                       type: string
- *                       format: date-time
- *       400:
- *         description: 위치와 날짜/시간이 필요합니다.
- *       500:
- *         description: 서버 내부 오류
+ *       401:
+ *         description: 인증이 필요함
  */
 
-// 일정 조회 API
+//전체 일정 조회 API
 /**
  * @swagger
- * /prod/day-schedules/{day_id}/schedules:
+ * /prod/schedule:
  *   get:
- *     summary: 일정 조회
- *     description: 특정 하루 일정에 포함된 일정을 조회합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
- *     parameters:
- *       - in: path
- *         name: day_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: "조회할 하루 일정 ID"
+ *     tags: [schedule]
+ *     summary: 전체 일정 조회
+ *     description: 사용자의 모든 일정을 조회합니다.
  *     responses:
  *       200:
  *         description: 일정 조회 성공
@@ -2708,33 +2468,25 @@ app.listen(port, () => {
  *                   date_time:
  *                     type: string
  *                     format: date-time
- *       500:
- *         description: 서버 내부 오류
+ *       401:
+ *         description: 인증이 필요함
  */
 
-// 날짜별 일정 조회 API
+//날짜별 일정 조회 API
 /**
  * @swagger
- * /prod/day-schedules/{day_id}/schedules/{date}:
+ * /prod/schedule/{date}:
  *   get:
+ *     tags: [schedule]
  *     summary: 날짜별 일정 조회
  *     description: 특정 날짜의 일정을 조회합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: day_id
+ *       - name: date
+ *         in: path
  *         required: true
- *         schema:
- *           type: integer
- *         description: "조회할 하루 일정 ID"
- *       - in: path
- *         name: date
- *         required: true
+ *         description: 조회할 날짜 (ISO 8601 형식)
  *         schema:
  *           type: string
- *           format: date
- *         description: "조회할 날짜"
  *     responses:
  *       200:
  *         description: 일정 조회 성공
@@ -2752,32 +2504,90 @@ app.listen(port, () => {
  *                   date_time:
  *                     type: string
  *                     format: date-time
- *       500:
- *         description: 서버 내부 오류
+ *       400:
+ *         description: 유효하지 않은 날짜 형식
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: 인증이 필요함
  */
 
-// 일정 수정 API
+//특정 일정 조회 API
 /**
  * @swagger
- * /prod/day-schedules/{day_id}/schedules/{schedule_id}:
+ * /prod/schedule/{date}/{schedule_id}:
+ *   get:
+ *     tags: [schedule]
+ *     summary: 특정 일정 조회
+ *     description: 특정 일정의 세부 정보를 조회합니다.
+ *     parameters:
+ *       - name: date
+ *         in: path
+ *         required: true
+ *         description: 일정이 있는 날짜 (ISO 8601 형식)
+ *         schema:
+ *           type: string
+ *       - name: schedule_id
+ *         in: path
+ *         required: true
+ *         description: 조회할 일정 ID
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 일정 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 schedule_id:
+ *                   type: integer
+ *                 location:
+ *                   type: string
+ *                 date_time:
+ *                   type: string
+ *                   format: date-time
+ *       404:
+ *         description: 일정을 찾을 수 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: 인증이 필요함
+ */
+
+
+//일정 수정 API
+/**
+ * @swagger
+ * /prod/schedule/{date}/{schedule_id}:
  *   patch:
+ *     tags: [schedule]
  *     summary: 일정 수정
  *     description: 특정 일정을 수정합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
  *     parameters:
- *       - in: path
- *         name: day_id
+ *       - name: date
+ *         in: path
  *         required: true
+ *         description: 일정이 있는 날짜 (ISO 8601 형식)
+ *         schema:
+ *           type: string
+ *       - name: schedule_id
+ *         in: path
+ *         required: true
+ *         description: 수정할 일정 ID
  *         schema:
  *           type: integer
- *         description: "수정할 일정이 포함된 하루 일정 ID"
- *       - in: path
- *         name: schedule_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: "수정할 일정 ID"
  *     requestBody:
  *       required: true
  *       content:
@@ -2787,11 +2597,9 @@ app.listen(port, () => {
  *             properties:
  *               location:
  *                 type: string
- *                 description: "일정 위치"
  *               date_time:
  *                 type: string
  *                 format: date-time
- *                 description: "일정 날짜 및 시간"
  *     responses:
  *       200:
  *         description: 일정 수정 성공
@@ -2800,40 +2608,15 @@ app.listen(port, () => {
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 schedule_id:
+ *                   type: integer
+ *                 location:
  *                   type: string
- *                   example: "일정 수정 성공"
+ *                 date_time:
+ *                   type: string
+ *                   format: date-time
  *       404:
- *         description: 해당 일정이 존재하지 않습니다.
- *       500:
- *         description: 서버 내부 오류
- */
-
-// 일정 삭제 API
-/**
- * @swagger
- * /prod/day-schedules/{day_id}/schedules/{schedule_id}:
- *   delete:
- *     summary: 일정 삭제
- *     description: 특정 일정을 삭제합니다.
- *     security:
- *       - bearerAuth: []  # JWT 토큰 인증
- *     parameters:
- *       - in: path
- *         name: day_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: "삭제할 일정이 포함된 하루 일정 ID"
- *       - in: path
- *         name: schedule_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: "삭제할 일정 ID"
- *     responses:
- *       200:
- *         description: 일정 삭제 성공
+ *         description: 일정을 찾을 수 없음
  *         content:
  *           application/json:
  *             schema:
@@ -2841,12 +2624,49 @@ app.listen(port, () => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "일정 삭제 성공"
- *       404:
- *         description: 해당 일정이 존재하지 않습니다.
- *       500:
- *         description: 서버 내부 오류
+ *       401:
+ *         description: 인증이 필요함
  */
+
+//일정 삭제 API
+/**
+ * @swagger
+ * /prod/schedule/{date}/{schedule_id}:
+ *   delete:
+ *     tags: [schedule]
+ *     summary: 일정 삭제
+ *     description: 특정 일정을 삭제합니다.
+ *     parameters:
+ *       - name: date
+ *         in: path
+ *         required: true
+ *         description: 일정이 있는 날짜 (ISO 8601 형식)
+ *         schema:
+ *           type: string
+ *       - name: schedule_id
+ *         in: path
+ *         required: true
+ *         description: 삭제할 일정 ID
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 일정 삭제 성공
+ *       404:
+ *         description: 일정을 찾을 수 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: 인증이 필요함
+ */
+
+
+
 
 // 마이페이지 - 유저 정보 조회
 /**
