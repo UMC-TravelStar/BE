@@ -5,7 +5,7 @@ class PlanetRepository{
     // planetId로 행성 찾기
     async findPlanetByUserId(planetId){
         return await prisma.planet.findUnique({
-            where: {planet_id: planetId}
+            where: {planet_id: parseInt(planetId)}
         })
     }
 
