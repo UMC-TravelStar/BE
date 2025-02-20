@@ -59,7 +59,7 @@ const handleUpdatePlanet = async (req, res) => {
 const handleGetOtherPlanet = async (req, res) => {
     try{
         // console.log('다른 유저의 행성 조회');
-        const userId = req.params.userId;
+        const userId = req.params.planetId;
         const result = await PlanetService.getPlanet(userId);
         res.status(200).json({
             resultType: 'success',
