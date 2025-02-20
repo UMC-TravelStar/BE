@@ -50,6 +50,7 @@ model post {
   star        star         @relation(fields: [star_id], references: [star_id])
   user        user         @relation(fields: [user_id], references: [user_id])
   post_images post_image[]
+  size        Int?
 
   @@index([star_id], map: "post_star_id_fkey")
   @@index([user_id], map: "post_user_id_fkey")

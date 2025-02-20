@@ -23,6 +23,7 @@ class PostResponseDTO {
         this.title = post.title;
         this.content = post.content;
         this.music = post.music;
+        this.feel_color = post.feel_color;
         this.created_at = post.created_at;
         this.star_id = post.star?.star_id;
         this.region = post.star?.region;
@@ -37,7 +38,14 @@ class PostResponseDTO {
     }
 }
 
-const getRandomSize = () => Math.floor(Math.random() * 3) + 1;
+class StoragePostResponseDTO {
+    constructor(post) {
+        this.post_id = post.post_id;
+        this.title = post.title;
+        this.created_at = post.created_at;
+        this.updated_at = post.updated_at;
+    }
+}
 
 const formatPostResponse = (post) => {
     if (!post) {
@@ -55,7 +63,7 @@ const formatPostResponse = (post) => {
             region: post.star.region // star 테이블의 region 값 추가
         },
         images: post.post_images.map(image => image.imageUrl),
-        size: getRandomSize()
+        size: post.size
     };
 };
 
@@ -74,7 +82,7 @@ class EditPostDto {
 module.exports = {
     formatPostResponse,
     UserPostResponseDTO,
+    StoragePostResponseDTO,
     EditPostDto,
     PostResponseDTO,
-    getRandomSize,
 };

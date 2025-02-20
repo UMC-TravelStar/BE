@@ -4,6 +4,9 @@ const prisma = new PrismaClient();
 // 일지 조회
 const getUserPosts = async (skip, limit) => {
   return await prisma.post.findMany({
+    where: {
+      storage: { not: 2 } 
+    },
     include: {
       star: {
         select: { region: true }
@@ -24,6 +27,7 @@ const getUserPosts = async (skip, limit) => {
     take: limit
   });
 };
+
 
 // 일지 개수 카운트
 const countUserPosts = async () => {

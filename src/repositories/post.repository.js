@@ -37,10 +37,15 @@ const createStar = async (region, starsId) => {
     }
 };
 
+const getRandomSize = () => Math.floor(Math.random() * 3) + 1;
+
 const savePost = async (userId, starId, postData) => {
     if (!starId) {
         throw new Error('Star ID is required');
     }
+
+    const num = getRandomSize()
+
     return await prisma.post.create({
         data: {
             title: postData.title,
@@ -49,6 +54,7 @@ const savePost = async (userId, starId, postData) => {
             feel_color: postData.feel_color,
             feeling: postData.feeling,
             storage: parseInt(postData.storage),
+            size: num,
             user: {
                 connect: { user_id: userId },  // user와 연결 (user_id를 통해)
             },
@@ -76,7 +82,8 @@ const getAllUserPosts = async (skip, userId) => {
                 select: {
                     imageUrl: true,
                 }
-            }
+            },
+            size: true
         },
         where: {
             user_id: userId,
@@ -369,8 +376,8 @@ const registerPostImages = async (posts_id, fileUrls) => {
     });
 };
 
-const findPostImages = async (posts_id) => {
-    return prisma.post_image.findMany({
+const findPostImages = async (posts_id, url_id) => {
+    return prisma.post_image.findFirst({
         where: {
             post_id: parseInt(posts_id),
         },
