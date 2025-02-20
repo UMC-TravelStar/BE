@@ -1,4 +1,5 @@
 const FriendsService = require('../services/friends.service');
+const FriendsRepository = require('../repositories/friends.repository');
 
 // 친구 요청
 const handleSendFriendRequest = async (req, res) => {
@@ -114,8 +115,17 @@ const handleGetFriendsList = async (req, res) => {
 // 친구 삭제
 const handleDeleteFriend = async (req, res) => {
   try{
-    console.log('친구 삭제');
-    console.log("params: ",req.params);
+    // console.log('친구 삭제');
+    // console.log("params: ",req.params);
+
+    const {requestId} = req.params;
+    const friendRequest = await FriendsRepository.findFriendRequestById(requestId);
+    if(!friendRequest) {
+      return res.status(404).json({
+        resultType: 'error',
+        message: '해당 친구 요청을 찾을 수 없습니다.'
+      })
+    }
 
     const userId = req.userId;
     const {friendId} = req.params;

@@ -21,7 +21,8 @@ const getFilteredStarRegionsService = async (starsId) => {
   return stars.map((star) => ({
     id: star.star_id,
     region: star.region,
-    feel_color: star.posts?.length > 0 ? star.posts[0].feel_color : null, }))
+    feel_color: star.posts?.length > 0 ? star.posts[0].feel_color : null,
+  }));
 };
 
 const setStarsNameService = async (userId, name) => {
@@ -54,7 +55,7 @@ const getStarsRankingService = async () => {
 
   try {
     // 600초 만료 설정 추가
-    await redisClient.set(cacheKey, JSON.stringify(rankings), { EX: 600 });
+    await redisClient.set(cacheKey, JSON.stringify(rankings), { EX: 300 });
     console.log("Redis 캐시에 저장 완료!");
   } catch (error) {
     console.error("Redis 캐싱 실패:", error);
