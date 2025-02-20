@@ -369,8 +369,8 @@ const registerPostImages = async (posts_id, fileUrls) => {
     });
 };
 
-const findPostImages = async (posts_id) => {
-    return prisma.post_image.findMany({
+const findPostImages = async (posts_id, url_id) => {
+    return prisma.post_image.findFirst({
         where: {
             post_id: parseInt(posts_id),
         },
