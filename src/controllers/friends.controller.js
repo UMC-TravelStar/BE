@@ -93,6 +93,7 @@ const handleGetFriendsList = async (req, res) => {
   try{
     const userId = req.userId;
     const result = await FriendsService.getFriendsList(userId);  
+    console.log('friends list result: ', result);
 
     if(result.length === 0){
       return res.status(200).json({
@@ -127,9 +128,8 @@ const handleDeleteFriend = async (req, res) => {
       })
     }
 
-    const userId = req.userId;
-    const {friendId} = req.params;
-    const result = await FriendsService.deleteFriend(userId, friendId);
+    const {from_user_id, to_user_id} = friendRequest;
+    const result = await FriendsService.deleteFriend(from_user_id, to_user_id);
     res.status(200).json({
       resultType: 'success',
       message: '친구 삭제 완료',
