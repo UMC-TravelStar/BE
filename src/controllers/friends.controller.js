@@ -105,7 +105,7 @@ const handleGetFriendsList = async (req, res) => {
 
     res.status(200).json({
       resultType: 'success',
-      message: '서로 친구인 목록 조회 완료',
+      message: '서로 친구 상태인 목록 조회 완료',
       data: result
     });
   } catch(error) {
@@ -116,7 +116,7 @@ const handleGetFriendsList = async (req, res) => {
 // 친구 삭제
 const handleDeleteFriend = async (req, res) => {
   try{
-    // console.log('친구 삭제');
+    console.log('친구 삭제');
     // console.log("params: ",req.params);
 
     const {requestId} = req.params;
