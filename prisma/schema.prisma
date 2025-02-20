@@ -37,7 +37,7 @@ model user {
 model post {
   post_id     Int          @id @default(autoincrement())
   title       String?
-  content     String?
+  content     String?      @db.Text
   music       String?
   feeling     String?
   feel_color  String?
