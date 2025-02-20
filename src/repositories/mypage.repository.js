@@ -35,17 +35,17 @@ class MyPageRepository {
     };
 
     // 보관 글 목록 조회
-    async findStoragedPost(userId){
+    async findStoragedPost(userId) {
         return await prisma.post.findMany({
-            where: {user_id: userId, storage: 2},
+            where: { user_id: userId, storage: 2 },
             select: {
                 post_id: true,
                 title: true,
                 created_at: true,
                 updated_at: true,
             }
-        })
-    };
+        });
+    }
 
     // 보관 글 상태 수정(보관->전체공개)
     async updateStoragePost(postId){

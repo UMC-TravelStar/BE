@@ -1,10 +1,11 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-// 일지 조회 (storage가 2인 포스트 제외)
+
+// 일지 조회
 const getUserPosts = async (skip, limit) => {
   return await prisma.post.findMany({
     where: {
-      storage: { not: 2 } // storage가 2가 아닌 포스트만 조회
+      storage: { not: 2 } 
     },
     include: {
       star: {

@@ -36,18 +36,21 @@ const updateMyPage = async (req, res) => {
 
 // 보관 글 목록 조회
 const getStoragedPost = async (req, res) => {
-    try{
+    try {
         const userId = req.userId;
         const posts = await MyPageService.findStoragedPost(userId);
+        
         res.status(200).json({
             resultType: 'success',
             message: '보관 글 목록 조회 성공',
             data: posts
         });
-    } catch(error) {
-        res.status(500).json({message: error.message});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
+
+
 
 // 보관 글 상태 수정(보관->전체공개)
 const updateStoragePost = async (req, res) => {
