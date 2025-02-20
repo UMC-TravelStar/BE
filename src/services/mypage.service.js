@@ -1,6 +1,7 @@
 const { request } = require('express');
 const MyPageRepository = require('../repositories/mypage.repository');
 const { deleteImage } = require("../middlewares/deleteImage.js");
+const { StoragePostResponseDTO } = require('../dtos/post.dto');
 
 class MyPageService {
     // 유저 정보 조회
@@ -24,14 +25,14 @@ class MyPageService {
     };
 
     // 보관 글 목록 조회
-    async findStoragedPost(userId){
+    async findStoragedPost(userId) {
         const posts = await MyPageRepository.findStoragedPost(userId);
-        if(!posts || posts.length === 0){
-            throw new Error('보관 글 목록 조회에 실패했습니다.');
+        if (!posts || posts.length === 0) {
+            throw new Error('보관 글 목록이 없습니다.');
         }
 
-        return posts;
-    };
+        return posts.map(post => new StoragePostResponseDTO(post));
+    }
 
     // 보관 글 상태 수정(보관->전체공개)
     async updateStoragePost(postId){

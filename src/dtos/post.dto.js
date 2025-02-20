@@ -37,6 +37,16 @@ class PostResponseDTO {
     }
 }
 
+class StoragePostResponseDTO {
+    constructor(post) {
+        this.post_id = post.post_id;
+        this.title = post.title;
+        this.created_at = post.created_at;
+        this.updated_at = post.updated_at;
+    }
+}
+
+
 const getRandomSize = () => Math.floor(Math.random() * 3) + 1;
 
 const formatPostResponse = (post) => {
@@ -74,6 +84,7 @@ class EditPostDto {
 module.exports = {
     formatPostResponse,
     UserPostResponseDTO,
+    StoragePostResponseDTO,
     EditPostDto,
     PostResponseDTO,
     getRandomSize,
