@@ -37,6 +37,8 @@ class PostResponseDTO {
     }
 }
 
+const getRandomSize = () => Math.floor(Math.random() * 3) + 1;
+
 const formatPostResponse = (post) => {
     if (!post) {
         console.error('Received undefined or null post:', post); // post가 undefined나 null일 때 로그 출력
@@ -52,7 +54,8 @@ const formatPostResponse = (post) => {
             id: post.star.star_id,  // star_id 추가
             region: post.star.region // star 테이블의 region 값 추가
         },
-        images: post.post_images.map(image => image.imageUrl)
+        images: post.post_images.map(image => image.imageUrl),
+        size: getRandomSize()
     };
 };
 
@@ -73,4 +76,5 @@ module.exports = {
     UserPostResponseDTO,
     EditPostDto,
     PostResponseDTO,
+    getRandomSize,
 };

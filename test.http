@@ -160,8 +160,8 @@ GET http://15.165.117.176:4000/home
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
 
 ### 홈 검색
-GET http://15.165.117.176:4000/home/search?term=파리&page=1&limit=10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzM5OTY5ODY0LCJleHAiOjE3NDAwMDU4NjR9.Xib1o_vlUNrgcCMc5cEWuQSi7szlhCrz6U-21OHN2iU
+GET http://15.165.117.176:4000/home/search?term=제주도&page=1&limit=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyIiwiaWF0IjoxNzQwMDIyODcyLCJleHAiOjE3NDAwNTg4NzJ9.uOqMo_gp5Qotsb3BaddD7KrTVvF9BZMA1OkMbLIav24
 
 ### 홈 검색 랭킹 조회
 GET http://15.165.117.176:4000/home/search/rankings

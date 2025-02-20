@@ -64,7 +64,7 @@ class FriendsRepository{
     // 내게 온 친구 요청 조회(아직 수락하지 않은 요청)
     async findReceivedFriendRequests(userId){
         return await prisma.friend.findMany({
-            where: {to_user_id: userId, are_we_friend: false},
+            where: {to_user_id: userId, are_we_friend: true},
             select:{
                 request_id: true,
                 from_user_id: true, 
