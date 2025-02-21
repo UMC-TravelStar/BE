@@ -164,7 +164,7 @@ const deleteUserPost = async (userId, postsId) => {
 
         const postImages = await findPostImages(postsId);
 
-        if (postImages.length != 0) {
+        if ((postImages?.length || 0) != 0) {
             const imageUrls = postImages.map(img => img.imageUrl);
             await deleteImage("posts", imageUrls);
         
@@ -178,7 +178,7 @@ const deleteUserPost = async (userId, postsId) => {
         console.log(`Post (ID: ${postsId}) deleted successfully.`);
 
         const relatedPosts = await getRelatedPostsByStarId(starId);
-        if (relatedPosts.length === 0) {
+        if (!relatedPosts) {
             await deleteStar(starId);
             console.log("Star deleted successfully");
         }

@@ -321,11 +321,11 @@ const getPostById2 = async (userId, postsId) => {
 };
 
 const getRelatedPostsByStarId = async (starId) => {
-    return await prisma.post.findMany({
+    return await prisma.post.findFirst({
         where: { 
             star_id: parseInt(starId)
         },
-    });
+    }) || {};
 };
 
 const deletePost = async (userId, postsId) => {
