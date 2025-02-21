@@ -130,6 +130,29 @@ class FriendsRepository{
         })
     }
 
+    async checkRequest(requestId, toId) {
+        return await prisma.friend.findFirst({
+            where: {
+                request_id: parseInt(requestId),
+                to_user_id: toId
+            }
+        })
+    }
+
+    async deleteRequest(requestId, toId, fromId) {
+        await prisma.friend.delete({
+            where: {
+                request_id: parseInt(requestId),
+            }
+        })
+
+        return await prisma.friend.deleteMany({
+            where: {
+                from_user_id: toId,
+                to_user_id: fromId
+            }
+        })
+    }
 }
 
 module.exports = new FriendsRepository();

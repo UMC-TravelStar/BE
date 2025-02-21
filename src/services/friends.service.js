@@ -128,6 +128,21 @@ class FriendsService{
             message: '친구 관계가 해제되었습니다.'
         }
     }
+
+    async deleteRequest(requestId, toId) {
+        const check = await FriendsRepository.checkRequest(requestId, toId);
+
+        if (!check) {
+            console.log("Request not found.");
+            return null;
+        }
+
+        await FriendsRepository.deleteRequest(requestId, toId, check.from_user_id);
+
+        return {
+            message: "친구 요청이 거절되었습니다."
+        }
+    }
 }
 
 module.exports = new FriendsService();

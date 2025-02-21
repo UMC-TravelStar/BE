@@ -52,6 +52,7 @@ const {
   handleGetReceivedFriendRequests,
   handleGetFriendsList,
   handleDeleteFriend,
+  deleteFriendRequest,
 } = require("./controllers/friends.controller.js");
 const {
   handleListMainPost,
@@ -83,6 +84,7 @@ const {
   deleteUserImage,
   getUserImage,
 } = require("./controllers/mypage.controller.js");
+const { deleteFriend } = require("./repositories/friends.repository.js");
 
 const options = {
   swaggerDefinition: {
@@ -190,6 +192,7 @@ app.get("/friends/list/sent", handleGetSentFriendRequests); // 내가 친구 요
 app.get("/friends/list/received", handleGetReceivedFriendRequests); // 나에게 친구 요청한 목록 조회
 app.get("/friends/list", handleGetFriendsList); // 서로 친구인 목록 조회
 app.delete("/friends/request/:requestId", handleDeleteFriend); // 친구 삭제
+app.delete("/friends/request/delete/:requestId", deleteFriendRequest); // 친구 요청 삭제
 
 app.get("/stars/:stars_id/regions", getFilteredStarRegions); // 특정 조건의 별들의 위치(region) 조회
 app.patch("/stars/name", upload.single("image"), setStarsNameWithImage); // 별자리 이름 설정 및 업데이트

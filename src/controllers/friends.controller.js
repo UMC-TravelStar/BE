@@ -144,11 +144,28 @@ const handleDeleteFriend = async (req, res) => {
   }
 };
 
+// 친구 요청 삭제
+const deleteFriendRequest = async (req, res) => {
+  try {
+    const toId = req.userId;
+    const requestId = req.params.requestId;
+
+    const result = await FriendsService.deleteRequest(requestId, toId);
+
+    res.status(200).json({ success: true, message: result.message });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: '서버 내부 오류' });
+  }
+};
+
 module.exports = {
   handleSendFriendRequest,
   handleAcceptFriendRequest,
   handleGetSentFriendRequests,
   handleGetReceivedFriendRequests,
   handleGetFriendsList,
-  handleDeleteFriend
+  handleDeleteFriend,
+  deleteFriendRequest
 }
