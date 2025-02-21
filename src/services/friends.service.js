@@ -78,19 +78,32 @@ class FriendsService{
         })
         const fullyAcceptedFriends = (await Promise.all(fullyAcceptedPromises)).filter(Boolean);
 
-        return fullyAcceptedFriends.map((friend) => {
-            // 현재 유저가 from_user_id인 경우 => 친구 정보는 friend.to_user
-            // 현재 유저가 to_user_id인 경우 => 친구 정보는 friend.from_user
-            const isIAmFrom = friend.from_user_id === userId;
-            const friendInfo = isIAmFrom ? friend.to_user : friend.from_user;
+        // return fullyAcceptedFriends.map((friend) => {
+        //     // 현재 유저가 from_user_id인 경우 => 친구 정보는 friend.to_user
+        //     // 현재 유저가 to_user_id인 경우 => 친구 정보는 friend.from_user
+        //     const isIAmFrom = friend.from_user_id === userId;
+        //     const friendInfo = isIAmFrom ? friend.to_user : friend.from_user;
 
-            return {
-                requestId: friend.request_id,
-                friendNickname: friendInfo.nickname,
-                friendImage: friendInfo.u_image,
-                requestedAt: friend.created_at
-            }
-        });
+        //     return {
+        //         requestId: friend.request_id,
+        //         friendNickname: friendInfo.nickname,
+        //         friendImage: friendInfo.u_image,
+        //         requestedAt: friend.created_at
+        //     }
+        // });
+        return fullyAcceptedFriends
+    .filter((friend) => friend.request_id % 2 !== 0) // 홀수인 경우만 필터링
+    .map((friend) => {
+        const isIAmFrom = friend.from_user_id === userId;
+        const friendInfo = isIAmFrom ? friend.to_user : friend.from_user;
+
+        return {
+            requestId: friend.request_id,
+            friendNickname: friendInfo.nickname,
+            friendImage: friendInfo.u_image,
+            requestedAt: friend.created_at
+        };
+    });
     }
 
     //친구 삭제
